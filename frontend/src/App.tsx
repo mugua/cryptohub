@@ -1,12 +1,19 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ConfigProvider, theme } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
+import enUS from 'antd/locale/en_US';
+import { useTranslation } from 'react-i18next';
 import MainLayout from './layouts/MainLayout';
 import Dashboard from './pages/Dashboard';
 import MarketAnalysis from './pages/MarketAnalysis';
 import QuantTrading from './pages/QuantTrading';
 import PersonalCenter from './pages/PersonalCenter';
 import Settings from './pages/Settings';
+
+const antdLocales: Record<string, typeof zhCN> = {
+  zh_CN: zhCN,
+  en_US: enUS,
+};
 
 const darkTheme = {
   algorithm: theme.darkAlgorithm,
@@ -21,8 +28,10 @@ const darkTheme = {
 };
 
 function App() {
+  const { i18n } = useTranslation();
+
   return (
-    <ConfigProvider locale={zhCN} theme={darkTheme}>
+    <ConfigProvider locale={antdLocales[i18n.language] || zhCN} theme={darkTheme}>
       <BrowserRouter>
         <MainLayout>
           <Routes>

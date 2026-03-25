@@ -9,6 +9,7 @@ import {
   ApiOutlined, UserOutlined,
   WalletOutlined, HistoryOutlined,
 } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import { fetchExchangeAccounts, fetchOrders } from '../../services/api';
 import type { ExchangeAccount, Order, ExchangeName } from '../../types';
 import './PersonalCenter.css';
@@ -32,6 +33,7 @@ const PersonalCenter: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [addOpen, setAddOpen] = useState(false);
   const [form] = Form.useForm();
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     Promise.all([fetchExchangeAccounts(), fetchOrders()]).then(([a, o]) => {
@@ -54,34 +56,36 @@ const PersonalCenter: React.FC = () => {
     setAccounts((prev) => [...prev, newAcc]);
     setAddOpen(false);
     form.resetFields();
-    message.success('交易所账户添加成功，正在连接验证...');
+    message.success(t('profile.accountAdded'));
     // Simulate connection
     setTimeout(() => {
       setAccounts((prev) =>
         prev.map((a) => (a.id === newAcc.id ? { ...a, isConnected: true, lastSyncAt: new Date().toISOString() } : a)),
       );
-      message.success('账户连接成功！');
+      message.success(t('profile.accountConnected'));
     }, 2000);
   };
 
   const handleSync = (id: string) => {
-    message.loading({ content: '同步中...', key: id });
+    message.loading({ content: t('profile.syncing'), key: id });
     setTimeout(() => {
       setAccounts((prev) =>
         prev.map((a) => (a.id === id ? { ...a, lastSyncAt: new Date().toISOString() } : a)),
       );
-      message.success({ content: '同步完成', key: id });
+      message.success({ content: t('profile.syncComplete'), key: id });
     }, 1500);
   };
 
   const handleRemove = (id: string) => {
     setAccounts((prev) => prev.filter((a) => a.id !== id));
-    message.success('账户已移除');
+    message.success(t('profile.accountRemoved'));
   };
+
+  const locale = i18n.language === 'en_US' ? 'en-US' : 'zh-CN';
 
   const accountColumns = [
     {
-      title: '交易所',
+      title: t('profile.exchange'),
       key: 'exchange',
       render: (row: ExchangeAccount) => (
         <Space>
@@ -94,54 +98,54 @@ const PersonalCenter: React.FC = () => {
       ),
     },
     {
-      title: 'API Key',
+      title: t('profile.apiKey'),
       dataIndex: 'apiKey',
       key: 'apiKey',
       render: (v: string) => <Text style={{ color: '#888', fontFamily: 'monospace', fontSize: 12 }}>{v}</Text>,
     },
     {
-      title: '状态',
+      title: t('profile.status'),
       dataIndex: 'isConnected',
       key: 'isConnected',
       render: (v: boolean) => (
         v
-          ? <Badge status="success" text={<Text style={{ color: '#52c41a', fontSize: 12 }}>已连接</Text>} />
-          : <Badge status="error" text={<Text style={{ color: '#f5222d', fontSize: 12 }}>未连接</Text>} />
+          ? <Badge status="success" text={<Text style={{ color: '#52c41a', fontSize: 12 }}>{t('profile.connected')}</Text>} />
+          : <Badge status="error" text={<Text style={{ color: '#f5222d', fontSize: 12 }}>{t('profile.disconnected')}</Text>} />
       ),
     },
     {
-      title: '权限',
+      title: t('profile.permissions'),
       dataIndex: 'permissions',
       key: 'permissions',
       render: (perms: string[]) => (
         <Space>
           {perms.map((p) => (
             <Tag key={p} color={p === 'withdraw' ? 'error' : p === 'trade' ? 'success' : 'blue'} style={{ fontSize: 11 }}>
-              {p === 'read' ? '只读' : p === 'trade' ? '交易' : '提现'}
+              {p === 'read' ? t('profile.readOnly') : p === 'trade' ? t('profile.trade') : t('profile.withdraw')}
             </Tag>
           ))}
         </Space>
       ),
     },
     {
-      title: '最后同步',
+      title: t('profile.lastSync'),
       dataIndex: 'lastSyncAt',
       key: 'lastSyncAt',
       render: (v?: string) => (
         <Text style={{ color: '#888', fontSize: 12 }}>
-          {v ? new Date(v).toLocaleString('zh-CN') : '从未'}
+          {v ? new Date(v).toLocaleString(locale) : t('common.never')}
         </Text>
       ),
     },
     {
-      title: '操作',
+      title: t('profile.actions'),
       key: 'actions',
       render: (_: unknown, row: ExchangeAccount) => (
         <Space>
-          <Tooltip title="同步账户">
+          <Tooltip title={t('profile.syncAccount')}>
             <Button type="text" size="small" icon={<SyncOutlined style={{ color: '#1677ff' }} />} onClick={() => handleSync(row.id)} />
           </Tooltip>
-          <Popconfirm title="确认删除此账户？" onConfirm={() => handleRemove(row.id)} okText="删除" cancelText="取消">
+          <Popconfirm title={t('profile.confirmDeleteAccount')} onConfirm={() => handleRemove(row.id)} okText={t('common.delete')} cancelText={t('common.cancel')}>
             <Button type="text" size="small" icon={<DeleteOutlined style={{ color: '#f5222d' }} />} />
           </Popconfirm>
         </Space>
@@ -151,58 +155,58 @@ const PersonalCenter: React.FC = () => {
 
   const orderColumns = [
     {
-      title: '时间',
+      title: t('profile.time'),
       dataIndex: 'createdAt',
       key: 'createdAt',
-      render: (v: string) => <Text style={{ color: '#888', fontSize: 11 }}>{new Date(v).toLocaleString('zh-CN')}</Text>,
+      render: (v: string) => <Text style={{ color: '#888', fontSize: 11 }}>{new Date(v).toLocaleString(locale)}</Text>,
     },
     {
-      title: '交易所',
+      title: t('profile.exchange'),
       dataIndex: 'exchange',
       key: 'exchange',
       render: (v: string) => <Text style={{ color: '#ccc', fontSize: 12 }}>{v.toUpperCase()}</Text>,
     },
     {
-      title: '交易对',
+      title: t('profile.tradingPair'),
       dataIndex: 'symbol',
       key: 'symbol',
       render: (v: string) => <Text strong style={{ color: '#fff', fontSize: 12 }}>{v}</Text>,
     },
     {
-      title: '方向',
+      title: t('profile.direction'),
       dataIndex: 'side',
       key: 'side',
-      render: (v: string) => <Tag color={v === 'buy' ? 'success' : 'error'} style={{ fontSize: 11 }}>{v === 'buy' ? '买入' : '卖出'}</Tag>,
+      render: (v: string) => <Tag color={v === 'buy' ? 'success' : 'error'} style={{ fontSize: 11 }}>{v === 'buy' ? t('profile.buy') : t('profile.sell')}</Tag>,
     },
     {
-      title: '类型',
+      title: t('profile.orderType'),
       dataIndex: 'type',
       key: 'type',
-      render: (v: string) => <Tag color="blue" style={{ fontSize: 11 }}>{v === 'market' ? '市价' : v === 'limit' ? '限价' : v}</Tag>,
+      render: (v: string) => <Tag color="blue" style={{ fontSize: 11 }}>{v === 'market' ? t('profile.market') : v === 'limit' ? t('profile.limit') : v}</Tag>,
     },
     {
-      title: '价格',
+      title: t('profile.price'),
       dataIndex: 'price',
       key: 'price',
-      render: (v?: number) => <Text style={{ color: '#ccc', fontSize: 12 }}>{v ? `$${v.toLocaleString('en-US', { maximumFractionDigits: 2 })}` : '市价'}</Text>,
+      render: (v?: number) => <Text style={{ color: '#ccc', fontSize: 12 }}>{v ? `$${v.toLocaleString('en-US', { maximumFractionDigits: 2 })}` : t('profile.marketPrice')}</Text>,
     },
     {
-      title: '数量',
+      title: t('profile.quantity'),
       dataIndex: 'quantity',
       key: 'quantity',
       render: (v: number) => <Text style={{ color: '#ccc', fontSize: 12 }}>{v.toFixed(4)}</Text>,
     },
     {
-      title: '状态',
+      title: t('profile.status'),
       dataIndex: 'status',
       key: 'status',
       render: (v: string) => {
         const map: Record<string, [string, string]> = {
-          filled: ['success', '已成交'],
-          open: ['processing', '待成交'],
-          partially_filled: ['warning', '部分成交'],
-          cancelled: ['default', '已取消'],
-          rejected: ['error', '已拒绝'],
+          filled: ['success', t('profile.filled')],
+          open: ['processing', t('profile.open')],
+          partially_filled: ['warning', t('profile.partiallyFilled')],
+          cancelled: ['default', t('profile.cancelled')],
+          rejected: ['error', t('profile.rejected')],
         };
         const [color, label] = map[v] ?? ['default', v];
         return <Badge status={color as any} text={<Text style={{ fontSize: 11, color: '#ccc' }}>{label}</Text>} />;
@@ -218,8 +222,8 @@ const PersonalCenter: React.FC = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <Avatar size={56} style={{ backgroundColor: '#1677ff' }} icon={<UserOutlined />} />
           <div>
-            <Title level={4} style={{ color: '#fff', margin: 0 }}>个人中心</Title>
-            <Text style={{ color: '#888', fontSize: 12 }}>管理交易所账户与交易记录</Text>
+            <Title level={4} style={{ color: '#fff', margin: 0 }}>{t('profile.title')}</Title>
+            <Text style={{ color: '#888', fontSize: 12 }}>{t('profile.subtitle')}</Text>
           </div>
         </div>
       </div>
@@ -229,7 +233,7 @@ const PersonalCenter: React.FC = () => {
         <Col xs={12} sm={6}>
           <Card className="stat-card" size="small">
             <Statistic
-              title={<span style={{ color: '#888', fontSize: 12 }}>已连接交易所</span>}
+              title={<span style={{ color: '#888', fontSize: 12 }}>{t('profile.connectedExchanges')}</span>}
               value={connectedCount}
               suffix={`/ ${accounts.length}`}
               valueStyle={{ color: '#52c41a', fontSize: 22 }}
@@ -240,7 +244,7 @@ const PersonalCenter: React.FC = () => {
         <Col xs={12} sm={6}>
           <Card className="stat-card" size="small">
             <Statistic
-              title={<span style={{ color: '#888', fontSize: 12 }}>历史订单</span>}
+              title={<span style={{ color: '#888', fontSize: 12 }}>{t('profile.historicalOrders')}</span>}
               value={orders.length}
               valueStyle={{ color: '#1677ff', fontSize: 22 }}
               prefix={<HistoryOutlined />}
@@ -250,7 +254,7 @@ const PersonalCenter: React.FC = () => {
         <Col xs={12} sm={6}>
           <Card className="stat-card" size="small">
             <Statistic
-              title={<span style={{ color: '#888', fontSize: 12 }}>已成交订单</span>}
+              title={<span style={{ color: '#888', fontSize: 12 }}>{t('profile.filledOrders')}</span>}
               value={orders.filter((o) => o.status === 'filled').length}
               valueStyle={{ color: '#52c41a', fontSize: 22 }}
               prefix={<CheckCircleOutlined />}
@@ -260,7 +264,7 @@ const PersonalCenter: React.FC = () => {
         <Col xs={12} sm={6}>
           <Card className="stat-card" size="small">
             <Statistic
-              title={<span style={{ color: '#888', fontSize: 12 }}>待成交订单</span>}
+              title={<span style={{ color: '#888', fontSize: 12 }}>{t('profile.pendingOrders')}</span>}
               value={orders.filter((o) => o.status === 'open').length}
               valueStyle={{ color: '#faad14', fontSize: 22 }}
               prefix={<WalletOutlined />}
@@ -274,12 +278,12 @@ const PersonalCenter: React.FC = () => {
         items={[
           {
             key: 'accounts',
-            label: <span><ApiOutlined />交易所账户</span>,
+            label: <span><ApiOutlined />{t('profile.exchangeAccounts')}</span>,
             children: (
               <Card className="pc-card">
                 <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
                   <Button type="primary" icon={<PlusOutlined />} onClick={() => setAddOpen(true)}>
-                    添加交易所
+                    {t('profile.addExchange')}
                   </Button>
                 </div>
                 <Table
@@ -297,7 +301,7 @@ const PersonalCenter: React.FC = () => {
           },
           {
             key: 'orders',
-            label: <span><HistoryOutlined />订单历史</span>,
+            label: <span><HistoryOutlined />{t('profile.orderHistory')}</span>,
             children: (
               <Card className="pc-card">
                 <Table
@@ -318,17 +322,17 @@ const PersonalCenter: React.FC = () => {
 
       {/* Add Exchange Modal */}
       <Modal
-        title={<span style={{ color: '#fff' }}><ApiOutlined /> 添加交易所账户</span>}
+        title={<span style={{ color: '#fff' }}><ApiOutlined /> {t('profile.addExchangeAccount')}</span>}
         open={addOpen}
         onCancel={() => setAddOpen(false)}
         onOk={() => form.submit()}
-        okText="添加并验证"
-        cancelText="取消"
+        okText={t('profile.addAndVerify')}
+        cancelText={t('common.cancel')}
         styles={{ body: { background: '#161b22' }, header: { background: '#161b22', borderBottom: '1px solid #1f2937' }, footer: { background: '#161b22', borderTop: '1px solid #1f2937' } }}
       >
         <Form form={form} layout="vertical" onFinish={handleAddAccount} style={{ marginTop: 16 }}>
-          <Form.Item name="exchange" label={<span style={{ color: '#ccc' }}>交易所</span>} rules={[{ required: true }]}>
-            <Select placeholder="选择交易所">
+          <Form.Item name="exchange" label={<span style={{ color: '#ccc' }}>{t('profile.exchange')}</span>} rules={[{ required: true }]}>
+            <Select placeholder={t('profile.selectExchange')}>
               {(['binance', 'okx', 'bybit', 'gate', 'coinbase', 'kraken', 'huobi'] as ExchangeName[]).map((e) => (
                 <Option key={e} value={e}>
                   {EXCHANGE_LOGOS[e]} {e.toUpperCase()}
@@ -336,22 +340,22 @@ const PersonalCenter: React.FC = () => {
               ))}
             </Select>
           </Form.Item>
-          <Form.Item name="label" label={<span style={{ color: '#ccc' }}>账户标签</span>} rules={[{ required: true, message: '请输入账户标签' }]}>
-            <Input placeholder="如：主账户" />
+          <Form.Item name="label" label={<span style={{ color: '#ccc' }}>{t('profile.accountLabel')}</span>} rules={[{ required: true, message: t('profile.accountLabelRequired') }]}>
+            <Input placeholder={t('profile.accountLabelPlaceholder')} />
           </Form.Item>
-          <Form.Item name="apiKey" label={<span style={{ color: '#ccc' }}>API Key</span>} rules={[{ required: true, message: '请输入 API Key' }]}>
-            <Input placeholder="输入您的 API Key" />
+          <Form.Item name="apiKey" label={<span style={{ color: '#ccc' }}>{t('profile.apiKey')}</span>} rules={[{ required: true, message: t('profile.apiKeyRequired') }]}>
+            <Input placeholder={t('profile.apiKeyPlaceholder')} />
           </Form.Item>
-          <Form.Item name="secretKey" label={<span style={{ color: '#ccc' }}>Secret Key</span>} rules={[{ required: true, message: '请输入 Secret Key' }]}>
-            <Input.Password placeholder="输入您的 Secret Key" />
+          <Form.Item name="secretKey" label={<span style={{ color: '#ccc' }}>{t('profile.secretKey')}</span>} rules={[{ required: true, message: t('profile.secretKeyRequired') }]}>
+            <Input.Password placeholder={t('profile.secretKeyPlaceholder')} />
           </Form.Item>
-          <Form.Item name="passphrase" label={<span style={{ color: '#ccc' }}>Passphrase (可选)</span>}>
-            <Input.Password placeholder="OKX 等平台需要填写" />
+          <Form.Item name="passphrase" label={<span style={{ color: '#ccc' }}>{t('profile.passphrase')}</span>}>
+            <Input.Password placeholder={t('profile.passphrasePlaceholder')} />
           </Form.Item>
         </Form>
         <div style={{ background: '#0d1117', border: '1px solid #374151', borderRadius: 6, padding: '10px 14px', marginTop: 8 }}>
           <Text style={{ color: '#888', fontSize: 12 }}>
-            🔒 API Key 将使用 AES-256 加密存储，平台仅请求交易和读取权限，不会申请提现权限。
+            {t('profile.securityNotice')}
           </Text>
         </div>
       </Modal>

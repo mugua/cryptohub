@@ -10,6 +10,7 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, PieChart, Pie, Cell,
 } from 'recharts';
+import { useTranslation } from 'react-i18next';
 import { fetchPortfolio, fetchTickers, fetchCandles } from '../../services/api';
 import type { PortfolioSnapshot, Ticker, Candle } from '../../types';
 import './Dashboard.css';
@@ -23,6 +24,7 @@ const Dashboard: React.FC = () => {
   const [tickers, setTickers] = useState<Ticker[]>([]);
   const [btcCandles, setBtcCandles] = useState<Candle[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     Promise.all([
@@ -40,15 +42,17 @@ const Dashboard: React.FC = () => {
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 400 }}>
-        <Spin size="large" tip="加载数据中..." />
+        <Spin size="large" tip={t('common.loading')} />
       </div>
     );
   }
 
+  const locale = i18n.language === 'en_US' ? 'en-US' : 'zh-CN';
+
   const equityData = btcCandles.map((c, i) => ({
     time: i,
     price: c.close,
-    label: new Date(c.time).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }),
+    label: new Date(c.time).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' }),
   }));
 
   const pieData = portfolio?.assets.map((a) => ({
@@ -58,19 +62,19 @@ const Dashboard: React.FC = () => {
 
   const tickerColumns = [
     {
-      title: '交易对',
+      title: t('dashboard.tradingPair'),
       dataIndex: 'symbol',
       key: 'symbol',
       render: (s: string) => <Text strong style={{ color: '#fff' }}>{s}</Text>,
     },
     {
-      title: '最新价',
+      title: t('dashboard.latestPrice'),
       dataIndex: 'price',
       key: 'price',
       render: (p: number) => <Text style={{ color: '#fff' }}>${p.toLocaleString('en-US', { maximumFractionDigits: 4 })}</Text>,
     },
     {
-      title: '24h涨跌',
+      title: t('dashboard.change24h'),
       dataIndex: 'changePct24h',
       key: 'changePct24h',
       render: (v: number) => (
@@ -80,7 +84,7 @@ const Dashboard: React.FC = () => {
       ),
     },
     {
-      title: '24h成交量',
+      title: t('dashboard.volume24h'),
       dataIndex: 'volume24h',
       key: 'volume24h',
       render: (v: number) => <Text style={{ color: '#888' }}>${(v / 1e6).toFixed(1)}M</Text>,
@@ -88,18 +92,18 @@ const Dashboard: React.FC = () => {
   ];
 
   const positionColumns = [
-    { title: '合约', dataIndex: 'symbol', key: 'symbol', render: (s: string) => <Text strong style={{ color: '#fff' }}>{s}</Text> },
+    { title: t('dashboard.contract'), dataIndex: 'symbol', key: 'symbol', render: (s: string) => <Text strong style={{ color: '#fff' }}>{s}</Text> },
     {
-      title: '方向',
+      title: t('dashboard.direction'),
       dataIndex: 'side',
       key: 'side',
-      render: (s: string) => <Tag color={s === 'long' ? 'success' : 'error'}>{s === 'long' ? '做多' : '做空'}</Tag>,
+      render: (s: string) => <Tag color={s === 'long' ? 'success' : 'error'}>{s === 'long' ? t('dashboard.long') : t('dashboard.short')}</Tag>,
     },
-    { title: '数量', dataIndex: 'size', key: 'size', render: (v: number) => <Text style={{ color: '#fff' }}>{v}</Text> },
-    { title: '开仓价', dataIndex: 'entryPrice', key: 'entryPrice', render: (v: number) => <Text style={{ color: '#888' }}>${v.toLocaleString()}</Text> },
-    { title: '标记价', dataIndex: 'markPrice', key: 'markPrice', render: (v: number) => <Text style={{ color: '#fff' }}>${v.toLocaleString()}</Text> },
+    { title: t('dashboard.quantity'), dataIndex: 'size', key: 'size', render: (v: number) => <Text style={{ color: '#fff' }}>{v}</Text> },
+    { title: t('dashboard.entryPrice'), dataIndex: 'entryPrice', key: 'entryPrice', render: (v: number) => <Text style={{ color: '#888' }}>${v.toLocaleString()}</Text> },
+    { title: t('dashboard.markPrice'), dataIndex: 'markPrice', key: 'markPrice', render: (v: number) => <Text style={{ color: '#fff' }}>${v.toLocaleString()}</Text> },
     {
-      title: '未实现盈亏',
+      title: t('dashboard.unrealizedPnl'),
       dataIndex: 'unrealizedPnl',
       key: 'unrealizedPnl',
       render: (v: number) => (
@@ -108,13 +112,13 @@ const Dashboard: React.FC = () => {
         </Text>
       ),
     },
-    { title: '杠杆', dataIndex: 'leverage', key: 'leverage', render: (v: number) => <Tag color="blue">{v}x</Tag> },
+    { title: t('dashboard.leverage'), dataIndex: 'leverage', key: 'leverage', render: (v: number) => <Tag color="blue">{v}x</Tag> },
   ];
 
   return (
     <div className="dashboard">
       <Title level={4} style={{ color: '#fff', marginBottom: 16 }}>
-        <DollarOutlined /> 资产总览
+        <DollarOutlined /> {t('dashboard.title')}
       </Title>
 
       {/* KPI Cards */}
@@ -122,7 +126,7 @@ const Dashboard: React.FC = () => {
         <Col xs={24} sm={12} lg={6}>
           <Card className="stat-card">
             <Statistic
-              title={<span style={{ color: '#888' }}>总资产 (USDT)</span>}
+              title={<span style={{ color: '#888' }}>{t('dashboard.totalAssets')}</span>}
               value={portfolio?.totalUsdValue}
               precision={2}
               prefix="$"
@@ -134,7 +138,7 @@ const Dashboard: React.FC = () => {
         <Col xs={24} sm={12} lg={6}>
           <Card className="stat-card">
             <Statistic
-              title={<span style={{ color: '#888' }}>今日盈亏</span>}
+              title={<span style={{ color: '#888' }}>{t('dashboard.dailyPnl')}</span>}
               value={portfolio?.dailyPnl}
               precision={2}
               prefix={portfolio && portfolio.dailyPnl >= 0 ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
@@ -142,33 +146,33 @@ const Dashboard: React.FC = () => {
               valueStyle={{ color: portfolio && portfolio.dailyPnl >= 0 ? '#52c41a' : '#f5222d', fontSize: 24 }}
             />
             <Text style={{ color: portfolio && portfolio.dailyPnl >= 0 ? '#52c41a' : '#f5222d', fontSize: 12 }}>
-              {portfolio?.dailyPnlPct.toFixed(2)}% 较昨日
+              {portfolio?.dailyPnlPct.toFixed(2)}% {t('dashboard.comparedYesterday')}
             </Text>
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
           <Card className="stat-card">
             <Statistic
-              title={<span style={{ color: '#888' }}>运行策略</span>}
+              title={<span style={{ color: '#888' }}>{t('dashboard.runningStrategies')}</span>}
               value={3}
               prefix={<ThunderboltOutlined style={{ color: '#faad14' }} />}
-              suffix="个"
+              suffix={t('dashboard.strategySuffix')}
               valueStyle={{ color: '#fff', fontSize: 24 }}
             />
-            <Text style={{ color: '#888', fontSize: 12 }}>共 6 个策略</Text>
+            <Text style={{ color: '#888', fontSize: 12 }}>{t('dashboard.totalStrategies', { count: 6 })}</Text>
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
           <Card className="stat-card">
             <Statistic
-              title={<span style={{ color: '#888' }}>持仓盈亏</span>}
+              title={<span style={{ color: '#888' }}>{t('dashboard.positionPnl')}</span>}
               value={1590}
               precision={2}
               prefix={<RiseOutlined style={{ color: '#52c41a' }} />}
               suffix="$"
               valueStyle={{ color: '#52c41a', fontSize: 24 }}
             />
-            <Text style={{ color: '#52c41a', fontSize: 12 }}>+2.1% 未实现</Text>
+            <Text style={{ color: '#52c41a', fontSize: 12 }}>+2.1% {t('dashboard.unrealized')}</Text>
           </Card>
         </Col>
       </Row>
@@ -178,7 +182,7 @@ const Dashboard: React.FC = () => {
         <Col xs={24} lg={16}>
           <Card
             className="chart-card"
-            title={<span style={{ color: '#fff' }}>BTC/USDT 价格走势 (48H)</span>}
+            title={<span style={{ color: '#fff' }}>{t('dashboard.btcPriceTrend')}</span>}
           >
             <ResponsiveContainer width="100%" height={240}>
               <AreaChart data={equityData}>
@@ -197,7 +201,7 @@ const Dashboard: React.FC = () => {
                 />
                 <Tooltip
                   contentStyle={{ background: '#1f2937', border: '1px solid #374151', color: '#fff' }}
-                  formatter={(v) => [`$${Number(v).toLocaleString()}`, 'BTC价格']}
+                  formatter={(v) => [`$${Number(v).toLocaleString()}`, t('dashboard.btcPrice')]}
                 />
                 <Area type="monotone" dataKey="price" stroke="#1677ff" fill="url(#btcGradient)" strokeWidth={2} />
               </AreaChart>
@@ -207,7 +211,7 @@ const Dashboard: React.FC = () => {
         <Col xs={24} lg={8}>
           <Card
             className="chart-card"
-            title={<span style={{ color: '#fff' }}>资产分布</span>}
+            title={<span style={{ color: '#fff' }}>{t('dashboard.assetDistribution')}</span>}
           >
             <ResponsiveContainer width="100%" height={200}>
               <PieChart>
@@ -218,7 +222,7 @@ const Dashboard: React.FC = () => {
                 </Pie>
                 <Tooltip
                   contentStyle={{ background: '#1f2937', border: '1px solid #374151', color: '#fff' }}
-                  formatter={(v) => [`$${Number(v).toLocaleString()}`, '估值']}
+                  formatter={(v) => [`$${Number(v).toLocaleString()}`, t('dashboard.valuation')]}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -229,7 +233,7 @@ const Dashboard: React.FC = () => {
       {/* Market Table */}
       <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
         <Col xs={24} lg={14}>
-          <Card className="chart-card" title={<span style={{ color: '#fff' }}>市场行情</span>}>
+          <Card className="chart-card" title={<span style={{ color: '#fff' }}>{t('dashboard.marketInfo')}</span>}>
             <Table
               dataSource={tickers}
               columns={tickerColumns}
@@ -241,7 +245,7 @@ const Dashboard: React.FC = () => {
           </Card>
         </Col>
         <Col xs={24} lg={10}>
-          <Card className="chart-card" title={<span style={{ color: '#fff' }}>当前持仓</span>}>
+          <Card className="chart-card" title={<span style={{ color: '#fff' }}>{t('dashboard.currentPositions')}</span>}>
             <Table
               dataSource={portfolio?.positions}
               columns={positionColumns}
