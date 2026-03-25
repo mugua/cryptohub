@@ -1,0 +1,85 @@
+.market-analysis {
+  padding: 4px;
+}
+
+.analysis-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.analysis-card {
+  background: #161b22 !important;
+  border: 1px solid #1f2937 !important;
+  border-radius: 8px !important;
+}
+
+.analysis-card .ant-card-head {
+  border-bottom: 1px solid #1f2937 !important;
+  background: transparent !important;
+  min-height: 44px !important;
+  padding: 0 16px !important;
+}
+
+.analysis-card .ant-card-body {
+  padding: 16px !important;
+}
+
+.analysis-card .ant-tabs-nav {
+  background: transparent !important;
+}
+
+.analysis-card .ant-tabs-tab {
+  color: #888 !important;
+  font-size: 13px !important;
+}
+
+.analysis-card .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #1677ff !important;
+}
+
+.analysis-card .ant-tabs-ink-bar {
+  background: #1677ff !important;
+}
+
+.score-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.inner-card {
+  background: #0d1117 !important;
+  border: 1px solid #1f2937 !important;
+  border-radius: 6px !important;
+}
+
+.inner-card .ant-card-head {
+  border-bottom: 1px solid #1f2937 !important;
+  background: transparent !important;
+  min-height: 36px !important;
+}
+
+.dark-table .ant-table {
+  background: transparent !important;
+  color: #ccc;
+}
+
+.dark-table .ant-table-thead > tr > th {
+  background: #0d1117 !important;
+  color: #888 !important;
+  border-bottom: 1px solid #1f2937 !important;
+  font-size: 12px;
+}
+
+.dark-table .ant-table-tbody > tr > td {
+  border-bottom: 1px solid #1a1f2e !important;
+  background: transparent !important;
+}
+
+.dark-table .ant-table-tbody > tr:hover > td {
+  background: #1f2937 !important;
+}

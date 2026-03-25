@@ -1,0 +1,74 @@
+{
+  "easycom": {
+    "autoscan": true,
+    "custom": {
+      "^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue"
+    }
+  },
+  "pages": [
+    {
+      "path": "pages/dashboard/dashboard",
+      "style": { "navigationBarTitleText": "仪表盘" }
+    },
+    {
+      "path": "pages/market/market",
+      "style": { "navigationBarTitleText": "市场分析" }
+    },
+    {
+      "path": "pages/trading/trading",
+      "style": { "navigationBarTitleText": "量化交易" }
+    },
+    {
+      "path": "pages/profile/profile",
+      "style": { "navigationBarTitleText": "个人中心" }
+    },
+    {
+      "path": "pages/settings/settings",
+      "style": { "navigationBarTitleText": "系统设置" }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "CryptoHub",
+    "navigationBarBackgroundColor": "#161B22",
+    "backgroundColor": "#0D1117"
+  },
+  "tabBar": {
+    "color": "#888888",
+    "selectedColor": "#1677FF",
+    "backgroundColor": "#161B22",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/dashboard/dashboard",
+        "text": "仪表盘",
+        "iconPath": "static/images/tab_home.png",
+        "selectedIconPath": "static/images/tab_home_active.png"
+      },
+      {
+        "pagePath": "pages/market/market",
+        "text": "市场",
+        "iconPath": "static/images/tab_market.png",
+        "selectedIconPath": "static/images/tab_market_active.png"
+      },
+      {
+        "pagePath": "pages/trading/trading",
+        "text": "量化",
+        "iconPath": "static/images/tab_trade.png",
+        "selectedIconPath": "static/images/tab_trade_active.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的",
+        "iconPath": "static/images/tab_user.png",
+        "selectedIconPath": "static/images/tab_user_active.png"
+      },
+      {
+        "pagePath": "pages/settings/settings",
+        "text": "设置",
+        "iconPath": "static/images/tab_settings.png",
+        "selectedIconPath": "static/images/tab_settings_active.png"
+      }
+    ]
+  }
+}

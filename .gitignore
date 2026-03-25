@@ -1,0 +1,56 @@
+# ── Node / Frontend ───────────────────────────────────────────────────────────
+node_modules/
+dist/
+.next/
+.nuxt/
+.vite/
+*.local
+
+# ── Go Backend ────────────────────────────────────────────────────────────────
+backend/go-core/server
+backend/go-core/*.exe
+backend/go-core/tmp/
+
+# ── Python Backend ────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
+.env
+.env.*
+!.env.example
+
+# ── Flutter App ───────────────────────────────────────────────────────────────
+app/.dart_tool/
+app/.packages
+app/.pub-cache/
+app/.pub/
+app/build/
+app/*.g.dart
+app/*.freezed.dart
+
+# ── IDEs ──────────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# ── Docker ────────────────────────────────────────────────────────────────────
+.docker/
+
+# ── Logs & temp ───────────────────────────────────────────────────────────────
+*.log
+*.pid
+*.seed
+coverage/
+.coverage
+.pytest_cache/
+.mypy_cache/
+htmlcov/

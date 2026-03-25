@@ -1,0 +1,51 @@
+.dashboard {
+  padding: 4px;
+}
+
+.stat-card {
+  background: #161b22 !important;
+  border: 1px solid #1f2937 !important;
+  border-radius: 8px !important;
+}
+
+.stat-card .ant-card-body {
+  padding: 16px !important;
+}
+
+.chart-card {
+  background: #161b22 !important;
+  border: 1px solid #1f2937 !important;
+  border-radius: 8px !important;
+}
+
+.chart-card .ant-card-head {
+  border-bottom: 1px solid #1f2937 !important;
+  background: transparent !important;
+  min-height: 44px !important;
+  padding: 0 16px !important;
+}
+
+.chart-card .ant-card-body {
+  padding: 12px !important;
+}
+
+.dark-table .ant-table {
+  background: transparent !important;
+  color: #ccc;
+}
+
+.dark-table .ant-table-thead > tr > th {
+  background: #0d1117 !important;
+  color: #888 !important;
+  border-bottom: 1px solid #1f2937 !important;
+  font-size: 12px;
+}
+
+.dark-table .ant-table-tbody > tr > td {
+  border-bottom: 1px solid #1a1f2e !important;
+  background: transparent !important;
+}
+
+.dark-table .ant-table-tbody > tr:hover > td {
+  background: #1f2937 !important;
+}

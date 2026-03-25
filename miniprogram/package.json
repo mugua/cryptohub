@@ -1,0 +1,23 @@
+{
+  "name": "cryptohub-miniprogram",
+  "description": "CryptoHub 小程序 (微信 / 抖音) – 加密货币量化交易平台",
+  "version": "1.0.0",
+  "scripts": {
+    "dev:mp-weixin": "uni-app dev --platform mp-weixin",
+    "dev:mp-toutiao": "uni-app dev --platform mp-toutiao",
+    "build:mp-weixin": "uni-app build --platform mp-weixin",
+    "build:mp-toutiao": "uni-app build --platform mp-toutiao"
+  },
+  "dependencies": {
+    "@dcloudio/uni-app": "^3.0.0",
+    "@dcloudio/uni-ui": "^1.4.27",
+    "pinia": "^2.2.2",
+    "vue": "^3.4.0"
+  },
+  "devDependencies": {
+    "@dcloudio/uni-cli-shared": "^3.0.0",
+    "@dcloudio/vite-plugin-uni": "^3.0.0",
+    "typescript": "^5.6.2",
+    "vite": "^5.4.8"
+  }
+}
