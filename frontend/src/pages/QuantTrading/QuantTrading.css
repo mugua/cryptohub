@@ -1,0 +1,67 @@
+.quant-trading {
+  padding: 4px;
+}
+
+.trading-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.stat-card {
+  background: #161b22 !important;
+  border: 1px solid #1f2937 !important;
+  border-radius: 8px !important;
+}
+
+.trading-card {
+  background: #161b22 !important;
+  border: 1px solid #1f2937 !important;
+  border-radius: 8px !important;
+}
+
+.trading-card .ant-card-head {
+  border-bottom: 1px solid #1f2937 !important;
+  background: transparent !important;
+}
+
+.trading-card .ant-card-body {
+  padding: 12px !important;
+}
+
+.strategy-lib-card {
+  background: #0d1117 !important;
+  border: 1px solid #1f2937 !important;
+  border-radius: 6px !important;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.strategy-lib-card:hover {
+  border-color: #1677ff !important;
+}
+
+.dark-table .ant-table {
+  background: transparent !important;
+}
+
+.dark-table .ant-table-thead > tr > th {
+  background: #0d1117 !important;
+  color: #888 !important;
+  border-bottom: 1px solid #1f2937 !important;
+  font-size: 12px;
+}
+
+.dark-table .ant-table-tbody > tr > td {
+  border-bottom: 1px solid #1a1f2e !important;
+  background: transparent !important;
+}
+
+.dark-table .ant-table-tbody > tr:hover > td {
+  background: #1f2937 !important;
+}
+
+.dark-table .ant-pagination-item a {
+  color: #888;
+}

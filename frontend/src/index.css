@@ -1,0 +1,141 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #0d1117;
+  color: #c9d1d9;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0d1117;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #374151;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4b5563;
+}
+
+/* Ant Design overrides */
+.ant-layout {
+  background: #0d1117 !important;
+}
+
+.ant-menu-dark {
+  background: #0d1117 !important;
+}
+
+.ant-menu-dark .ant-menu-item-selected {
+  background: #1f2937 !important;
+}
+
+.ant-statistic-title {
+  font-size: 12px;
+}
+
+.ant-tag {
+  border-radius: 4px;
+}
+
+.ant-modal-content {
+  background: #161b22 !important;
+  border: 1px solid #1f2937 !important;
+}
+
+.ant-modal-title {
+  color: #fff !important;
+}
+
+.ant-form-item-label > label {
+  color: #ccc !important;
+}
+
+.ant-input, .ant-input-password, .ant-select-selector {
+  background: #0d1117 !important;
+  border-color: #374151 !important;
+  color: #fff !important;
+}
+
+.ant-input::placeholder, .ant-select-selection-placeholder {
+  color: #555 !important;
+}
+
+.ant-input-number {
+  background: #0d1117 !important;
+  border-color: #374151 !important;
+}
+
+.ant-input-number-input {
+  color: #fff !important;
+}
+
+.ant-drawer-content {
+  background: #0d1117 !important;
+}
+
+.ant-select-dropdown {
+  background: #161b22 !important;
+  border: 1px solid #1f2937 !important;
+}
+
+.ant-select-item {
+  color: #ccc !important;
+}
+
+.ant-select-item-option-selected {
+  background: #1f2937 !important;
+}
+
+.ant-select-item-option-active {
+  background: #1f2937 !important;
+}
+
+.ant-tabs-nav {
+  background: transparent !important;
+}
+
+.ant-tabs-tab {
+  color: #888 !important;
+}
+
+.ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #1677ff !important;
+}
+
+.ant-tabs-ink-bar {
+  background: #1677ff !important;
+}
+
+.ant-tabs-content-holder {
+  background: transparent !important;
+}
+
+.ant-slider-track {
+  background: #1677ff !important;
+}
+
+.ant-slider-handle::after {
+  box-shadow: 0 0 0 2px #1677ff !important;
+}
+
+.ant-popover-inner {
+  background: #161b22 !important;
+  border: 1px solid #1f2937 !important;
+}
+
+.ant-popover-message-title {
+  color: #ccc !important;
+}

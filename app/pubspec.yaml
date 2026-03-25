@@ -1,0 +1,48 @@
+name: cryptohub
+description: CryptoHub – Cryptocurrency Quantitative Trading App
+version: 1.0.0+1
+publish_to: 'none'
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+  flutter: '>=3.19.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # Navigation
+  go_router: ^14.0.0
+  # State management
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.5
+  # Networking
+  dio: ^5.6.0
+  web_socket_channel: ^3.0.0
+  # Charts
+  fl_chart: ^0.68.0
+  # UI & icons
+  cupertino_icons: ^1.0.6
+  lucide_icons: ^1.0.2
+  # Storage
+  flutter_secure_storage: ^9.2.2
+  shared_preferences: ^2.3.2
+  # Utilities
+  intl: ^0.19.0
+  logger: ^2.4.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  build_runner: ^2.4.12
+  riverpod_generator: ^2.4.3
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/icons/
+  fonts:
+    - family: JetBrainsMono
+      fonts:
+        - asset: assets/fonts/JetBrainsMono-Regular.ttf
