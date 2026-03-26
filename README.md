@@ -45,6 +45,9 @@ cryptohub/
 ### 本地开发
 
 ```bash
+# 拉取镜像
+git clone https://github.com/mugua/cryptohub.git
+
 # 启动所有基础服务（数据库、Redis、Kafka）
 docker-compose up -d postgres redis influxdb kafka
 
