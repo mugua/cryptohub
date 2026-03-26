@@ -9,6 +9,38 @@ body {
   color: #c9d1d9;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
   -webkit-font-smoothing: antialiased;
+  transition: background 0.3s, color 0.3s;
+}
+
+body[data-theme="light"] {
+  background: #f5f5f5;
+  color: #333;
+}
+
+body[data-theme="light"] .ant-layout {
+  background: #f5f5f5 !important;
+}
+
+body[data-theme="light"] .ant-menu-dark {
+  background: #fff !important;
+}
+
+body[data-theme="light"] .ant-modal-content {
+  background: #fff !important;
+  border: 1px solid #e0e0e0 !important;
+}
+
+body[data-theme="light"] .stat-card,
+body[data-theme="light"] .pc-card,
+body[data-theme="light"] .settings-card,
+body[data-theme="light"] .analysis-card {
+  background: #fff !important;
+  border-color: #e0e0e0 !important;
+}
+
+body[data-theme="light"] .inner-card {
+  background: #fafafa !important;
+  border-color: #e0e0e0 !important;
 }
 
 ::-webkit-scrollbar {

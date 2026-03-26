@@ -1,6 +1,7 @@
 import {
   Ticker, Candle, PortfolioSnapshot, AnalysisReport, Strategy,
   BacktestResult, ExchangeAccount, Order, SystemSettings,
+  UserProfile, VipPlan, ExchangeApiConfig,
 } from '../types';
 
 // ---------------------------------------------------------------------------
@@ -299,6 +300,102 @@ export async function fetchSettings(): Promise<SystemSettings> {
       stopLossPct: 5,
     },
   };
+}
+
+// ─── User / Auth ──────────────────────────────────────────────────────────────
+export async function fetchUserProfile(): Promise<UserProfile> {
+  await delay(200);
+  return {
+    id: 'u1',
+    email: 'admin@cryptohub.io',
+    nickname: 'CryptoMaster',
+    phone: '+86 138****8888',
+    role: 'admin',
+    isVerified: true,
+    createdAt: '2025-10-01T00:00:00Z',
+    lastLoginAt: new Date().toISOString(),
+    loginMethod: 'email',
+  };
+}
+
+export async function sendVerificationCode(_email: string): Promise<{ success: boolean }> {
+  await delay(500);
+  return { success: true };
+}
+
+export async function verifyCode(_email: string, _code: string): Promise<{ success: boolean; token: string }> {
+  await delay(500);
+  return { success: true, token: 'mock-jwt-token' };
+}
+
+export async function registerUser(_email: string, _code: string, _password: string): Promise<{ success: boolean }> {
+  await delay(500);
+  return { success: true };
+}
+
+export async function loginWithThirdParty(_provider: 'google' | 'github'): Promise<{ success: boolean; redirectUrl: string }> {
+  await delay(300);
+  return {
+    success: true,
+    redirectUrl: _provider === 'google'
+      ? 'https://accounts.google.com/o/oauth2/v2/auth?client_id=YOUR_CLIENT_ID&redirect_uri=...'
+      : 'https://github.com/login/oauth/authorize?client_id=YOUR_CLIENT_ID&redirect_uri=...',
+  };
+}
+
+export async function updateUserProfile(profile: Partial<UserProfile>): Promise<{ success: boolean }> {
+  await delay(300);
+  console.log('Profile updated:', profile);
+  return { success: true };
+}
+
+export async function fetchVipPlans(): Promise<VipPlan[]> {
+  await delay(200);
+  return [
+    {
+      level: 'vip1',
+      name: 'VIP 1',
+      priceUsdt: 29.9,
+      duration: '30 days',
+      features: ['realTimeData', 'basicIndicators', 'fiveStrategies', 'emailSupport'],
+    },
+    {
+      level: 'vip2',
+      name: 'VIP 2',
+      priceUsdt: 99.9,
+      duration: '30 days',
+      features: ['allVip1', 'advancedIndicators', 'twentyStrategies', 'prioritySupport', 'backtesting'],
+    },
+    {
+      level: 'vip3',
+      name: 'VIP 3',
+      priceUsdt: 299.9,
+      duration: '30 days',
+      features: ['allVip2', 'unlimitedStrategies', 'apiAccess', 'dedicatedSupport', 'customStrategy'],
+    },
+  ];
+}
+
+// ─── Exchange API Config ──────────────────────────────────────────────────────
+export async function fetchExchangeApiConfigs(): Promise<ExchangeApiConfig[]> {
+  await delay(200);
+  return [
+    {
+      id: 'cfg1', exchange: 'binance', label: 'Binance Main',
+      apiKey: '', secretKey: '', isEnabled: true,
+      createdAt: '2026-01-01T00:00:00Z',
+    },
+    {
+      id: 'cfg2', exchange: 'okx', label: 'OKX Trading',
+      apiKey: '', secretKey: '', passphrase: '', isEnabled: false,
+      createdAt: '2026-02-01T00:00:00Z',
+    },
+  ];
+}
+
+export async function saveExchangeApiConfig(_config: Partial<ExchangeApiConfig>): Promise<{ success: boolean }> {
+  await delay(300);
+  return { success: true };
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

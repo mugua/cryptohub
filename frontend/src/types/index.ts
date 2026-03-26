@@ -197,6 +197,41 @@ export interface Order {
   updatedAt: string;
 }
 
+// ─── User / Auth Types ───────────────────────────────────────────────────────
+export type UserRole = 'user' | 'vip1' | 'vip2' | 'vip3' | 'admin';
+
+export interface UserProfile {
+  id: string;
+  email: string;
+  nickname: string;
+  avatar?: string;
+  phone?: string;
+  role: UserRole;
+  isVerified: boolean;
+  createdAt: string;
+  lastLoginAt: string;
+  loginMethod: 'email' | 'google' | 'github';
+}
+
+export interface VipPlan {
+  level: UserRole;
+  name: string;
+  priceUsdt: number;
+  duration: string;
+  features: string[];
+}
+
+export interface ExchangeApiConfig {
+  id: string;
+  exchange: ExchangeName;
+  label: string;
+  apiKey: string;
+  secretKey: string;
+  passphrase?: string;
+  isEnabled: boolean;
+  createdAt: string;
+}
+
 // ─── Settings ─────────────────────────────────────────────────────────────────
 export interface SystemSettings {
   language: 'zh_CN' | 'en_US';
