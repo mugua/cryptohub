@@ -18,6 +18,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   redis:
     image: redis:7-alpine
@@ -31,6 +32,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   influxdb:
     image: influxdb:2.7-alpine
@@ -46,6 +48,7 @@ services:
       - "8086:8086"
     volumes:
       - influxdb_data:/var/lib/influxdb2
+    restart: unless-stopped
 
   # ── Message Queue ─────────────────────────────────────────────────────────────
   zookeeper:
@@ -56,6 +59,7 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     volumes:
       - zookeeper_data:/var/lib/zookeeper/data
+    restart: unless-stopped
 
   kafka:
     image: confluentinc/cp-kafka:7.7.0
@@ -73,6 +77,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     volumes:
       - kafka_data:/var/lib/kafka/data
+    restart: unless-stopped
 
   # ── Backend: Go core trading engine ─────────────────────────────────────────
   go-core:
