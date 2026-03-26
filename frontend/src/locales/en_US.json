@@ -117,7 +117,8 @@
     "neutralWatch": "Neutral",
     "recommendSell": "Sell",
     "strongSell": "Strong Sell",
-    "marketDataOverview": "Market Data Overview"
+    "marketDataOverview": "Market Data Overview",
+    "viewFullTrendReport": "View Full Trend Report"
   },
   "trend": {
     "title": "Trend Report",

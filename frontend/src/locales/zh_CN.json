@@ -117,7 +117,8 @@
     "neutralWatch": "中性观望",
     "recommendSell": "建议卖出",
     "strongSell": "强烈卖出",
-    "marketDataOverview": "市场数据概览"
+    "marketDataOverview": "市场数据概览",
+    "viewFullTrendReport": "查看完整趋势报告"
   },
   "trend": {
     "title": "趋势报告",
