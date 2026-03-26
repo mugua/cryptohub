@@ -217,7 +217,7 @@ const TrendReport: React.FC = () => {
       {/* Dimension Cards */}
       <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
         {report.dimensions.map((d) => (
-          <Col xs={24} sm={12} lg={Math.floor(24 / report.dimensions.length)} key={d.name}>
+          <Col xs={24} sm={12} md={8} lg={8} xl={4} key={d.name}>
             <Card
               className="dim-card"
               title={
