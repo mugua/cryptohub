@@ -60,7 +60,7 @@ cd backend/go-core && go run ./cmd/server
 # Python 分析服务
 cd backend/python-analysis
 pip install -r requirements.txt
-python main.py
+python3 main.py
 ```
 
 ### 全栈 Docker 部署
