@@ -9,6 +9,10 @@ from app.models.schemas import (
     AnalysisReport, MacroAnalysis, PolicyAnalysis, PolicyEvent,
     SupplyDemandAnalysis, SentimentAnalysis, TechnicalAnalysis,
     TechnicalIndicator, Signal,
+    DimensionScore, TrendReport,
+)
+from app.services.trend_report import (
+    BASE_WEIGHTS, compute_trend, normalise_score, severity_from_score,
 )
 
 router = APIRouter()
@@ -115,3 +119,88 @@ async def get_sentiment(symbol: str) -> dict:
             "generated_at": datetime.now(timezone.utc).isoformat(),
         }
     }
+
+
+@router.get("/trend-report", response_model=TrendReport)
+async def get_trend_report(
+    symbol: str = Query("BTC/USDT", description="Trading pair symbol"),
+) -> TrendReport:
+    """
+    Generate a composite trend report by aggregating five analysis dimensions:
+
+    * Macro Economy        (20 %)
+    * Regulation & Policy  (25 %)
+    * Supply & Demand      (25 %)
+    * Market Sentiment     (15 %)
+    * Technical Analysis   (15 %)
+
+    Each dimension score is normalised to [-1, 1], weighted (with severity
+    boost), and aggregated into a single composite score.  The composite
+    score is then classified into a signal label.
+    """
+    is_btc = symbol.startswith("BTC")
+
+    # Raw scores on a -100..100 scale (mock – replace with real data feeds)
+    raw_macro = 62.0
+    raw_policy = 55.0 if is_btc else 40.0
+    raw_supply = 72.0
+    raw_sentiment = 68.0
+    raw_technical = 65.0
+
+    dims = [
+        DimensionScore(
+            name="macro",
+            raw_score=normalise_score(raw_macro),
+            base_weight=BASE_WEIGHTS["macro"],
+            adjusted_weight=0,  # filled by compute_trend
+            severity=severity_from_score(raw_macro),
+            summary="美联储降息预期增强，宏观流动性趋于宽松，对风险资产整体利好。",
+        ),
+        DimensionScore(
+            name="policy",
+            raw_score=normalise_score(raw_policy),
+            base_weight=BASE_WEIGHTS["policy"],
+            adjusted_weight=0,
+            severity=severity_from_score(raw_policy),
+            summary="全球主要监管机构对加密市场态度趋于明朗，机构合规渠道持续拓展。",
+        ),
+        DimensionScore(
+            name="supply_demand",
+            raw_score=normalise_score(raw_supply),
+            base_weight=BASE_WEIGHTS["supply_demand"],
+            adjusted_weight=0,
+            severity=severity_from_score(raw_supply),
+            summary="链上数据显示大量比特币从交易所流出，鲸鱼地址持续积累。",
+        ),
+        DimensionScore(
+            name="sentiment",
+            raw_score=normalise_score(raw_sentiment),
+            base_weight=BASE_WEIGHTS["sentiment"],
+            adjusted_weight=0,
+            severity=severity_from_score(raw_sentiment),
+            summary="市场情绪处于贪婪区间，散户FOMO情绪升温，需警惕短期回调风险。",
+        ),
+        DimensionScore(
+            name="technical",
+            raw_score=normalise_score(raw_technical),
+            base_weight=BASE_WEIGHTS["technical"],
+            adjusted_weight=0,
+            severity=severity_from_score(raw_technical),
+            summary="价格位于多条均线之上，MACD出现金叉，整体技术面偏多。",
+        ),
+    ]
+
+    composite, signal = compute_trend(dims)
+
+    return TrendReport(
+        symbol=symbol,
+        generated_at=datetime.now(timezone.utc),
+        composite_score=composite,
+        signal=signal,
+        dimensions=dims,
+        summary=(
+            "综合宏观、政策、链上、情绪及技术面五大维度加权分析，"
+            f"当前综合趋势得分 {composite:+.2f}，信号为{signal.value}，"
+            "建议关注关键支撑阻力位变化。"
+        ),
+    )

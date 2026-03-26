@@ -2,6 +2,7 @@ import {
   Ticker, Candle, PortfolioSnapshot, AnalysisReport, Strategy,
   BacktestResult, ExchangeAccount, Order, SystemSettings,
   UserProfile, VipPlan, ExchangeApiConfig,
+  TrendReport, DimensionScore, TrendSignal,
 } from '../types';
 
 // ---------------------------------------------------------------------------
@@ -396,6 +397,98 @@ export async function fetchExchangeApiConfigs(): Promise<ExchangeApiConfig[]> {
 export async function saveExchangeApiConfig(_config: Partial<ExchangeApiConfig>): Promise<{ success: boolean }> {
   await delay(300);
   return { success: true };
+}
+
+// ─── Trend Report ─────────────────────────────────────────────────────────────
+
+function normaliseScore(raw: number, lo = -100, hi = 100): number {
+  const clamped = Math.max(lo, Math.min(hi, raw));
+  return +((clamped - lo) / (hi - lo) * 2 - 1).toFixed(4);
+}
+
+function severityFromScore(s: number): number {
+  return +Math.min(Math.abs(s) / 100, 1).toFixed(4);
+}
+
+function computeTrend(dims: DimensionScore[]): { compositeScore: number; signal: TrendSignal } {
+  const boostMul = 0.8;
+  const adjusted = dims.map(d => d.baseWeight * (1 + d.severity * boostMul));
+  const total = adjusted.reduce((a, b) => a + b, 0);
+  const norm = total === 0 ? dims.map(() => 1 / dims.length) : adjusted.map(w => w / total);
+  dims.forEach((d, i) => { d.adjustedWeight = +norm[i].toFixed(4); });
+  let composite = dims.reduce((acc, d) => acc + d.rawScore * d.adjustedWeight, 0);
+  composite = +Math.max(-1, Math.min(1, composite)).toFixed(4);
+  let signal: TrendSignal = 'neutral';
+  if (composite >= 0.5) signal = 'strong_bullish';
+  else if (composite >= 0.2) signal = 'mild_bullish';
+  else if (composite > -0.2) signal = 'neutral';
+  else if (composite > -0.5) signal = 'mild_bearish';
+  else signal = 'strong_bearish';
+  return { compositeScore: composite, signal };
+}
+
+export async function fetchTrendReport(symbol: string): Promise<TrendReport> {
+  await delay(500);
+  const isBTC = symbol.startsWith('BTC');
+  const rawMacro = 62;
+  const rawPolicy = isBTC ? 55 : 40;
+  const rawSupply = 72;
+  const rawSentiment = 68;
+  const rawTechnical = 65;
+
+  const dims: DimensionScore[] = [
+    {
+      name: 'macro',
+      rawScore: normaliseScore(rawMacro),
+      baseWeight: 0.20,
+      adjustedWeight: 0,
+      severity: severityFromScore(rawMacro),
+      summary: '美联储降息预期增强，宏观流动性趋于宽松，对风险资产整体利好。',
+    },
+    {
+      name: 'policy',
+      rawScore: normaliseScore(rawPolicy),
+      baseWeight: 0.25,
+      adjustedWeight: 0,
+      severity: severityFromScore(rawPolicy),
+      summary: '全球主要监管机构对加密市场态度趋于明朗，机构合规渠道持续拓展。',
+    },
+    {
+      name: 'supply_demand',
+      rawScore: normaliseScore(rawSupply),
+      baseWeight: 0.25,
+      adjustedWeight: 0,
+      severity: severityFromScore(rawSupply),
+      summary: '链上数据显示大量比特币从交易所流出，鲸鱼地址持续积累。',
+    },
+    {
+      name: 'sentiment',
+      rawScore: normaliseScore(rawSentiment),
+      baseWeight: 0.15,
+      adjustedWeight: 0,
+      severity: severityFromScore(rawSentiment),
+      summary: '市场情绪处于贪婪区间，散户FOMO情绪升温，需警惕短期回调风险。',
+    },
+    {
+      name: 'technical',
+      rawScore: normaliseScore(rawTechnical),
+      baseWeight: 0.15,
+      adjustedWeight: 0,
+      severity: severityFromScore(rawTechnical),
+      summary: '价格位于多条均线之上，MACD出现金叉，整体技术面偏多。',
+    },
+  ];
+
+  const { compositeScore, signal } = computeTrend(dims);
+
+  return {
+    symbol,
+    generatedAt: new Date().toISOString(),
+    compositeScore,
+    signal,
+    dimensions: dims,
+    summary: `综合宏观、政策、链上、情绪及技术面五大维度加权分析，当前综合趋势得分 ${compositeScore > 0 ? '+' : ''}${compositeScore.toFixed(2)}，建议关注关键支撑阻力位变化。`,
+  };
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

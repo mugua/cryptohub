@@ -7,6 +7,7 @@ import { ThemeProvider, useTheme } from './ThemeContext';
 import MainLayout from './layouts/MainLayout';
 import Dashboard from './pages/Dashboard';
 import MarketAnalysis from './pages/MarketAnalysis';
+import TrendReport from './pages/TrendReport';
 import QuantTrading from './pages/QuantTrading';
 import PersonalCenter from './pages/PersonalCenter';
 import Settings from './pages/Settings';
@@ -51,6 +52,7 @@ function AppInner() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/market" element={<MarketAnalysis />} />
+            <Route path="/trend" element={<TrendReport />} />
             <Route path="/trading" element={<QuantTrading />} />
             <Route path="/profile" element={<PersonalCenter />} />
             <Route path="/settings" element={<Settings />} />

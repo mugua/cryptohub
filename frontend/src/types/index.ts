@@ -65,6 +65,32 @@ export interface AnalysisReport {
   signal: 'strong_buy' | 'buy' | 'neutral' | 'sell' | 'strong_sell';
 }
 
+// ─── Trend Report ────────────────────────────────────────────────────────────
+export type TrendSignal =
+  | 'strong_bullish'
+  | 'mild_bullish'
+  | 'neutral'
+  | 'mild_bearish'
+  | 'strong_bearish';
+
+export interface DimensionScore {
+  name: string;
+  rawScore: number;       // -1 to 1
+  baseWeight: number;     // 0 to 1
+  adjustedWeight: number; // 0 to 1
+  severity: number;       // 0 to 1
+  summary: string;
+}
+
+export interface TrendReport {
+  symbol: string;
+  generatedAt: string;
+  compositeScore: number; // -1 to 1
+  signal: TrendSignal;
+  dimensions: DimensionScore[];
+  summary: string;
+}
+
 export interface MacroAnalysis {
   score: number; // -100 to 100
   inflationExpectation: string;

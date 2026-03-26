@@ -85,6 +85,36 @@ class AnalysisReport(BaseModel):
     signal: Signal
 
 
+# ── Trend Report models ──────────────────────────────────────────────────────
+
+class TrendSignal(str, Enum):
+    strong_bullish = "strong_bullish"
+    mild_bullish = "mild_bullish"
+    neutral = "neutral"
+    mild_bearish = "mild_bearish"
+    strong_bearish = "strong_bearish"
+
+
+class DimensionScore(BaseModel):
+    """Score and weight details for one analysis dimension."""
+    name: str
+    raw_score: float = Field(..., ge=-1, le=1, description="Normalised score in [-1, 1]")
+    base_weight: float = Field(..., ge=0, le=1)
+    adjusted_weight: float = Field(..., ge=0, le=1)
+    severity: float = Field(..., ge=0, le=1, description="Importance / severity 0-1")
+    summary: str
+
+
+class TrendReport(BaseModel):
+    """Aggregated multi-dimension trend report."""
+    symbol: str
+    generated_at: datetime
+    composite_score: float = Field(..., ge=-1, le=1)
+    signal: TrendSignal
+    dimensions: list[DimensionScore]
+    summary: str
+
+
 # ── Backtest models ───────────────────────────────────────────────────────────
 
 class BacktestRequest(BaseModel):

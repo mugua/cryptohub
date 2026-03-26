@@ -3,6 +3,7 @@ import { Layout, Menu, Avatar, Badge, Dropdown, Space, Tag } from 'antd';
 import {
   DashboardOutlined,
   LineChartOutlined,
+  FundOutlined,
   RobotOutlined,
   UserOutlined,
   SettingOutlined,
@@ -34,6 +35,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const menuItems: MenuProps['items'] = [
     { key: '/', icon: <DashboardOutlined />, label: t('menu.dashboard') },
     { key: '/market', icon: <LineChartOutlined />, label: t('menu.marketAnalysis') },
+    { key: '/trend', icon: <FundOutlined />, label: t('menu.trendReport') },
     { key: '/trading', icon: <RobotOutlined />, label: t('menu.quantTrading') },
     { key: '/profile', icon: <UserOutlined />, label: t('menu.personalCenter') },
     { key: '/settings', icon: <SettingOutlined />, label: t('menu.systemSettings') },
