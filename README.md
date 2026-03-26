@@ -63,10 +63,54 @@ python main.py
 ### 全栈 Docker 部署
 
 ```bash
+# 首次构建并启动（前台运行，Ctrl+C 停止）
 docker-compose up --build
+
+# 首次构建并后台启动（推荐）
+docker-compose up --build -d
 ```
 
 访问 `http://localhost:3000` 查看 Web 端。
+
+### 运行与重启
+
+```bash
+# 后台启动所有服务（已构建过镜像时无需 --build）
+docker-compose up -d
+
+# 查看所有服务运行状态
+docker-compose ps
+
+# 查看服务日志（实时跟踪）
+docker-compose logs -f
+
+# 查看指定服务日志
+docker-compose logs -f frontend
+
+# 重启所有服务
+docker-compose restart
+
+# 重启指定服务
+docker-compose restart frontend
+
+# 停止所有服务（不删除容器）
+docker-compose stop
+
+# 停止并删除所有容器（保留数据卷）
+docker-compose down
+
+# 停止并删除所有容器及数据卷（⚠️ 数据会丢失）
+docker-compose down -v
+
+# 重新构建并启动（代码更新后使用）
+docker-compose up --build -d
+```
+
+> **提示：** 所有服务均已配置 `restart: unless-stopped`，服务器重启后 Docker 会自动拉起所有容器，无需手动操作。如果服务未自动恢复，请确认 Docker 服务已设置开机自启：
+>
+> ```bash
+> sudo systemctl enable docker
+> ```
 
 ## API 文档
 
