@@ -2,6 +2,7 @@
   "menu": {
     "dashboard": "Dashboard",
     "marketAnalysis": "Market Analysis",
+    "trendReport": "Trend Report",
     "quantTrading": "Quant Trading",
     "personalCenter": "Personal Center",
     "systemSettings": "Settings"
@@ -116,7 +117,36 @@
     "neutralWatch": "Neutral",
     "recommendSell": "Sell",
     "strongSell": "Strong Sell",
-    "marketDataOverview": "Market Data Overview"
+    "marketDataOverview": "Market Data Overview",
+    "viewFullTrendReport": "View Full Trend Report"
+  },
+  "trend": {
+    "title": "Trend Report",
+    "generating": "Generating trend report...",
+    "compositeScore": "Composite Trend Score",
+    "signalLabel": "Trend Signal",
+    "strongBullish": "Strong Bullish",
+    "mildBullish": "Mild Bullish",
+    "neutral": "Neutral / Sideways",
+    "mildBearish": "Mild Bearish",
+    "strongBearish": "Strong Bearish",
+    "dimensionBreakdown": "Dimension Breakdown",
+    "dimension": "Dimension",
+    "rawScore": "Raw Score",
+    "baseWeight": "Base Weight",
+    "adjustedWeight": "Adjusted Weight",
+    "severity": "Severity",
+    "summary": "Summary",
+    "macro": "Macro Economy",
+    "policy": "Regulation & Policy",
+    "supply_demand": "Supply & Demand (On-Chain)",
+    "sentiment": "Market Sentiment",
+    "technical": "Technical Analysis",
+    "weightFormula": "Weight Formula",
+    "formulaDesc": "adjusted_weight = base_weight × (1 + severity × 0.8), then normalized to sum to 1",
+    "scoreRange": "Composite score ranges from -1 to +1",
+    "radarTitle": "Five-Dimension Radar",
+    "dimensionDetail": "Dimension Detail"
   },
   "trading": {
     "title": "Quant Trading",

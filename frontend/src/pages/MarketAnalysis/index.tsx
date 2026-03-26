@@ -1,20 +1,22 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import {
   Row, Col, Card, Select, Spin, Tag, Typography, Progress, Table,
-  Tabs, Statistic, Alert, Button, Space,
+  Statistic, Alert, Button, Space,
 } from 'antd';
 import {
-  LineChartOutlined, GlobalOutlined, SafetyCertificateOutlined,
-  TeamOutlined, ThunderboltOutlined, ExperimentOutlined,
+  LineChartOutlined, FundOutlined, RadarChartOutlined,
+  RightOutlined,
 } from '@ant-design/icons';
 import {
-  RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer,
+  RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
+  ResponsiveContainer, Tooltip,
 } from 'recharts';
 import { createChart, ColorType, CandlestickSeries, HistogramSeries, LineSeries } from 'lightweight-charts';
 import type { IChartApi, ISeriesApi, CandlestickData, Time } from 'lightweight-charts';
 import { useTranslation } from 'react-i18next';
-import { fetchAnalysis, fetchCandles } from '../../services/api';
-import type { AnalysisReport, Candle } from '../../types';
+import { useNavigate } from 'react-router-dom';
+import { fetchAnalysis, fetchCandles, fetchTrendReport } from '../../services/api';
+import type { AnalysisReport, Candle, TrendReport, TrendSignal } from '../../types';
 import './MarketAnalysis.css';
 
 const { Title, Text, Paragraph } = Typography;
@@ -23,6 +25,37 @@ const { Option } = Select;
 const SYMBOLS = ['BTC/USDT', 'ETH/USDT', 'BNB/USDT', 'SOL/USDT', 'XRP/USDT'];
 const TIMEFRAMES = ['1m', '5m', '15m', '30m', '1H', '4H', '1D', '1W'];
 const INDICATORS = ['SMA', 'EMA', 'RSI', 'MACD', 'BB', 'ATR', 'CCI', 'W%R', 'MFI', 'ADX', 'OBV', 'ADOSC', 'AD', 'KDJ'];
+
+const TREND_SIGNAL_CONFIG: Record<TrendSignal, { color: string; tagColor: string }> = {
+  strong_bullish: { color: '#52c41a', tagColor: 'success' },
+  mild_bullish:   { color: '#73d13d', tagColor: 'lime' },
+  neutral:        { color: '#faad14', tagColor: 'warning' },
+  mild_bearish:   { color: '#ff7a45', tagColor: 'orange' },
+  strong_bearish: { color: '#f5222d', tagColor: 'error' },
+};
+
+const DIM_ICONS: Record<string, string> = {
+  macro: '🏦', policy: '📜', supply_demand: '⛓', sentiment: '💬', technical: '📈',
+};
+
+function trendSignalLabel(signal: TrendSignal, t: (k: string) => string): string {
+  const map: Record<TrendSignal, string> = {
+    strong_bullish: t('trend.strongBullish'),
+    mild_bullish: t('trend.mildBullish'),
+    neutral: t('trend.neutral'),
+    mild_bearish: t('trend.mildBearish'),
+    strong_bearish: t('trend.strongBearish'),
+  };
+  return map[signal] ?? signal;
+}
+
+function trendScoreColor(score: number): string {
+  if (score >= 0.5) return '#52c41a';
+  if (score >= 0.2) return '#73d13d';
+  if (score > -0.2) return '#faad14';
+  if (score > -0.5) return '#ff7a45';
+  return '#f5222d';
+}
 
 function computeSMA(data: Candle[], period: number): { time: number; value: number }[] {
   const result: { time: number; value: number }[] = [];
@@ -68,6 +101,7 @@ const MarketAnalysis: React.FC = () => {
   const [timeframe, setTimeframe] = useState('1D');
   const [activeIndicators, setActiveIndicators] = useState<string[]>([]);
   const [report, setReport] = useState<AnalysisReport | null>(null);
+  const [trendReport, setTrendReport] = useState<TrendReport | null>(null);
   const [candles, setCandles] = useState<Candle[]>([]);
   const [loading, setLoading] = useState(true);
   const chartContainerRef = useRef<HTMLDivElement>(null);
@@ -76,6 +110,7 @@ const MarketAnalysis: React.FC = () => {
   const volumeSeriesRef = useRef<ISeriesApi<'Histogram'> | null>(null);
   const indicatorSeriesRef = useRef<ISeriesApi<'Line'>[]>([]);
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
 
   const SIGNAL_COLOR: Record<string, string> = {
     strong_buy: '#00c853',
@@ -100,9 +135,11 @@ const MarketAnalysis: React.FC = () => {
     Promise.all([
       fetchAnalysis(symbol),
       fetchCandles(symbol, interval, limit),
-    ]).then(([r, c]) => {
+      fetchTrendReport(symbol),
+    ]).then(([r, c, tr]) => {
       setReport(r);
       setCandles(c);
+      setTrendReport(tr);
       setLoading(false);
     });
   }, [symbol, timeframe]);
@@ -286,33 +323,16 @@ const MarketAnalysis: React.FC = () => {
     volume: lastCandle.volume.toLocaleString('en-US', { maximumFractionDigits: 0 }),
   } : null;
 
-  const radarData = report
-    ? [
-        { subject: t('market.macro'), A: Math.max(0, report.macro.score) },
-        { subject: t('market.policy'), A: Math.max(0, report.policy.score) },
-        { subject: t('market.supplyDemand'), A: Math.max(0, report.supplyDemand.score) },
-        { subject: t('market.sentiment'), A: Math.max(0, report.sentiment.score) },
-        { subject: t('market.technical'), A: report.technical.trend === 'uptrend' ? 75 : report.technical.trend === 'downtrend' ? 25 : 50 },
-      ]
+  // Trend report radar data
+  const trendRadarData = trendReport
+    ? trendReport.dimensions.map((d) => ({
+        dimension: t(`trend.${d.name}`),
+        score: Math.round((d.rawScore + 1) * 50),
+        fullMark: 100,
+      }))
     : [];
 
-  const policyColumns = [
-    { title: t('market.date'), dataIndex: 'date', key: 'date', width: 110, render: (v: string) => <Text style={{ color: '#888', fontSize: 12 }}>{v}</Text> },
-    { title: t('market.countryRegion'), dataIndex: 'country', key: 'country', width: 100, render: (v: string) => <Text style={{ color: '#ccc', fontSize: 12 }}>{v}</Text> },
-    { title: t('market.event'), dataIndex: 'title', key: 'title', render: (v: string) => <Text style={{ color: '#fff', fontSize: 12 }}>{v}</Text> },
-    {
-      title: t('market.impact'),
-      dataIndex: 'impact',
-      key: 'impact',
-      width: 80,
-      render: (v: string) => (
-        <Tag color={v === 'positive' ? 'success' : v === 'negative' ? 'error' : 'default'} style={{ fontSize: 11 }}>
-          {v === 'positive' ? t('market.positive') : v === 'negative' ? t('market.negative') : t('market.neutral')}
-        </Tag>
-      ),
-    },
-  ];
-
+  // Key indicator columns from original analysis
   const indicatorColumns = [
     { title: t('market.indicator'), dataIndex: 'name', key: 'name', render: (v: string) => <Text style={{ color: '#ccc' }}>{v}</Text> },
     {
@@ -334,29 +354,6 @@ const MarketAnalysis: React.FC = () => {
       ),
     },
   ];
-
-  const ScoreCard: React.FC<{ title: string; score: number; icon: React.ReactNode; summary: string }> = ({
-    title, score, icon, summary,
-  }) => (
-    <Card className="analysis-card" size="small">
-      <div className="score-header">
-        {icon}
-        <Text style={{ color: '#ccc', marginLeft: 8 }}>{title}</Text>
-        <span style={{ marginLeft: 'auto', color: score >= 60 ? '#52c41a' : score >= 40 ? '#faad14' : '#f5222d', fontWeight: 700, fontSize: 20 }}>
-          {score}
-        </span>
-      </div>
-      <Progress
-        percent={score}
-        strokeColor={score >= 60 ? '#52c41a' : score >= 40 ? '#faad14' : '#f5222d'}
-        trailColor="#1f2937"
-        showInfo={false}
-        size="small"
-        style={{ margin: '8px 0' }}
-      />
-      <Text style={{ color: '#888', fontSize: 12 }}>{summary}</Text>
-    </Card>
-  );
 
   return (
     <div className="market-analysis">
@@ -450,282 +447,179 @@ const MarketAnalysis: React.FC = () => {
         <div ref={chartContainerRef} style={{ width: '100%' }} />
       </Card>
 
-      <Row gutter={[16, 16]}>
-        {/* Radar Chart */}
-        <Col xs={24} xl={8}>
-          <Card className="analysis-card" title={<span style={{ color: '#fff' }}>{t('market.radarChart')}</span>}>
-            <ResponsiveContainer width="100%" height={260}>
-              <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
-                <PolarGrid stroke="#1f2937" />
-                <PolarAngleAxis dataKey="subject" tick={{ fill: '#888', fontSize: 11 }} />
-                <Radar name={t('market.score')} dataKey="A" stroke="#1677ff" fill="#1677ff" fillOpacity={0.35} />
-              </RadarChart>
-            </ResponsiveContainer>
-          </Card>
-        </Col>
+      {/* ── Trend Report Section ────────────────────────────────────────── */}
+      {trendReport && (
+        <>
+          {/* Composite Score + Radar */}
+          <Row gutter={[16, 16]}>
+            <Col xs={24} xl={8}>
+              <Card className="analysis-card" style={{ textAlign: 'center' }}>
+                <FundOutlined style={{ fontSize: 20, color: '#1677ff', marginBottom: 8 }} />
+                <div style={{ fontSize: 42, fontWeight: 700, color: TREND_SIGNAL_CONFIG[trendReport.signal].color, lineHeight: 1 }}>
+                  {trendReport.compositeScore > 0 ? '+' : ''}{trendReport.compositeScore.toFixed(2)}
+                </div>
+                <div style={{ color: '#888', fontSize: 13, margin: '4px 0 12px' }}>{t('trend.compositeScore')}</div>
+                <Tag
+                  color={TREND_SIGNAL_CONFIG[trendReport.signal].tagColor}
+                  style={{ fontSize: 14, padding: '4px 16px', borderRadius: 16, fontWeight: 600 }}
+                >
+                  {trendSignalLabel(trendReport.signal, t)}
+                </Tag>
+                <Progress
+                  type="dashboard"
+                  percent={Math.round((trendReport.compositeScore + 1) * 50)}
+                  strokeColor={TREND_SIGNAL_CONFIG[trendReport.signal].color}
+                  trailColor="#1f2937"
+                  size={160}
+                  format={() => ''}
+                  style={{ marginTop: 16 }}
+                />
+                <div style={{ color: '#666', fontSize: 11, marginTop: 4 }}>{t('trend.scoreRange')}</div>
+              </Card>
+            </Col>
 
-        {/* Volume & Moving Average Stats */}
-        <Col xs={24} xl={16}>
-          <Card className="analysis-card" title={<span style={{ color: '#fff' }}>{t('market.marketDataOverview')}</span>}>
-            <Row gutter={[16, 16]}>
-              <Col span={6}>
-                <Statistic
-                  title={<span style={{ color: '#888', fontSize: 12 }}>VOL(5,10,20)</span>}
-                  value={candles.length > 0 ? candles[candles.length - 1].volume : 0}
-                  valueStyle={{ color: '#fff', fontSize: 18 }}
-                  formatter={(v) => `${Number(v).toLocaleString('en-US', { maximumFractionDigits: 0 })}`}
-                />
-              </Col>
-              <Col span={6}>
-                <Statistic
-                  title={<span style={{ color: '#f39c12', fontSize: 12 }}>MA5</span>}
-                  value={candles.length >= 5 ? (candles.slice(-5).reduce((s, c) => s + c.close, 0) / 5) : 0}
-                  valueStyle={{ color: '#f39c12', fontSize: 18 }}
-                  precision={2}
-                />
-              </Col>
-              <Col span={6}>
-                <Statistic
-                  title={<span style={{ color: '#3498db', fontSize: 12 }}>MA10</span>}
-                  value={candles.length >= 10 ? (candles.slice(-10).reduce((s, c) => s + c.close, 0) / 10) : 0}
-                  valueStyle={{ color: '#3498db', fontSize: 18 }}
-                  precision={2}
-                />
-              </Col>
-              <Col span={6}>
-                <Statistic
-                  title={<span style={{ color: '#e74c3c', fontSize: 12 }}>MA20</span>}
-                  value={candles.length >= 20 ? (candles.slice(-20).reduce((s, c) => s + c.close, 0) / 20) : 0}
-                  valueStyle={{ color: '#e74c3c', fontSize: 18 }}
-                  precision={2}
-                />
-              </Col>
-            </Row>
-          </Card>
-        </Col>
-      </Row>
+            <Col xs={24} xl={16}>
+              <Card
+                className="analysis-card"
+                title={<span style={{ color: '#fff' }}><RadarChartOutlined /> {t('trend.radarTitle')}</span>}
+              >
+                <ResponsiveContainer width="100%" height={300}>
+                  <RadarChart data={trendRadarData}>
+                    <PolarGrid stroke="#1f2937" />
+                    <PolarAngleAxis dataKey="dimension" tick={{ fill: '#aaa', fontSize: 12 }} />
+                    <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: '#666', fontSize: 10 }} />
+                    <Radar dataKey="score" stroke="#1677ff" fill="#1677ff" fillOpacity={0.3} />
+                    <Tooltip
+                      contentStyle={{ background: '#1f2937', border: '1px solid #374151', color: '#fff' }}
+                      formatter={(v: number) => [`${v}/100`, t('market.score')]}
+                    />
+                  </RadarChart>
+                </ResponsiveContainer>
+              </Card>
+            </Col>
+          </Row>
 
-      {/* Analysis Tabs */}
-      <Card className="analysis-card" style={{ marginTop: 16 }}>
-        <Tabs
-          defaultActiveKey="macro"
-          items={[
-            {
-              key: 'macro',
-              label: <span><GlobalOutlined />{t('market.macro')}</span>,
-              children: report && (
-                <Row gutter={[16, 16]}>
-                  <Col xs={24} md={8}>
-                    <ScoreCard
-                      title={t('market.macroScore')}
-                      score={report.macro.score}
-                      icon={<GlobalOutlined style={{ color: '#1677ff' }} />}
-                      summary={report.macro.summary}
-                    />
-                  </Col>
-                  <Col xs={24} md={16}>
-                    <Row gutter={[12, 12]}>
-                      <Col span={8}>
-                        <Statistic
-                          title={<span style={{ color: '#888', fontSize: 12 }}>{t('market.fearGreedIndex')}</span>}
-                          value={report.macro.fearGreedIndex}
-                          suffix="/100"
-                          valueStyle={{ color: report.macro.fearGreedIndex >= 60 ? '#f5222d' : '#52c41a', fontSize: 22 }}
-                        />
-                        <Text style={{ color: '#888', fontSize: 11 }}>
-                          {report.macro.fearGreedIndex >= 75 ? t('market.extremeGreed') : report.macro.fearGreedIndex >= 55 ? t('market.greed') : report.macro.fearGreedIndex >= 45 ? t('market.neutral') : t('market.fear')}
-                        </Text>
-                      </Col>
-                      <Col span={8}>
-                        <Statistic
-                          title={<span style={{ color: '#888', fontSize: 12 }}>{t('market.dollarIndex')}</span>}
-                          value={report.macro.dollarIndex}
-                          valueStyle={{ color: '#fff', fontSize: 22 }}
-                        />
-                      </Col>
-                      <Col span={8}>
-                        <Statistic
-                          title={<span style={{ color: '#888', fontSize: 12 }}>{t('market.inflationExpectation')}</span>}
-                          value={report.macro.inflationExpectation}
-                          valueStyle={{ color: '#faad14', fontSize: 16 }}
-                        />
-                      </Col>
-                    </Row>
-                    <Paragraph style={{ color: '#aaa', marginTop: 16, fontSize: 13, lineHeight: '1.8' }}>
-                      {report.macro.summary}
-                    </Paragraph>
-                  </Col>
-                </Row>
-              ),
-            },
-            {
-              key: 'policy',
-              label: <span><SafetyCertificateOutlined />{t('market.policy')}</span>,
-              children: report && (
-                <Row gutter={[16, 16]}>
-                  <Col xs={24} md={8}>
-                    <ScoreCard
-                      title={t('market.policyScore')}
-                      score={report.policy.score}
-                      icon={<SafetyCertificateOutlined style={{ color: '#faad14' }} />}
-                      summary={report.policy.summary}
-                    />
-                  </Col>
-                  <Col xs={24} md={16}>
-                    <Text style={{ color: '#888', fontSize: 12, display: 'block', marginBottom: 8 }}>{t('market.recentPolicyEvents')}</Text>
-                    <Table
-                      dataSource={report.policy.recentEvents}
-                      columns={policyColumns}
-                      pagination={false}
-                      size="small"
-                      className="dark-table"
-                      rowKey="title"
-                    />
-                  </Col>
-                </Row>
-              ),
-            },
-            {
-              key: 'supply',
-              label: <span><TeamOutlined />{t('market.supplyDemand')}</span>,
-              children: report && (
-                <Row gutter={[16, 16]}>
-                  <Col xs={24} md={8}>
-                    <ScoreCard
-                      title={t('market.supplyDemandScore')}
-                      score={report.supplyDemand.score}
-                      icon={<TeamOutlined style={{ color: '#52c41a' }} />}
-                      summary={report.supplyDemand.summary}
-                    />
-                  </Col>
-                  <Col xs={24} md={16}>
-                    <Row gutter={[12, 12]}>
-                      <Col span={12}>
-                        <Statistic
-                          title={<span style={{ color: '#888', fontSize: 12 }}>{t('market.exchangeNetflow')}</span>}
-                          value={report.supplyDemand.exchangeNetflow}
-                          valueStyle={{ color: report.supplyDemand.exchangeNetflow < 0 ? '#52c41a' : '#f5222d', fontSize: 20 }}
-                        />
-                        <Text style={{ color: '#888', fontSize: 11 }}>
-                          {report.supplyDemand.exchangeNetflow < 0 ? t('market.netOutflowBullish') : t('market.netInflowBearish')}
-                        </Text>
-                      </Col>
-                      <Col span={12}>
-                        <Statistic
-                          title={<span style={{ color: '#888', fontSize: 12 }}>{t('market.minersNetflow')}</span>}
-                          value={report.supplyDemand.minersNetflow}
-                          valueStyle={{ color: '#fff', fontSize: 20 }}
-                        />
-                      </Col>
-                      <Col span={24} style={{ marginTop: 8 }}>
-                        <Text style={{ color: '#888', fontSize: 12 }}>{t('market.whaleActivity')}</Text>
-                        <Tag color={report.supplyDemand.whaleActivity === 'accumulating' ? 'success' : report.supplyDemand.whaleActivity === 'distributing' ? 'error' : 'default'}>
-                          {report.supplyDemand.whaleActivity === 'accumulating' ? t('market.accumulating') : report.supplyDemand.whaleActivity === 'distributing' ? t('market.distributing') : t('market.neutral')}
-                        </Tag>
-                      </Col>
-                    </Row>
-                    <Paragraph style={{ color: '#aaa', marginTop: 12, fontSize: 13, lineHeight: '1.8' }}>
-                      {report.supplyDemand.summary}
-                    </Paragraph>
-                  </Col>
-                </Row>
-              ),
-            },
-            {
-              key: 'sentiment',
-              label: <span><TeamOutlined />{t('market.sentiment')}</span>,
-              children: report && (
-                <Row gutter={[16, 16]}>
-                  <Col xs={24} md={8}>
-                    <ScoreCard
-                      title={t('market.sentimentScore')}
-                      score={report.sentiment.score}
-                      icon={<ThunderboltOutlined style={{ color: '#f5222d' }} />}
-                      summary={report.sentiment.summary}
-                    />
-                  </Col>
-                  <Col xs={24} md={16}>
-                    <Row gutter={[12, 12]}>
-                      <Col span={8}>
-                        <Statistic
-                          title={<span style={{ color: '#888', fontSize: 12 }}>{t('market.fearGreed')}</span>}
-                          value={report.sentiment.fearGreedIndex}
-                          suffix="/100"
-                          valueStyle={{ color: '#f5222d', fontSize: 22 }}
-                        />
-                        <Tag color="error">{report.sentiment.fearGreedLabel}</Tag>
-                      </Col>
-                      <Col span={8}>
-                        <Statistic
-                          title={<span style={{ color: '#888', fontSize: 12 }}>{t('market.twitterBullish')}</span>}
-                          value={report.sentiment.twitterBullishPct}
-                          suffix="%"
-                          valueStyle={{ color: '#52c41a', fontSize: 22 }}
-                        />
-                      </Col>
-                      <Col span={8}>
-                        <Statistic
-                          title={<span style={{ color: '#888', fontSize: 12 }}>{t('market.redditSentiment')}</span>}
-                          value={report.sentiment.redditSentiment}
-                          valueStyle={{ color: '#1677ff', fontSize: 18 }}
-                        />
-                      </Col>
-                    </Row>
-                    <Paragraph style={{ color: '#aaa', marginTop: 12, fontSize: 13, lineHeight: '1.8' }}>
-                      {report.sentiment.summary}
-                    </Paragraph>
-                  </Col>
-                </Row>
-              ),
-            },
-            {
-              key: 'technical',
-              label: <span><ExperimentOutlined />{t('market.technical')}</span>,
-              children: report && (
-                <Row gutter={[16, 16]}>
-                  <Col xs={24} md={12}>
-                    <Card className="inner-card" size="small" title={<span style={{ color: '#ccc' }}>{t('market.technicalIndicators')}</span>}>
-                      <Table
-                        dataSource={report.technical.indicators}
-                        columns={indicatorColumns}
-                        pagination={false}
-                        size="small"
-                        className="dark-table"
-                        rowKey="name"
-                      />
-                    </Card>
-                  </Col>
-                  <Col xs={24} md={12}>
-                    <Card className="inner-card" size="small" title={<span style={{ color: '#ccc' }}>{t('market.keyLevels')}</span>}>
-                      <div style={{ marginBottom: 12 }}>
-                        <Text style={{ color: '#52c41a', fontSize: 13, display: 'block', marginBottom: 6 }}>{t('market.supportLevels')}</Text>
-                        {report.technical.supportLevels.map((l, i) => (
-                          <Tag key={i} color="success" style={{ marginBottom: 4 }}>S{i + 1}: ${l.toLocaleString()}</Tag>
-                        ))}
-                      </div>
-                      <div>
-                        <Text style={{ color: '#f5222d', fontSize: 13, display: 'block', marginBottom: 6 }}>{t('market.resistanceLevels')}</Text>
-                        {report.technical.resistanceLevels.map((l, i) => (
-                          <Tag key={i} color="error" style={{ marginBottom: 4 }}>R{i + 1}: ${l.toLocaleString()}</Tag>
-                        ))}
-                      </div>
-                      <div style={{ marginTop: 16 }}>
-                        <Text style={{ color: '#888', fontSize: 12 }}>{t('market.trendJudgment')}</Text>
-                        <Tag color={report.technical.trend === 'uptrend' ? 'success' : report.technical.trend === 'downtrend' ? 'error' : 'default'} style={{ marginLeft: 8 }}>
-                          {report.technical.trend === 'uptrend' ? t('market.uptrend') : report.technical.trend === 'downtrend' ? t('market.downtrend') : t('market.sideways')}
-                        </Tag>
-                      </div>
-                      <Paragraph style={{ color: '#aaa', marginTop: 12, fontSize: 13, lineHeight: '1.8' }}>
-                        {report.technical.summary}
-                      </Paragraph>
-                    </Card>
-                  </Col>
-                </Row>
-              ),
-            },
-          ]}
-        />
-      </Card>
+          {/* Dimension Cards */}
+          <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
+            {trendReport.dimensions.map((d) => (
+              <Col xs={24} sm={12} md={8} lg={8} xl={4} key={d.name}>
+                <Card className="analysis-card" size="small">
+                  <div style={{ fontSize: 13, color: '#ccc', marginBottom: 8 }}>
+                    {DIM_ICONS[d.name]} {t(`trend.${d.name}`)}
+                  </div>
+                  <div style={{ fontSize: 24, fontWeight: 700, color: trendScoreColor(d.rawScore), lineHeight: 1 }}>
+                    {d.rawScore > 0 ? '+' : ''}{d.rawScore.toFixed(2)}
+                  </div>
+                  <div style={{ color: '#888', fontSize: 11, margin: '4px 0' }}>
+                    {t('trend.baseWeight')}: {(d.baseWeight * 100).toFixed(0)}% → {t('trend.adjustedWeight')}: {(d.adjustedWeight * 100).toFixed(1)}%
+                  </div>
+                  <Text style={{ color: '#aaa', fontSize: 12 }}>{d.summary}</Text>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        </>
+      )}
+
+      {/* ── Key Market Items from Analysis ─────────────────────────────── */}
+      {report && (
+        <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
+          {/* Key Metrics */}
+          <Col xs={24} xl={8}>
+            <Card className="analysis-card" title={<span style={{ color: '#fff' }}>{t('market.marketDataOverview')}</span>}>
+              <Row gutter={[12, 16]}>
+                <Col span={12}>
+                  <Statistic
+                    title={<span style={{ color: '#888', fontSize: 12 }}>{t('market.fearGreedIndex')}</span>}
+                    value={report.macro.fearGreedIndex}
+                    suffix="/100"
+                    valueStyle={{ color: report.macro.fearGreedIndex >= 60 ? '#f5222d' : '#52c41a', fontSize: 22 }}
+                  />
+                  <Text style={{ color: '#888', fontSize: 11 }}>
+                    {report.macro.fearGreedIndex >= 75 ? t('market.extremeGreed') : report.macro.fearGreedIndex >= 55 ? t('market.greed') : report.macro.fearGreedIndex >= 45 ? t('market.neutral') : t('market.fear')}
+                  </Text>
+                </Col>
+                <Col span={12}>
+                  <Statistic
+                    title={<span style={{ color: '#888', fontSize: 12 }}>{t('market.dollarIndex')}</span>}
+                    value={report.macro.dollarIndex}
+                    valueStyle={{ color: '#fff', fontSize: 22 }}
+                  />
+                </Col>
+                <Col span={12}>
+                  <Statistic
+                    title={<span style={{ color: '#888', fontSize: 12 }}>{t('market.exchangeNetflow')}</span>}
+                    value={report.supplyDemand.exchangeNetflow}
+                    valueStyle={{ color: report.supplyDemand.exchangeNetflow < 0 ? '#52c41a' : '#f5222d', fontSize: 20 }}
+                  />
+                  <Text style={{ color: '#888', fontSize: 11 }}>
+                    {report.supplyDemand.exchangeNetflow < 0 ? t('market.netOutflowBullish') : t('market.netInflowBearish')}
+                  </Text>
+                </Col>
+                <Col span={12}>
+                  <div style={{ marginBottom: 4 }}>
+                    <Text style={{ color: '#888', fontSize: 12 }}>{t('market.whaleActivity')}</Text>
+                  </div>
+                  <Tag color={report.supplyDemand.whaleActivity === 'accumulating' ? 'success' : report.supplyDemand.whaleActivity === 'distributing' ? 'error' : 'default'}>
+                    {report.supplyDemand.whaleActivity === 'accumulating' ? t('market.accumulating') : report.supplyDemand.whaleActivity === 'distributing' ? t('market.distributing') : t('market.neutral')}
+                  </Tag>
+                </Col>
+              </Row>
+            </Card>
+          </Col>
+
+          {/* Technical Indicators */}
+          <Col xs={24} xl={8}>
+            <Card className="analysis-card" title={<span style={{ color: '#fff' }}>{t('market.technicalIndicators')}</span>}>
+              <Table
+                dataSource={report.technical.indicators}
+                columns={indicatorColumns}
+                pagination={false}
+                size="small"
+                className="dark-table"
+                rowKey="name"
+              />
+            </Card>
+          </Col>
+
+          {/* Key Levels + Trend */}
+          <Col xs={24} xl={8}>
+            <Card className="analysis-card" title={<span style={{ color: '#fff' }}>{t('market.keyLevels')}</span>}>
+              <div style={{ marginBottom: 12 }}>
+                <Text style={{ color: '#52c41a', fontSize: 13, display: 'block', marginBottom: 6 }}>{t('market.supportLevels')}</Text>
+                {report.technical.supportLevels.map((l, i) => (
+                  <Tag key={i} color="success" style={{ marginBottom: 4 }}>S{i + 1}: ${l.toLocaleString()}</Tag>
+                ))}
+              </div>
+              <div style={{ marginBottom: 12 }}>
+                <Text style={{ color: '#f5222d', fontSize: 13, display: 'block', marginBottom: 6 }}>{t('market.resistanceLevels')}</Text>
+                {report.technical.resistanceLevels.map((l, i) => (
+                  <Tag key={i} color="error" style={{ marginBottom: 4 }}>R{i + 1}: ${l.toLocaleString()}</Tag>
+                ))}
+              </div>
+              <div>
+                <Text style={{ color: '#888', fontSize: 12 }}>{t('market.trendJudgment')}</Text>
+                <Tag color={report.technical.trend === 'uptrend' ? 'success' : report.technical.trend === 'downtrend' ? 'error' : 'default'} style={{ marginLeft: 8 }}>
+                  {report.technical.trend === 'uptrend' ? t('market.uptrend') : report.technical.trend === 'downtrend' ? t('market.downtrend') : t('market.sideways')}
+                </Tag>
+              </div>
+            </Card>
+          </Col>
+        </Row>
+      )}
+
+      {/* View Full Trend Report link */}
+      {trendReport && (
+        <div style={{ textAlign: 'right', marginTop: 16 }}>
+          <Button
+            type="link"
+            onClick={() => navigate('/trend')}
+            style={{ fontSize: 14, padding: 0 }}
+          >
+            {t('market.viewFullTrendReport')} <RightOutlined />
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

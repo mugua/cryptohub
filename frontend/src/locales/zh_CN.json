@@ -2,6 +2,7 @@
   "menu": {
     "dashboard": "仪表盘",
     "marketAnalysis": "市场分析",
+    "trendReport": "趋势报告",
     "quantTrading": "量化交易",
     "personalCenter": "个人中心",
     "systemSettings": "系统设置"
@@ -116,7 +117,36 @@
     "neutralWatch": "中性观望",
     "recommendSell": "建议卖出",
     "strongSell": "强烈卖出",
-    "marketDataOverview": "市场数据概览"
+    "marketDataOverview": "市场数据概览",
+    "viewFullTrendReport": "查看完整趋势报告"
+  },
+  "trend": {
+    "title": "趋势报告",
+    "generating": "正在生成趋势报告...",
+    "compositeScore": "综合趋势得分",
+    "signalLabel": "趋势信号",
+    "strongBullish": "强烈看多",
+    "mildBullish": "温和看多",
+    "neutral": "震荡/中性",
+    "mildBearish": "温和看空",
+    "strongBearish": "强烈看空",
+    "dimensionBreakdown": "维度分析明细",
+    "dimension": "维度",
+    "rawScore": "原始得分",
+    "baseWeight": "基础权重",
+    "adjustedWeight": "调整权重",
+    "severity": "严重程度",
+    "summary": "综合研判",
+    "macro": "宏观经济",
+    "policy": "政策法规",
+    "supply_demand": "供需分析 (链上)",
+    "sentiment": "市场情绪",
+    "technical": "技术分析",
+    "weightFormula": "权重计算公式",
+    "formulaDesc": "adjusted_weight = base_weight × (1 + severity × 0.8)，最后归一化使权重总和为 1",
+    "scoreRange": "综合得分范围 -1 至 +1",
+    "radarTitle": "五维评分雷达图",
+    "dimensionDetail": "维度详情"
   },
   "trading": {
     "title": "量化交易",
