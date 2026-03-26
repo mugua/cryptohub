@@ -2,30 +2,44 @@ import React, { useEffect, useState } from 'react';
 import {
   Row, Col, Card, Form, Input, Select, Switch, Slider, Button,
   Typography, Divider, InputNumber, message, Spin, Tabs, Tag,
+  Table, Space, Popconfirm, Modal, Badge,
 } from 'antd';
 import {
   SettingOutlined, BellOutlined, SafetyOutlined, GlobalOutlined,
-  ApiOutlined, SaveOutlined,
+  ApiOutlined, SaveOutlined, PlusOutlined, DeleteOutlined,
+  LinkOutlined,
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { fetchSettings } from '../../services/api';
+import { useTheme } from '../../ThemeContext';
+import { fetchSettings, fetchExchangeApiConfigs, saveExchangeApiConfig } from '../../services/api';
+import type { ExchangeApiConfig, ExchangeName } from '../../types';
 import './Settings.css';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
 
+const EXCHANGE_LOGOS: Record<ExchangeName, string> = {
+  binance: '🟡', okx: '⚫', bybit: '🟠', coinbase: '🔵',
+  kraken: '🟣', gate: '🟢', huobi: '🔴',
+};
+
 const Settings: React.FC = () => {
   const [loading, setLoading] = useState(true);
+  const [exchangeConfigs, setExchangeConfigs] = useState<ExchangeApiConfig[]>([]);
+  const [addExchangeOpen, setAddExchangeOpen] = useState(false);
   const [generalForm] = Form.useForm();
   const [notifyForm] = Form.useForm();
   const [riskForm] = Form.useForm();
+  const [exchangeForm] = Form.useForm();
   const { t, i18n } = useTranslation();
+  const { themeMode, setThemeMode } = useTheme();
 
   useEffect(() => {
-    fetchSettings().then((s) => {
-      generalForm.setFieldsValue({ language: s.language, theme: s.theme, currency: s.currency });
+    Promise.all([fetchSettings(), fetchExchangeApiConfigs()]).then(([s, configs]) => {
+      generalForm.setFieldsValue({ language: s.language, theme: themeMode, currency: s.currency });
       notifyForm.setFieldsValue(s.notifications);
       riskForm.setFieldsValue(s.risk);
+      setExchangeConfigs(configs);
       setLoading(false);
     });
   }, []);
@@ -35,6 +49,10 @@ const Settings: React.FC = () => {
     if (lang && lang !== i18n.language) {
       i18n.changeLanguage(lang);
       localStorage.setItem('language', lang);
+    }
+    const newTheme = values.theme as 'dark' | 'light';
+    if (newTheme && newTheme !== themeMode) {
+      setThemeMode(newTheme);
     }
     message.success(t('settings.generalSaved'));
   };
@@ -47,6 +65,36 @@ const Settings: React.FC = () => {
     message.success(t('settings.riskSaved'));
   };
 
+  const handleAddExchangeConfig = async (values: Record<string, string>) => {
+    const newConfig: ExchangeApiConfig = {
+      id: `cfg${Date.now()}`,
+      exchange: values.exchange as ExchangeName,
+      label: values.label,
+      apiKey: values.apiKey || '',
+      secretKey: values.secretKey || '',
+      passphrase: values.passphrase || '',
+      isEnabled: true,
+      createdAt: new Date().toISOString(),
+    };
+    await saveExchangeApiConfig(newConfig);
+    setExchangeConfigs((prev) => [...prev, newConfig]);
+    setAddExchangeOpen(false);
+    exchangeForm.resetFields();
+    message.success(t('settings.exchangeAdded'));
+  };
+
+  const handleDeleteExchangeConfig = (id: string) => {
+    setExchangeConfigs((prev) => prev.filter((c) => c.id !== id));
+    message.success(t('settings.exchangeRemoved'));
+  };
+
+  const handleToggleExchange = (id: string, enabled: boolean) => {
+    setExchangeConfigs((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, isEnabled: enabled } : c)),
+    );
+    message.success(enabled ? t('settings.exchangeEnabled') : t('settings.exchangeDisabled'));
+  };
+
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 300 }}>
@@ -57,6 +105,59 @@ const Settings: React.FC = () => {
 
   const formItemStyle = { marginBottom: 16 };
   const labelStyle = { color: '#ccc' };
+
+  const exchangeColumns = [
+    {
+      title: t('settings.exchangeName'),
+      key: 'exchange',
+      render: (row: ExchangeApiConfig) => (
+        <Space>
+          <span style={{ fontSize: 18 }}>{EXCHANGE_LOGOS[row.exchange]}</span>
+          <div>
+            <Text strong style={{ color: '#fff', display: 'block' }}>{row.label}</Text>
+            <Text style={{ color: '#888', fontSize: 11 }}>{row.exchange.toUpperCase()}</Text>
+          </div>
+        </Space>
+      ),
+    },
+    {
+      title: t('settings.apiKeyStatus'),
+      key: 'apiKey',
+      render: (row: ExchangeApiConfig) => (
+        row.apiKey
+          ? <Badge status="success" text={<Text style={{ color: '#52c41a', fontSize: 12 }}>{t('settings.configured')}</Text>} />
+          : <Badge status="default" text={<Text style={{ color: '#888', fontSize: 12 }}>{t('settings.notConfigured')}</Text>} />
+      ),
+    },
+    {
+      title: t('settings.enabledStatus'),
+      key: 'isEnabled',
+      render: (row: ExchangeApiConfig) => (
+        <Switch
+          checked={row.isEnabled}
+          onChange={(checked) => handleToggleExchange(row.id, checked)}
+          checkedChildren={t('common.on')}
+          unCheckedChildren={t('common.off')}
+        />
+      ),
+    },
+    {
+      title: t('profile.actions'),
+      key: 'actions',
+      render: (_: unknown, row: ExchangeApiConfig) => (
+        <Space>
+          <Popconfirm
+            title={t('settings.confirmDeleteExchange')}
+            onConfirm={() => handleDeleteExchangeConfig(row.id)}
+            okText={t('common.delete')}
+            cancelText={t('common.cancel')}
+          >
+            <Button type="text" size="small" icon={<DeleteOutlined style={{ color: '#f5222d' }} />} />
+          </Popconfirm>
+        </Space>
+      ),
+    },
+  ];
 
   const strategyNames = [
     t('settings.strategies.grid'),
@@ -117,6 +218,35 @@ const Settings: React.FC = () => {
                     {t('settings.saveGeneral')}
                   </Button>
                 </Form>
+              </Card>
+            ),
+          },
+          {
+            key: 'exchange',
+            label: <span><LinkOutlined /> {t('settings.exchangeApi')}</span>,
+            children: (
+              <Card className="settings-card">
+                <Text style={{ color: '#888', fontSize: 12, display: 'block', marginBottom: 16 }}>
+                  {t('settings.exchangeApiDesc')}
+                </Text>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
+                  <Button type="primary" icon={<PlusOutlined />} onClick={() => setAddExchangeOpen(true)}>
+                    {t('settings.addExchangeApi')}
+                  </Button>
+                </div>
+                <Table
+                  dataSource={exchangeConfigs}
+                  columns={exchangeColumns}
+                  rowKey="id"
+                  pagination={false}
+                  size="middle"
+                  className="dark-table"
+                />
+                <Card className="inner-card" size="small" style={{ marginTop: 16 }}>
+                  <Text style={{ color: '#888', fontSize: 12 }}>
+                    {t('settings.exchangeApiNotice')}
+                  </Text>
+                </Card>
               </Card>
             ),
           },
@@ -227,7 +357,7 @@ const Settings: React.FC = () => {
                         <Slider
                           min={5} max={50} step={1}
                           marks={{ 5: '5%', 15: '15%', 30: '30%', 50: '50%' }}
-                          tooltip={{ formatter: (v) => `${v}%` }}
+                          tooltip={{ formatter: (v?: number) => `${v}%` }}
                         />
                       </Form.Item>
                     </Col>
@@ -236,7 +366,7 @@ const Settings: React.FC = () => {
                         <Slider
                           min={1} max={20} step={0.5}
                           marks={{ 1: '1%', 5: '5%', 10: '10%', 20: '20%' }}
-                          tooltip={{ formatter: (v) => `${v}%` }}
+                          tooltip={{ formatter: (v?: number) => `${v}%` }}
                         />
                       </Form.Item>
                     </Col>
@@ -299,6 +429,46 @@ const Settings: React.FC = () => {
           },
         ]}
       />
+
+      {/* Add Exchange API Modal */}
+      <Modal
+        title={<span style={{ color: '#fff' }}><LinkOutlined /> {t('settings.addExchangeApi')}</span>}
+        open={addExchangeOpen}
+        onCancel={() => setAddExchangeOpen(false)}
+        onOk={() => exchangeForm.submit()}
+        okText={t('common.save')}
+        cancelText={t('common.cancel')}
+        styles={{ body: { background: '#161b22' }, header: { background: '#161b22', borderBottom: '1px solid #1f2937' }, footer: { background: '#161b22', borderTop: '1px solid #1f2937' } }}
+      >
+        <Form form={exchangeForm} layout="vertical" onFinish={handleAddExchangeConfig} style={{ marginTop: 16 }}>
+          <Form.Item name="exchange" label={<span style={{ color: '#ccc' }}>{t('settings.selectExchange')}</span>} rules={[{ required: true }]}>
+            <Select placeholder={t('settings.selectExchange')}>
+              {(['binance', 'okx', 'bybit', 'gate', 'coinbase', 'kraken', 'huobi'] as ExchangeName[]).map((e) => (
+                <Option key={e} value={e}>
+                  {EXCHANGE_LOGOS[e]} {e.toUpperCase()}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item name="label" label={<span style={{ color: '#ccc' }}>{t('settings.configLabel')}</span>} rules={[{ required: true }]}>
+            <Input placeholder={t('settings.configLabelPlaceholder')} />
+          </Form.Item>
+          <Form.Item name="apiKey" label={<span style={{ color: '#ccc' }}>API Key</span>}>
+            <Input placeholder={t('settings.apiKeyPlaceholder')} />
+          </Form.Item>
+          <Form.Item name="secretKey" label={<span style={{ color: '#ccc' }}>Secret Key</span>}>
+            <Input.Password placeholder={t('settings.secretKeyPlaceholder')} />
+          </Form.Item>
+          <Form.Item name="passphrase" label={<span style={{ color: '#ccc' }}>Passphrase ({t('common.optional')})</span>}>
+            <Input.Password placeholder={t('settings.passphrasePlaceholder')} />
+          </Form.Item>
+        </Form>
+        <div style={{ background: '#0d1117', border: '1px solid #374151', borderRadius: 6, padding: '10px 14px', marginTop: 8 }}>
+          <Text style={{ color: '#888', fontSize: 12 }}>
+            {t('settings.exchangeSecurityNotice')}
+          </Text>
+        </div>
+      </Modal>
     </div>
   );
 };

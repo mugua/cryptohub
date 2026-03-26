@@ -12,6 +12,7 @@ import {
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '../ThemeContext';
 import type { MenuProps } from 'antd';
 import './MainLayout.css';
 
@@ -26,6 +27,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
+  const { themeMode } = useTheme();
+
+  const isDark = themeMode === 'dark';
 
   const menuItems: MenuProps['items'] = [
     { key: '/', icon: <DashboardOutlined />, label: t('menu.dashboard') },
@@ -34,6 +38,11 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     { key: '/profile', icon: <UserOutlined />, label: t('menu.personalCenter') },
     { key: '/settings', icon: <SettingOutlined />, label: t('menu.systemSettings') },
   ];
+
+  const handleUserMenuClick: MenuProps['onClick'] = ({ key }) => {
+    if (key === 'profile') navigate('/profile');
+    else if (key === 'security') navigate('/settings');
+  };
 
   const userMenu: MenuProps['items'] = [
     { key: 'profile', icon: <UserOutlined />, label: t('header.profile') },
@@ -48,13 +57,13 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         collapsible
         collapsed={collapsed}
         onCollapse={setCollapsed}
-        theme="dark"
+        theme={isDark ? 'dark' : 'light'}
         width={220}
-        style={{ background: '#0d1117' }}
+        style={{ background: isDark ? '#0d1117' : '#fff' }}
       >
         <div className="logo">
           {!collapsed ? (
-            <span className="logo-text">
+            <span className="logo-text" style={{ color: isDark ? '#fff' : '#333' }}>
               <span className="logo-icon">₿</span> CryptoHub
             </span>
           ) : (
@@ -62,30 +71,30 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           )}
         </div>
         <Menu
-          theme="dark"
+          theme={isDark ? 'dark' : 'light'}
           mode="inline"
           selectedKeys={[location.pathname]}
           items={menuItems}
           onClick={({ key }) => navigate(key)}
-          style={{ background: '#0d1117', borderRight: 'none' }}
+          style={{ background: isDark ? '#0d1117' : '#fff', borderRight: 'none' }}
         />
       </Sider>
 
       <Layout>
-        <Header className="main-header">
+        <Header className="main-header" style={{ background: isDark ? '#0d1117' : '#fff', borderBottom: isDark ? '1px solid #1f2937' : '1px solid #e0e0e0' }}>
           <div className="header-left">
             <Tag color="#00c853" style={{ fontSize: 12 }}>{t('header.systemRunning')}</Tag>
-            <span style={{ color: '#888', fontSize: 13 }}>BTC: $67,420</span>
+            <span style={{ color: isDark ? '#888' : '#666', fontSize: 13 }}>BTC: $67,420</span>
             <span style={{ color: '#00c853', fontSize: 13 }}>▲ +1.28%</span>
           </div>
           <div className="header-right">
             <Badge count={3} size="small">
-              <BellOutlined style={{ fontSize: 18, color: '#ccc', cursor: 'pointer' }} />
+              <BellOutlined style={{ fontSize: 18, color: isDark ? '#ccc' : '#666', cursor: 'pointer' }} />
             </Badge>
-            <Dropdown menu={{ items: userMenu }} placement="bottomRight">
+            <Dropdown menu={{ items: userMenu, onClick: handleUserMenuClick }} placement="bottomRight">
               <Space style={{ cursor: 'pointer' }}>
                 <Avatar style={{ backgroundColor: '#1677ff' }} icon={<UserOutlined />} size={32} />
-                <span style={{ color: '#ccc', fontSize: 13 }}>Admin</span>
+                <span style={{ color: isDark ? '#ccc' : '#333', fontSize: 13 }}>Admin</span>
               </Space>
             </Dropdown>
           </div>

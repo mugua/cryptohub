@@ -3,6 +3,7 @@ import { ConfigProvider, theme } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import enUS from 'antd/locale/en_US';
 import { useTranslation } from 'react-i18next';
+import { ThemeProvider, useTheme } from './ThemeContext';
 import MainLayout from './layouts/MainLayout';
 import Dashboard from './pages/Dashboard';
 import MarketAnalysis from './pages/MarketAnalysis';
@@ -27,11 +28,24 @@ const darkTheme = {
   },
 };
 
-function App() {
+const lightTheme = {
+  algorithm: theme.defaultAlgorithm,
+  token: {
+    colorPrimary: '#1677ff',
+    borderRadius: 6,
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif",
+  },
+};
+
+function AppInner() {
   const { i18n } = useTranslation();
+  const { themeMode } = useTheme();
 
   return (
-    <ConfigProvider locale={antdLocales[i18n.language] || zhCN} theme={darkTheme}>
+    <ConfigProvider
+      locale={antdLocales[i18n.language] || zhCN}
+      theme={themeMode === 'dark' ? darkTheme : lightTheme}
+    >
       <BrowserRouter>
         <MainLayout>
           <Routes>
@@ -45,6 +59,14 @@ function App() {
         </MainLayout>
       </BrowserRouter>
     </ConfigProvider>
+  );
+}
+
+function App() {
+  return (
+    <ThemeProvider>
+      <AppInner />
+    </ThemeProvider>
   );
 }
 

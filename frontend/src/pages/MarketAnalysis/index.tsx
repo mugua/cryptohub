@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import {
   Row, Col, Card, Select, Spin, Tag, Typography, Progress, Table,
-  Tabs, Statistic, Alert,
+  Tabs, Statistic, Alert, Button, Space,
 } from 'antd';
 import {
   LineChartOutlined, GlobalOutlined, SafetyCertificateOutlined,
@@ -9,8 +9,9 @@ import {
 } from '@ant-design/icons';
 import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer,
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
 } from 'recharts';
+import { createChart, ColorType, CandlestickSeries, HistogramSeries, LineSeries } from 'lightweight-charts';
+import type { IChartApi, ISeriesApi, CandlestickData, Time } from 'lightweight-charts';
 import { useTranslation } from 'react-i18next';
 import { fetchAnalysis, fetchCandles } from '../../services/api';
 import type { AnalysisReport, Candle } from '../../types';
@@ -20,12 +21,60 @@ const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 
 const SYMBOLS = ['BTC/USDT', 'ETH/USDT', 'BNB/USDT', 'SOL/USDT', 'XRP/USDT'];
+const TIMEFRAMES = ['1m', '5m', '15m', '30m', '1H', '4H', '1D', '1W'];
+const INDICATORS = ['SMA', 'EMA', 'RSI', 'MACD', 'BB', 'ATR', 'CCI', 'W%R', 'MFI', 'ADX', 'OBV', 'ADOSC', 'AD', 'KDJ'];
+
+function computeSMA(data: Candle[], period: number): { time: number; value: number }[] {
+  const result: { time: number; value: number }[] = [];
+  for (let i = period - 1; i < data.length; i++) {
+    let sum = 0;
+    for (let j = 0; j < period; j++) sum += data[i - j].close;
+    result.push({ time: data[i].time, value: sum / period });
+  }
+  return result;
+}
+
+function computeEMA(data: Candle[], period: number): { time: number; value: number }[] {
+  const result: { time: number; value: number }[] = [];
+  const k = 2 / (period + 1);
+  let ema = data[0].close;
+  for (let i = 0; i < data.length; i++) {
+    ema = data[i].close * k + ema * (1 - k);
+    if (i >= period - 1) {
+      result.push({ time: data[i].time, value: ema });
+    }
+  }
+  return result;
+}
+
+function computeBollingerBands(data: Candle[], period: number = 20, stdDev: number = 2) {
+  const upper: { time: number; value: number }[] = [];
+  const lower: { time: number; value: number }[] = [];
+  for (let i = period - 1; i < data.length; i++) {
+    let sum = 0;
+    for (let j = 0; j < period; j++) sum += data[i - j].close;
+    const mean = sum / period;
+    let sqSum = 0;
+    for (let j = 0; j < period; j++) sqSum += (data[i - j].close - mean) ** 2;
+    const std = Math.sqrt(sqSum / period);
+    upper.push({ time: data[i].time, value: mean + stdDev * std });
+    lower.push({ time: data[i].time, value: mean - stdDev * std });
+  }
+  return { upper, lower };
+}
 
 const MarketAnalysis: React.FC = () => {
   const [symbol, setSymbol] = useState('BTC/USDT');
+  const [timeframe, setTimeframe] = useState('1D');
+  const [activeIndicators, setActiveIndicators] = useState<string[]>([]);
   const [report, setReport] = useState<AnalysisReport | null>(null);
   const [candles, setCandles] = useState<Candle[]>([]);
   const [loading, setLoading] = useState(true);
+  const chartContainerRef = useRef<HTMLDivElement>(null);
+  const chartRef = useRef<IChartApi | null>(null);
+  const candleSeriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null);
+  const volumeSeriesRef = useRef<ISeriesApi<'Histogram'> | null>(null);
+  const indicatorSeriesRef = useRef<ISeriesApi<'Line'>[]>([]);
   const { t, i18n } = useTranslation();
 
   const SIGNAL_COLOR: Record<string, string> = {
@@ -46,15 +95,176 @@ const MarketAnalysis: React.FC = () => {
 
   useEffect(() => {
     setLoading(true);
+    const limit = timeframe === '1W' ? 52 : timeframe === '1D' ? 120 : 200;
+    const interval = ['1D', '1W'].includes(timeframe) ? '1d' : '1h';
     Promise.all([
       fetchAnalysis(symbol),
-      fetchCandles(symbol, '1d', 90),
+      fetchCandles(symbol, interval, limit),
     ]).then(([r, c]) => {
       setReport(r);
       setCandles(c);
       setLoading(false);
     });
-  }, [symbol]);
+  }, [symbol, timeframe]);
+
+  const updateChart = useCallback(() => {
+    if (!chartContainerRef.current || candles.length === 0) return;
+
+    // Clean up existing chart
+    if (chartRef.current) {
+      chartRef.current.remove();
+      chartRef.current = null;
+    }
+
+    const chart = createChart(chartContainerRef.current, {
+      width: chartContainerRef.current.clientWidth,
+      height: 460,
+      layout: {
+        background: { type: ColorType.Solid, color: '#0d1117' },
+        textColor: '#888',
+        fontSize: 11,
+      },
+      grid: {
+        vertLines: { color: '#1f2937' },
+        horzLines: { color: '#1f2937' },
+      },
+      crosshair: {
+        mode: 0,
+      },
+      rightPriceScale: {
+        borderColor: '#1f2937',
+        scaleMargins: { top: 0.05, bottom: 0.2 },
+      },
+      timeScale: {
+        borderColor: '#1f2937',
+        timeVisible: true,
+      },
+    });
+
+    chartRef.current = chart;
+
+    // Candlestick series
+    const candleSeries = chart.addSeries(CandlestickSeries, {
+      upColor: '#26a69a',
+      downColor: '#ef5350',
+      borderVisible: false,
+      wickUpColor: '#26a69a',
+      wickDownColor: '#ef5350',
+    });
+
+    const candleData: CandlestickData<Time>[] = candles.map((c) => ({
+      time: (c.time / 1000) as Time,
+      open: c.open,
+      high: c.high,
+      low: c.low,
+      close: c.close,
+    }));
+
+    candleSeries.setData(candleData);
+    candleSeriesRef.current = candleSeries;
+
+    // Volume series
+    const volumeSeries = chart.addSeries(HistogramSeries, {
+      priceFormat: { type: 'volume' },
+      priceScaleId: 'volume',
+    });
+
+    chart.priceScale('volume').applyOptions({
+      scaleMargins: { top: 0.85, bottom: 0 },
+    });
+
+    volumeSeries.setData(
+      candles.map((c) => ({
+        time: (c.time / 1000) as Time,
+        value: c.volume,
+        color: c.close >= c.open ? 'rgba(38, 166, 154, 0.5)' : 'rgba(239, 83, 80, 0.5)',
+      })),
+    );
+    volumeSeriesRef.current = volumeSeries;
+
+    // Clean up old indicator series
+    indicatorSeriesRef.current = [];
+
+    // Add indicator overlays
+    if (activeIndicators.includes('SMA')) {
+      const sma20 = computeSMA(candles, 20);
+      const smaSeries = chart.addSeries(LineSeries, {
+        color: '#f39c12',
+        lineWidth: 1,
+        priceLineVisible: false,
+        lastValueVisible: false,
+      });
+      smaSeries.setData(sma20.map((d) => ({ time: (d.time / 1000) as Time, value: d.value })));
+      indicatorSeriesRef.current.push(smaSeries);
+    }
+
+    if (activeIndicators.includes('EMA')) {
+      const ema20 = computeEMA(candles, 20);
+      const emaSeries = chart.addSeries(LineSeries, {
+        color: '#3498db',
+        lineWidth: 1,
+        priceLineVisible: false,
+        lastValueVisible: false,
+      });
+      emaSeries.setData(ema20.map((d) => ({ time: (d.time / 1000) as Time, value: d.value })));
+      indicatorSeriesRef.current.push(emaSeries);
+    }
+
+    if (activeIndicators.includes('BB')) {
+      const bb = computeBollingerBands(candles);
+      const bbUpper = chart.addSeries(LineSeries, {
+        color: 'rgba(155, 89, 182, 0.6)',
+        lineWidth: 1,
+        priceLineVisible: false,
+        lastValueVisible: false,
+      });
+      bbUpper.setData(bb.upper.map((d) => ({ time: (d.time / 1000) as Time, value: d.value })));
+      indicatorSeriesRef.current.push(bbUpper);
+
+      const bbLower = chart.addSeries(LineSeries, {
+        color: 'rgba(155, 89, 182, 0.6)',
+        lineWidth: 1,
+        priceLineVisible: false,
+        lastValueVisible: false,
+      });
+      bbLower.setData(bb.lower.map((d) => ({ time: (d.time / 1000) as Time, value: d.value })));
+      indicatorSeriesRef.current.push(bbLower);
+    }
+
+    chart.timeScale().fitContent();
+
+    // Resize observer
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.target === chartContainerRef.current) {
+          chart.applyOptions({ width: entry.contentRect.width });
+        }
+      }
+    });
+    resizeObserver.observe(chartContainerRef.current);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [candles, activeIndicators]);
+
+  useEffect(() => {
+    if (!loading) {
+      updateChart();
+    }
+    return () => {
+      if (chartRef.current) {
+        chartRef.current.remove();
+        chartRef.current = null;
+      }
+    };
+  }, [loading, updateChart]);
+
+  const toggleIndicator = (indicator: string) => {
+    setActiveIndicators((prev) =>
+      prev.includes(indicator) ? prev.filter((i) => i !== indicator) : [...prev, indicator],
+    );
+  };
 
   if (loading) {
     return (
@@ -66,11 +276,15 @@ const MarketAnalysis: React.FC = () => {
 
   const locale = i18n.language === 'en_US' ? 'en-US' : 'zh-CN';
 
-  const chartData = candles.map((c) => ({
-    date: new Date(c.time).toLocaleDateString(locale, { month: 'short', day: 'numeric' }),
-    close: c.close,
-    volume: c.volume,
-  }));
+  const lastCandle = candles[candles.length - 1];
+  const ohlcvDisplay = lastCandle ? {
+    time: new Date(lastCandle.time).toLocaleString(locale),
+    open: lastCandle.open.toLocaleString('en-US', { minimumFractionDigits: 2 }),
+    high: lastCandle.high.toLocaleString('en-US', { minimumFractionDigits: 2 }),
+    low: lastCandle.low.toLocaleString('en-US', { minimumFractionDigits: 2 }),
+    close: lastCandle.close.toLocaleString('en-US', { minimumFractionDigits: 2 }),
+    volume: lastCandle.volume.toLocaleString('en-US', { maximumFractionDigits: 0 }),
+  } : null;
 
   const radarData = report
     ? [
@@ -178,28 +392,65 @@ const MarketAnalysis: React.FC = () => {
         />
       )}
 
-      <Row gutter={[16, 16]}>
-        {/* Price Chart */}
-        <Col xs={24} xl={16}>
-          <Card className="analysis-card" title={<span style={{ color: '#fff' }}>{symbol} {t('market.priceTrend90d')}</span>}>
-            <ResponsiveContainer width="100%" height={260}>
-              <AreaChart data={chartData}>
-                <defs>
-                  <linearGradient id="priceGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#1677ff" stopOpacity={0.35} />
-                    <stop offset="95%" stopColor="#1677ff" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
-                <XAxis dataKey="date" tick={{ fill: '#555', fontSize: 11 }} interval={14} />
-                <YAxis domain={['auto', 'auto']} tick={{ fill: '#555', fontSize: 11 }} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}K`} />
-                <Tooltip contentStyle={{ background: '#1f2937', border: '1px solid #374151', color: '#fff' }} formatter={(v) => [`$${Number(v).toLocaleString()}`, t('common.price')]} />
-                <Area type="monotone" dataKey="close" stroke="#1677ff" fill="url(#priceGrad)" strokeWidth={2} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </Card>
-        </Col>
+      {/* Candlestick Chart Section */}
+      <Card className="analysis-card" style={{ marginBottom: 16 }}>
+        {/* Timeframe selector */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
+          <Tag color="purple" style={{ fontSize: 12 }}>{symbol}</Tag>
+          <Space size={4}>
+            {TIMEFRAMES.map((tf) => (
+              <Button
+                key={tf}
+                type={timeframe === tf ? 'primary' : 'text'}
+                size="small"
+                onClick={() => setTimeframe(tf)}
+                style={{ fontSize: 12, padding: '0 8px', minWidth: 32 }}
+              >
+                {tf}
+              </Button>
+            ))}
+          </Space>
+        </div>
 
+        {/* Indicator selector */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 12, flexWrap: 'wrap' }}>
+          {INDICATORS.map((ind) => (
+            <Button
+              key={ind}
+              type={activeIndicators.includes(ind) ? 'primary' : 'default'}
+              size="small"
+              onClick={() => toggleIndicator(ind)}
+              style={{
+                fontSize: 11,
+                padding: '0 8px',
+                height: 26,
+                background: activeIndicators.includes(ind) ? undefined : '#1f2937',
+                borderColor: activeIndicators.includes(ind) ? undefined : '#374151',
+                color: activeIndicators.includes(ind) ? undefined : '#ccc',
+              }}
+            >
+              {ind}
+            </Button>
+          ))}
+        </div>
+
+        {/* OHLCV data display */}
+        {ohlcvDisplay && (
+          <div style={{ display: 'flex', gap: 16, marginBottom: 8, fontSize: 12, flexWrap: 'wrap' }}>
+            <Text style={{ color: '#888' }}>Time: {ohlcvDisplay.time}</Text>
+            <Text style={{ color: '#888' }}>Open: <span style={{ color: '#fff' }}>{ohlcvDisplay.open}</span></Text>
+            <Text style={{ color: '#888' }}>High: <span style={{ color: '#52c41a' }}>{ohlcvDisplay.high}</span></Text>
+            <Text style={{ color: '#888' }}>Low: <span style={{ color: '#f5222d' }}>{ohlcvDisplay.low}</span></Text>
+            <Text style={{ color: '#888' }}>Close: <span style={{ color: '#fff' }}>{ohlcvDisplay.close}</span></Text>
+            <Text style={{ color: '#888' }}>Volume: <span style={{ color: '#faad14' }}>{ohlcvDisplay.volume}</span></Text>
+          </div>
+        )}
+
+        {/* Chart container */}
+        <div ref={chartContainerRef} style={{ width: '100%' }} />
+      </Card>
+
+      <Row gutter={[16, 16]}>
         {/* Radar Chart */}
         <Col xs={24} xl={8}>
           <Card className="analysis-card" title={<span style={{ color: '#fff' }}>{t('market.radarChart')}</span>}>
@@ -210,6 +461,46 @@ const MarketAnalysis: React.FC = () => {
                 <Radar name={t('market.score')} dataKey="A" stroke="#1677ff" fill="#1677ff" fillOpacity={0.35} />
               </RadarChart>
             </ResponsiveContainer>
+          </Card>
+        </Col>
+
+        {/* Volume & Moving Average Stats */}
+        <Col xs={24} xl={16}>
+          <Card className="analysis-card" title={<span style={{ color: '#fff' }}>{t('market.marketDataOverview')}</span>}>
+            <Row gutter={[16, 16]}>
+              <Col span={6}>
+                <Statistic
+                  title={<span style={{ color: '#888', fontSize: 12 }}>VOL(5,10,20)</span>}
+                  value={candles.length > 0 ? candles[candles.length - 1].volume : 0}
+                  valueStyle={{ color: '#fff', fontSize: 18 }}
+                  formatter={(v) => `${Number(v).toLocaleString('en-US', { maximumFractionDigits: 0 })}`}
+                />
+              </Col>
+              <Col span={6}>
+                <Statistic
+                  title={<span style={{ color: '#f39c12', fontSize: 12 }}>MA5</span>}
+                  value={candles.length >= 5 ? (candles.slice(-5).reduce((s, c) => s + c.close, 0) / 5) : 0}
+                  valueStyle={{ color: '#f39c12', fontSize: 18 }}
+                  precision={2}
+                />
+              </Col>
+              <Col span={6}>
+                <Statistic
+                  title={<span style={{ color: '#3498db', fontSize: 12 }}>MA10</span>}
+                  value={candles.length >= 10 ? (candles.slice(-10).reduce((s, c) => s + c.close, 0) / 10) : 0}
+                  valueStyle={{ color: '#3498db', fontSize: 18 }}
+                  precision={2}
+                />
+              </Col>
+              <Col span={6}>
+                <Statistic
+                  title={<span style={{ color: '#e74c3c', fontSize: 12 }}>MA20</span>}
+                  value={candles.length >= 20 ? (candles.slice(-20).reduce((s, c) => s + c.close, 0) / 20) : 0}
+                  valueStyle={{ color: '#e74c3c', fontSize: 18 }}
+                  precision={2}
+                />
+              </Col>
+            </Row>
           </Card>
         </Col>
       </Row>
