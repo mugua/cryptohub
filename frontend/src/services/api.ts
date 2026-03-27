@@ -3,6 +3,7 @@ import {
   BacktestResult, ExchangeAccount, Order, SystemSettings,
   UserProfile, VipPlan, ExchangeApiConfig,
   TrendReport, DimensionScore, TrendSignal,
+  TrendReportConfig, DimensionConfig,
 } from '../types';
 
 // ---------------------------------------------------------------------------
@@ -304,6 +305,84 @@ export async function fetchSettings(): Promise<SystemSettings> {
 }
 
 // ─── User / Auth ──────────────────────────────────────────────────────────────
+
+const ADMIN_EMAIL = 'admin@cryptohub.io';
+const ADMIN_PASSWORD = '123456';
+
+const MOCK_USERS: { email: string; password: string; profile: UserProfile }[] = [
+  {
+    email: ADMIN_EMAIL,
+    password: ADMIN_PASSWORD,
+    profile: {
+      id: 'u1',
+      email: ADMIN_EMAIL,
+      nickname: 'CryptoMaster',
+      phone: '+86 138****8888',
+      role: 'admin',
+      isVerified: true,
+      createdAt: '2025-10-01T00:00:00Z',
+      lastLoginAt: new Date().toISOString(),
+      loginMethod: 'email',
+    },
+  },
+];
+
+function getMockUsers() {
+  const saved = localStorage.getItem('cryptohub_mock_users');
+  if (saved) return JSON.parse(saved) as typeof MOCK_USERS;
+  return MOCK_USERS;
+}
+
+function saveMockUsers(users: typeof MOCK_USERS) {
+  localStorage.setItem('cryptohub_mock_users', JSON.stringify(users));
+}
+
+export async function loginByPassword(email: string, password: string): Promise<{ success: boolean; token?: string; user?: UserProfile; message?: string }> {
+  await delay(400);
+  const users = getMockUsers();
+  const found = users.find((u) => u.email === email && u.password === password);
+  if (found) {
+    found.profile.lastLoginAt = new Date().toISOString();
+    return { success: true, token: 'mock-jwt-' + Date.now(), user: found.profile };
+  }
+  return { success: false, message: 'auth.invalidCredentials' };
+}
+
+export async function registerByEmail(email: string, password: string, code: string): Promise<{ success: boolean; token?: string; user?: UserProfile; message?: string }> {
+  await delay(500);
+  void code;
+  const users = getMockUsers();
+  if (users.find((u) => u.email === email)) {
+    return { success: false, message: 'auth.emailExists' };
+  }
+  const newUser: UserProfile = {
+    id: `u${Date.now()}`,
+    email,
+    nickname: email.split('@')[0],
+    role: 'user',
+    isVerified: true,
+    createdAt: new Date().toISOString(),
+    lastLoginAt: new Date().toISOString(),
+    loginMethod: 'email',
+  };
+  users.push({ email, password, profile: newUser });
+  saveMockUsers(users);
+  return { success: true, token: 'mock-jwt-' + Date.now(), user: newUser };
+}
+
+export async function resetPassword(email: string, code: string, newPassword: string): Promise<{ success: boolean; message?: string }> {
+  await delay(400);
+  void code;
+  const users = getMockUsers();
+  const found = users.find((u) => u.email === email);
+  if (!found) {
+    return { success: false, message: 'auth.emailNotFound' };
+  }
+  found.password = newPassword;
+  saveMockUsers(users);
+  return { success: true };
+}
+
 export async function fetchUserProfile(): Promise<UserProfile> {
   await delay(200);
   return {
@@ -401,6 +480,36 @@ export async function saveExchangeApiConfig(_config: Partial<ExchangeApiConfig>)
 
 // ─── Trend Report ─────────────────────────────────────────────────────────────
 
+const DEFAULT_TREND_CONFIG: TrendReportConfig = {
+  dimensions: [
+    { name: 'macro', baseWeight: 0.20, enabled: true },
+    { name: 'policy', baseWeight: 0.25, enabled: true },
+    { name: 'supply_demand', baseWeight: 0.25, enabled: true },
+    { name: 'sentiment', baseWeight: 0.15, enabled: true },
+    { name: 'technical', baseWeight: 0.15, enabled: true },
+  ],
+  boostFactor: 0.8,
+};
+
+export function getTrendReportConfig(): TrendReportConfig {
+  const saved = localStorage.getItem('cryptohub_trend_config');
+  if (saved) {
+    return JSON.parse(saved);
+  }
+  return DEFAULT_TREND_CONFIG;
+}
+
+export async function fetchTrendReportConfig(): Promise<TrendReportConfig> {
+  await delay(100);
+  return getTrendReportConfig();
+}
+
+export async function saveTrendReportConfig(config: TrendReportConfig): Promise<{ success: boolean }> {
+  await delay(200);
+  localStorage.setItem('cryptohub_trend_config', JSON.stringify(config));
+  return { success: true };
+}
+
 function normaliseScore(raw: number, lo = -100, hi = 100): number {
   const clamped = Math.max(lo, Math.min(hi, raw));
   return +((clamped - lo) / (hi - lo) * 2 - 1).toFixed(4);
@@ -410,8 +519,7 @@ function severityFromScore(s: number): number {
   return +Math.min(Math.abs(s) / 100, 1).toFixed(4);
 }
 
-function computeTrend(dims: DimensionScore[]): { compositeScore: number; signal: TrendSignal } {
-  const boostMul = 0.8;
+function computeTrend(dims: DimensionScore[], boostMul: number): { compositeScore: number; signal: TrendSignal } {
   const adjusted = dims.map(d => d.baseWeight * (1 + d.severity * boostMul));
   const total = adjusted.reduce((a, b) => a + b, 0);
   const norm = total === 0 ? dims.map(() => 1 / dims.length) : adjusted.map(w => w / total);
@@ -429,6 +537,7 @@ function computeTrend(dims: DimensionScore[]): { compositeScore: number; signal:
 
 export async function fetchTrendReport(symbol: string): Promise<TrendReport> {
   await delay(500);
+  const config = getTrendReportConfig();
   const isBTC = symbol.startsWith('BTC');
   const rawMacro = 62;
   const rawPolicy = isBTC ? 55 : 40;
@@ -436,50 +545,34 @@ export async function fetchTrendReport(symbol: string): Promise<TrendReport> {
   const rawSentiment = 68;
   const rawTechnical = 65;
 
-  const dims: DimensionScore[] = [
-    {
-      name: 'macro',
-      rawScore: normaliseScore(rawMacro),
-      baseWeight: 0.20,
-      adjustedWeight: 0,
-      severity: severityFromScore(rawMacro),
-      summary: '美联储降息预期增强，宏观流动性趋于宽松，对风险资产整体利好。',
-    },
-    {
-      name: 'policy',
-      rawScore: normaliseScore(rawPolicy),
-      baseWeight: 0.25,
-      adjustedWeight: 0,
-      severity: severityFromScore(rawPolicy),
-      summary: '全球主要监管机构对加密市场态度趋于明朗，机构合规渠道持续拓展。',
-    },
-    {
-      name: 'supply_demand',
-      rawScore: normaliseScore(rawSupply),
-      baseWeight: 0.25,
-      adjustedWeight: 0,
-      severity: severityFromScore(rawSupply),
-      summary: '链上数据显示大量比特币从交易所流出，鲸鱼地址持续积累。',
-    },
-    {
-      name: 'sentiment',
-      rawScore: normaliseScore(rawSentiment),
-      baseWeight: 0.15,
-      adjustedWeight: 0,
-      severity: severityFromScore(rawSentiment),
-      summary: '市场情绪处于贪婪区间，散户FOMO情绪升温，需警惕短期回调风险。',
-    },
-    {
-      name: 'technical',
-      rawScore: normaliseScore(rawTechnical),
-      baseWeight: 0.15,
-      adjustedWeight: 0,
-      severity: severityFromScore(rawTechnical),
-      summary: '价格位于多条均线之上，MACD出现金叉，整体技术面偏多。',
-    },
-  ];
+  const rawScores: Record<string, number> = {
+    macro: rawMacro,
+    policy: rawPolicy,
+    supply_demand: rawSupply,
+    sentiment: rawSentiment,
+    technical: rawTechnical,
+  };
 
-  const { compositeScore, signal } = computeTrend(dims);
+  const summaries: Record<string, string> = {
+    macro: '美联储降息预期增强，宏观流动性趋于宽松，对风险资产整体利好。',
+    policy: '全球主要监管机构对加密市场态度趋于明朗，机构合规渠道持续拓展。',
+    supply_demand: '链上数据显示大量比特币从交易所流出，鲸鱼地址持续积累。',
+    sentiment: '市场情绪处于贪婪区间，散户FOMO情绪升温，需警惕短期回调风险。',
+    technical: '价格位于多条均线之上，MACD出现金叉，整体技术面偏多。',
+  };
+
+  const dims: DimensionScore[] = config.dimensions
+    .filter((d: DimensionConfig) => d.enabled)
+    .map((d: DimensionConfig) => ({
+      name: d.name,
+      rawScore: normaliseScore(rawScores[d.name] ?? 50),
+      baseWeight: d.baseWeight,
+      adjustedWeight: 0,
+      severity: severityFromScore(rawScores[d.name] ?? 50),
+      summary: summaries[d.name] ?? '',
+    }));
+
+  const { compositeScore, signal } = computeTrend(dims, config.boostFactor);
 
   return {
     symbol,

@@ -258,6 +258,18 @@ export interface ExchangeApiConfig {
   createdAt: string;
 }
 
+// ─── Trend Report Config ──────────────────────────────────────────────────────
+export interface DimensionConfig {
+  name: string;
+  baseWeight: number;
+  enabled: boolean;
+}
+
+export interface TrendReportConfig {
+  dimensions: DimensionConfig[];
+  boostFactor: number;
+}
+
 // ─── Settings ─────────────────────────────────────────────────────────────────
 export interface SystemSettings {
   language: 'zh_CN' | 'en_US';

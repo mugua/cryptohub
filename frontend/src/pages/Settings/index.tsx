@@ -7,12 +7,12 @@ import {
 import {
   SettingOutlined, BellOutlined, SafetyOutlined, GlobalOutlined,
   ApiOutlined, SaveOutlined, PlusOutlined, DeleteOutlined,
-  LinkOutlined,
+  LinkOutlined, FundOutlined,
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../ThemeContext';
-import { fetchSettings, fetchExchangeApiConfigs, saveExchangeApiConfig } from '../../services/api';
-import type { ExchangeApiConfig, ExchangeName } from '../../types';
+import { fetchSettings, fetchExchangeApiConfigs, saveExchangeApiConfig, fetchTrendReportConfig, saveTrendReportConfig } from '../../services/api';
+import type { ExchangeApiConfig, ExchangeName, TrendReportConfig } from '../../types';
 import './Settings.css';
 
 const { Title, Text } = Typography;
@@ -26,6 +26,7 @@ const EXCHANGE_LOGOS: Record<ExchangeName, string> = {
 const Settings: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [exchangeConfigs, setExchangeConfigs] = useState<ExchangeApiConfig[]>([]);
+  const [trendConfig, setTrendConfig] = useState<TrendReportConfig | null>(null);
   const [addExchangeOpen, setAddExchangeOpen] = useState(false);
   const [generalForm] = Form.useForm();
   const [notifyForm] = Form.useForm();
@@ -35,11 +36,12 @@ const Settings: React.FC = () => {
   const { themeMode, setThemeMode } = useTheme();
 
   useEffect(() => {
-    Promise.all([fetchSettings(), fetchExchangeApiConfigs()]).then(([s, configs]) => {
+    Promise.all([fetchSettings(), fetchExchangeApiConfigs(), fetchTrendReportConfig()]).then(([s, configs, tc]) => {
       generalForm.setFieldsValue({ language: s.language, theme: themeMode, currency: s.currency });
       notifyForm.setFieldsValue(s.notifications);
       riskForm.setFieldsValue(s.risk);
       setExchangeConfigs(configs);
+      setTrendConfig(tc);
       setLoading(false);
     });
   }, []);
@@ -93,6 +95,38 @@ const Settings: React.FC = () => {
       prev.map((c) => (c.id === id ? { ...c, isEnabled: enabled } : c)),
     );
     message.success(enabled ? t('settings.exchangeEnabled') : t('settings.exchangeDisabled'));
+  };
+
+  const handleTrendWeightChange = (index: number, value: number | null) => {
+    if (!trendConfig || value === null) return;
+    const updated = { ...trendConfig, dimensions: [...trendConfig.dimensions] };
+    updated.dimensions[index] = { ...updated.dimensions[index], baseWeight: value / 100 };
+    setTrendConfig(updated);
+  };
+
+  const handleTrendEnabledChange = (index: number, enabled: boolean) => {
+    if (!trendConfig) return;
+    const updated = { ...trendConfig, dimensions: [...trendConfig.dimensions] };
+    updated.dimensions[index] = { ...updated.dimensions[index], enabled };
+    setTrendConfig(updated);
+  };
+
+  const handleBoostFactorChange = (value: number | null) => {
+    if (!trendConfig || value === null) return;
+    setTrendConfig({ ...trendConfig, boostFactor: value });
+  };
+
+  const handleSaveTrendConfig = async () => {
+    if (!trendConfig) return;
+    const totalWeight = trendConfig.dimensions
+      .filter((d) => d.enabled)
+      .reduce((acc, d) => acc + d.baseWeight, 0);
+    if (Math.abs(totalWeight - 1) > 0.01) {
+      message.warning(t('settings.trendWeightWarning'));
+      return;
+    }
+    await saveTrendReportConfig(trendConfig);
+    message.success(t('settings.trendConfigSaved'));
   };
 
   if (loading) {
@@ -384,6 +418,108 @@ const Settings: React.FC = () => {
                     {t('settings.saveRisk')}
                   </Button>
                 </Form>
+              </Card>
+            ),
+          },
+          {
+            key: 'trend',
+            label: <span><FundOutlined /> {t('settings.trendConfig')}</span>,
+            children: (
+              <Card className="settings-card">
+                <Text style={{ color: '#888', fontSize: 12, display: 'block', marginBottom: 16 }}>
+                  {t('settings.trendConfigDesc')}
+                </Text>
+                {trendConfig && (
+                  <>
+                    <Divider style={{ borderColor: '#1f2937', margin: '8px 0 20px' }}>
+                      <Text style={{ color: '#888', fontSize: 12 }}>{t('settings.dimensionWeights')}</Text>
+                    </Divider>
+                    {trendConfig.dimensions.map((dim, idx) => (
+                      <Row key={dim.name} gutter={16} style={{ marginBottom: 16, alignItems: 'center' }}>
+                        <Col xs={6} md={4}>
+                          <Space>
+                            <Switch
+                              size="small"
+                              checked={dim.enabled}
+                              onChange={(checked) => handleTrendEnabledChange(idx, checked)}
+                            />
+                            <Text style={{ color: dim.enabled ? '#ccc' : '#555', fontSize: 13 }}>
+                              {t(`trend.${dim.name}`)}
+                            </Text>
+                          </Space>
+                        </Col>
+                        <Col xs={12} md={14}>
+                          <Slider
+                            min={0}
+                            max={100}
+                            step={1}
+                            value={Math.round(dim.baseWeight * 100)}
+                            onChange={(v) => handleTrendWeightChange(idx, v)}
+                            disabled={!dim.enabled}
+                            tooltip={{ formatter: (v?: number) => `${v}%` }}
+                          />
+                        </Col>
+                        <Col xs={6} md={6}>
+                          <InputNumber
+                            min={0}
+                            max={100}
+                            step={1}
+                            value={Math.round(dim.baseWeight * 100)}
+                            onChange={(v) => handleTrendWeightChange(idx, v)}
+                            disabled={!dim.enabled}
+                            formatter={(v) => `${v}%`}
+                            parser={(v) => (v ? Number(v.replace('%', '')) : 0) as 0}
+                            style={{ width: '100%' }}
+                            size="small"
+                          />
+                        </Col>
+                      </Row>
+                    ))}
+                    <Card className="inner-card" size="small" style={{ marginBottom: 16 }}>
+                      <Row gutter={16} style={{ alignItems: 'center' }}>
+                        <Col xs={24} md={8}>
+                          <Text style={{ color: '#ccc', fontSize: 13 }}>
+                            {t('settings.totalWeight')}:{' '}
+                            <Tag color={
+                              Math.abs(trendConfig.dimensions.filter((d) => d.enabled).reduce((a, d) => a + d.baseWeight, 0) - 1) < 0.01
+                                ? 'green' : 'red'
+                            }>
+                              {Math.round(trendConfig.dimensions.filter((d) => d.enabled).reduce((a, d) => a + d.baseWeight, 0) * 100)}%
+                            </Tag>
+                          </Text>
+                        </Col>
+                      </Row>
+                    </Card>
+                    <Divider style={{ borderColor: '#1f2937', margin: '16px 0 20px' }}>
+                      <Text style={{ color: '#888', fontSize: 12 }}>{t('settings.boostConfig')}</Text>
+                    </Divider>
+                    <Row gutter={16} style={{ marginBottom: 16 }}>
+                      <Col xs={24} md={8}>
+                        <Text style={{ color: '#ccc', fontSize: 13, display: 'block', marginBottom: 8 }}>
+                          {t('settings.boostFactor')}
+                        </Text>
+                        <InputNumber
+                          min={0}
+                          max={2}
+                          step={0.1}
+                          value={trendConfig.boostFactor}
+                          onChange={handleBoostFactorChange}
+                          style={{ width: '100%' }}
+                        />
+                      </Col>
+                      <Col xs={24} md={16}>
+                        <Card className="inner-card" size="small" style={{ marginTop: 28 }}>
+                          <Text style={{ color: '#888', fontSize: 12 }}>
+                            {t('settings.boostFormulaDesc')}
+                          </Text>
+                        </Card>
+                      </Col>
+                    </Row>
+                    <Button type="primary" icon={<SaveOutlined />} onClick={handleSaveTrendConfig}>
+                      {t('settings.saveTrendConfig')}
+                    </Button>
+                  </>
+                )}
               </Card>
             ),
           },
