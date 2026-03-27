@@ -14,6 +14,7 @@ import {
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../ThemeContext';
+import { useAuth } from '../AuthContext';
 import type { MenuProps } from 'antd';
 import './MainLayout.css';
 
@@ -29,6 +30,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const location = useLocation();
   const { t } = useTranslation();
   const { themeMode } = useTheme();
+  const { user, logout } = useAuth();
 
   const isDark = themeMode === 'dark';
 
@@ -44,6 +46,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const handleUserMenuClick: MenuProps['onClick'] = ({ key }) => {
     if (key === 'profile') navigate('/profile');
     else if (key === 'security') navigate('/settings');
+    else if (key === 'logout') {
+      logout();
+      navigate('/login');
+    }
   };
 
   const userMenu: MenuProps['items'] = [
@@ -96,7 +102,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             <Dropdown menu={{ items: userMenu, onClick: handleUserMenuClick }} placement="bottomRight">
               <Space style={{ cursor: 'pointer' }}>
                 <Avatar style={{ backgroundColor: '#1677ff' }} icon={<UserOutlined />} size={32} />
-                <span style={{ color: isDark ? '#ccc' : '#333', fontSize: 13 }}>Admin</span>
+                <span style={{ color: isDark ? '#ccc' : '#333', fontSize: 13 }}>{user?.nickname || user?.email || 'User'}</span>
               </Space>
             </Dropdown>
           </div>

@@ -4,6 +4,7 @@ import zhCN from 'antd/locale/zh_CN';
 import enUS from 'antd/locale/en_US';
 import { useTranslation } from 'react-i18next';
 import { ThemeProvider, useTheme } from './ThemeContext';
+import { AuthProvider, useAuth } from './AuthContext';
 import MainLayout from './layouts/MainLayout';
 import Dashboard from './pages/Dashboard';
 import MarketAnalysis from './pages/MarketAnalysis';
@@ -11,6 +12,7 @@ import TrendReport from './pages/TrendReport';
 import QuantTrading from './pages/QuantTrading';
 import PersonalCenter from './pages/PersonalCenter';
 import Settings from './pages/Settings';
+import Login from './pages/Login';
 
 const antdLocales: Record<string, typeof zhCN> = {
   zh_CN: zhCN,
@@ -38,9 +40,16 @@ const lightTheme = {
   },
 };
 
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated } = useAuth();
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  return <>{children}</>;
+}
+
 function AppInner() {
   const { i18n } = useTranslation();
   const { themeMode } = useTheme();
+  const { isAuthenticated } = useAuth();
 
   return (
     <ConfigProvider
@@ -48,17 +57,27 @@ function AppInner() {
       theme={themeMode === 'dark' ? darkTheme : lightTheme}
     >
       <BrowserRouter>
-        <MainLayout>
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/market" element={<MarketAnalysis />} />
-            <Route path="/trend" element={<TrendReport />} />
-            <Route path="/trading" element={<QuantTrading />} />
-            <Route path="/profile" element={<PersonalCenter />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </MainLayout>
+        <Routes>
+          <Route path="/login" element={isAuthenticated ? <Navigate to="/" replace /> : <Login />} />
+          <Route
+            path="*"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <Routes>
+                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/market" element={<MarketAnalysis />} />
+                    <Route path="/trend" element={<TrendReport />} />
+                    <Route path="/trading" element={<QuantTrading />} />
+                    <Route path="/profile" element={<PersonalCenter />} />
+                    <Route path="/settings" element={<Settings />} />
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                  </Routes>
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
       </BrowserRouter>
     </ConfigProvider>
   );
@@ -67,7 +86,9 @@ function AppInner() {
 function App() {
   return (
     <ThemeProvider>
-      <AppInner />
+      <AuthProvider>
+        <AppInner />
+      </AuthProvider>
     </ThemeProvider>
   );
 }

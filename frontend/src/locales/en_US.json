@@ -13,6 +13,34 @@
     "securitySettings": "Security Settings",
     "logout": "Logout"
   },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "subtitle": "Professional Cryptocurrency Quantitative Trading Platform",
+    "loginSuccess": "Login successful",
+    "loginFailed": "Login failed",
+    "registerSuccess": "Registration successful!",
+    "registerFailed": "Registration failed",
+    "invalidCredentials": "Invalid email or password",
+    "emailExists": "This email is already registered",
+    "emailNotFound": "This email is not registered",
+    "forgotPassword": "Forgot password?",
+    "resetPassword": "Reset Password",
+    "resetDesc": "Enter your registered email and we'll send a verification code to reset your password",
+    "resetSuccess": "Password reset successful. Please login with your new password",
+    "resetFailed": "Password reset failed",
+    "confirmReset": "Confirm Reset",
+    "backToLogin": "Back to Login",
+    "orLoginWith": "Or login with",
+    "defaultAccount": "Default admin account",
+    "enterEmail": "Enter Email",
+    "verifyCode": "Verify Code",
+    "setPassword": "Set Password",
+    "newPassword": "New Password",
+    "newPasswordPlaceholder": "Enter new password (min 6 chars)",
+    "passwordPlaceholder": "Enter your password",
+    "passwordMinLength": "Password must be at least 6 characters"
+  },
   "common": {
     "loading": "Loading...",
     "confirm": "Confirm",
@@ -434,6 +462,16 @@
     "secretKeyPlaceholder": "Enter Secret Key (can configure later)",
     "passphrasePlaceholder": "Required for OKX and similar",
     "exchangeApiNotice": "🔐 API keys are stored with AES-256 encryption. Keys can be left empty and configured later when actual trading is needed. Only read and trade permissions are requested, never withdrawal.",
-    "exchangeSecurityNotice": "🔒 API keys are stored with AES-256 encryption. You can add exchange config first and fill in keys later."
+    "exchangeSecurityNotice": "🔒 API keys are stored with AES-256 encryption. You can add exchange config first and fill in keys later.",
+    "trendConfig": "Trend Report Config",
+    "trendConfigDesc": "Configure the five dimension weights and boost factor for trend report. Changes will affect composite score calculation.",
+    "dimensionWeights": "Dimension Weights",
+    "totalWeight": "Total enabled weight",
+    "trendWeightWarning": "Enabled dimension weights must sum to 100%",
+    "boostConfig": "Boost Factor Config",
+    "boostFactor": "Severity Boost Factor",
+    "boostFormulaDesc": "📊 Formula: adjusted_weight = base_weight × (1 + severity × boost_factor). Higher boost factor means greater weight adjustment for high-severity dimensions. Default: 0.8",
+    "saveTrendConfig": "Save Trend Config",
+    "trendConfigSaved": "Trend report configuration saved"
   }
 }

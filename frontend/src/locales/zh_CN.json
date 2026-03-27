@@ -13,6 +13,34 @@
     "securitySettings": "安全设置",
     "logout": "退出登录"
   },
+  "auth": {
+    "login": "登录",
+    "register": "注册",
+    "subtitle": "专业加密货币量化交易平台",
+    "loginSuccess": "登录成功",
+    "loginFailed": "登录失败",
+    "registerSuccess": "注册成功！",
+    "registerFailed": "注册失败",
+    "invalidCredentials": "邮箱或密码错误",
+    "emailExists": "该邮箱已注册",
+    "emailNotFound": "该邮箱未注册",
+    "forgotPassword": "忘记密码？",
+    "resetPassword": "重置密码",
+    "resetDesc": "输入注册邮箱，我们将发送验证码帮您重置密码",
+    "resetSuccess": "密码重置成功，请使用新密码登录",
+    "resetFailed": "密码重置失败",
+    "confirmReset": "确认重置",
+    "backToLogin": "返回登录",
+    "orLoginWith": "或通过以下方式登录",
+    "defaultAccount": "默认管理员账号",
+    "enterEmail": "输入邮箱",
+    "verifyCode": "验证码",
+    "setPassword": "设置密码",
+    "newPassword": "新密码",
+    "newPasswordPlaceholder": "输入新密码（至少6位）",
+    "passwordPlaceholder": "输入登录密码",
+    "passwordMinLength": "密码至少6位"
+  },
   "common": {
     "loading": "加载数据中...",
     "confirm": "确认",
@@ -434,6 +462,16 @@
     "secretKeyPlaceholder": "输入Secret Key（可稍后配置）",
     "passphrasePlaceholder": "OKX等平台需要",
     "exchangeApiNotice": "🔐 API密钥使用AES-256加密存储。密钥可以先留空，后续在需要实际交易时再配置。平台仅请求读取和交易权限，不会申请提现权限。",
-    "exchangeSecurityNotice": "🔒 API密钥将使用AES-256加密存储。您可以先添加交易所配置，密钥可以稍后再填写。"
+    "exchangeSecurityNotice": "🔒 API密钥将使用AES-256加密存储。您可以先添加交易所配置，密钥可以稍后再填写。",
+    "trendConfig": "趋势报告配置",
+    "trendConfigDesc": "配置趋势报告的五大维度权重和增强因子参数，调整后将影响趋势报告的综合得分计算",
+    "dimensionWeights": "维度权重配置",
+    "totalWeight": "已启用维度权重合计",
+    "trendWeightWarning": "已启用的维度权重合计必须为 100%",
+    "boostConfig": "增强因子配置",
+    "boostFactor": "Severity 增强因子",
+    "boostFormulaDesc": "📊 公式：adjusted_weight = base_weight × (1 + severity × boost_factor)。增强因子越大，高严重程度维度的权重调整幅度越大。默认值 0.8",
+    "saveTrendConfig": "保存趋势配置",
+    "trendConfigSaved": "趋势报告配置已保存"
   }
 }
