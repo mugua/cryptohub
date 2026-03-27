@@ -9,7 +9,7 @@ from pydantic import ValidationError
 from app.models.schemas import (
     AnalysisReport, MacroAnalysis, PolicyAnalysis, PolicyEvent,
     SupplyDemandAnalysis, SentimentAnalysis, TechnicalAnalysis,
-    TechnicalIndicator, Signal,
+    TechnicalIndicator, TechnicalTrend, ExecutionMetrics, Signal,
     DimensionScore, TrendReport, TrendReportConfig,
 )
 from app.services.trend_report import (
@@ -77,6 +77,29 @@ async def get_analysis_report(
     resistance = [68000, 70000, 72000] if is_btc else [3600, 3800, 4000]
     technical = TechnicalAnalysis(
         trend="uptrend",
+        short_term_trend=TechnicalTrend(
+            horizon="short_term",
+            trend="uptrend",
+            confidence=0.72,
+            key_indicators=[
+                TechnicalIndicator(name="EMA(7)/EMA(25)", value="bullish_cross", signal="buy"),
+                TechnicalIndicator(name="RSI(14)", value=62.4, signal="neutral"),
+                TechnicalIndicator(name="MACD", value="金叉", signal="buy"),
+                TechnicalIndicator(name="StochRSI", value=74.2, signal="neutral"),
+            ],
+            summary="短期EMA金叉，MACD多头，RSI中性偏强，短期趋势向上。",
+        ),
+        mid_long_term_trend=TechnicalTrend(
+            horizon="mid_long_term",
+            trend="uptrend",
+            confidence=0.65,
+            key_indicators=[
+                TechnicalIndicator(name="MA(50)/MA(200)", value="golden_cross", signal="buy"),
+                TechnicalIndicator(name="ADX", value=32.1, signal="buy"),
+                TechnicalIndicator(name="RSI(28)", value=58.1, signal="neutral"),
+            ],
+            summary="MA(50)上穿MA(200)形成金叉，ADX>25趋势明确，中长期看多。",
+        ),
         support_levels=support,
         resistance_levels=resistance,
         indicators=[
@@ -86,8 +109,17 @@ async def get_analysis_report(
             TechnicalIndicator(name="MA(50)", value=63200 if is_btc else 3320, signal="buy"),
             TechnicalIndicator(name="Bollinger", value="中轨以上", signal="neutral"),
             TechnicalIndicator(name="ADX", value=32.1, signal="buy"),
+            TechnicalIndicator(name="OBV", value="上升趋势", signal="buy"),
+            TechnicalIndicator(name="VWAP", value=66200 if is_btc else 3500, signal="neutral"),
         ],
-        summary="价格位于多条均线之上，MACD出现金叉，整体技术面偏多。",
+        execution=ExecutionMetrics(
+            avg_slippage_bps=3.2,
+            network_latency_ms=45,
+            api_success_rate=0.997,
+            order_book_depth_score=82,
+            execution_risk="low",
+        ),
+        summary="价格位于多条均线之上，MACD出现金叉，短期与中长期趋势均偏多；执行层面流动性充足，滑点可控。",
     )
 
     return AnalysisReport(
@@ -255,12 +287,33 @@ async def get_trend_config() -> TrendReportConfig:
                 SubItemConfig(name="GoogleTrends", weight=0.10, data_source="Google Trends API", data_description="搜索热度趋势", api_type="Scraper", api_endpoint="trends.google.com/trends/explore"),
             ]),
             DimensionConfig(name="technical", base_weight=0.15, enabled=True, sub_items=[
-                SubItemConfig(name="OKX_Binance", weight=0.25, data_source="OKX/Binance API", data_description="K线、交易量、深度图", api_type="REST/WebSocket", api_endpoint="api.okx.com;api.binance.com"),
-                SubItemConfig(name="CoinGecko", weight=0.25, data_source="CoinGecko", data_description="价格、市值、历史数据", api_type="REST API", api_endpoint="api.coingecko.com"),
-                SubItemConfig(name="CoinMarketCap", weight=0.20, data_source="CoinMarketCap", data_description="市场数据、历史价格", api_type="REST API", api_endpoint="pro-api.coinmarketcap.com"),
-                SubItemConfig(name="CryptoCompare", weight=0.15, data_source="CryptoCompare", data_description="多交易所OHLCV数据", api_type="REST/WebSocket", api_endpoint="min-api.cryptocompare.com"),
-                SubItemConfig(name="TradingView", weight=0.15, data_source="TradingView (UNOFFICIAL)", data_description="图表数据", api_type="Scraper", api_endpoint="pine_fetch() 或爬虫"),
-            ]),
+                SubItemConfig(name="TrendIndicators", weight=0.18, data_source="Binance/OKX OHLCV", data_description="MA交叉(EMA7/25, MA50/200)、MACD、ADX趋势强度", api_type="REST/WebSocket", api_endpoint="api.binance.com;api.okx.com"),
+                SubItemConfig(name="Momentum", weight=0.15, data_source="Binance/OKX OHLCV", data_description="RSI(14/28)、StochRSI、CCI、Williams %R", api_type="REST/WebSocket", api_endpoint="api.binance.com;api.okx.com"),
+                SubItemConfig(name="Volatility", weight=0.12, data_source="Binance/OKX OHLCV", data_description="布林带(BB)、ATR(14)、历史波动率(HV)", api_type="REST/WebSocket", api_endpoint="api.binance.com;api.okx.com"),
+                SubItemConfig(name="VolumeAnalysis", weight=0.13, data_source="Binance/OKX OHLCV", data_description="OBV、VWAP、成交量分布、CMF资金流", api_type="REST/WebSocket", api_endpoint="api.binance.com;api.okx.com"),
+                SubItemConfig(name="SupportResistance", weight=0.12, data_source="Binance/OKX OHLCV", data_description="斐波那契回撤、枢轴点、关键支撑阻力位", api_type="REST/WebSocket", api_endpoint="api.binance.com;api.okx.com"),
+                SubItemConfig(name="CandlestickPatterns", weight=0.10, data_source="Binance/OKX OHLCV", data_description="K线形态识别(吞没、十字星、锤头等)", api_type="REST/WebSocket", api_endpoint="api.binance.com;api.okx.com"),
+                SubItemConfig(name="MarketMicrostructure", weight=0.10, data_source="Binance/OKX OrderBook + Coinglass", data_description="订单簿深度、买卖价差、爆仓数据", api_type="REST/WebSocket", api_endpoint="api.binance.com;api.okx.com;api.coinglass.com"),
+                SubItemConfig(name="ExecutionLayer", weight=0.10, data_source="内部监控 + Exchange Ping", data_description="滑点(bps)、网络延迟(ms)、API成功率、流动性深度", api_type="REST/WebSocket", api_endpoint="内部监控系统"),
+            ], coin_specific_items={
+                "BTC": [
+                    SubItemConfig(name="HalvingCycle", weight=0.20, data_source="Blockchain.com / Blockchair", data_description="减半周期阶段、距下次减半天数、历史规律", api_type="REST API", api_endpoint="api.blockchain.info;api.blockchair.com"),
+                    SubItemConfig(name="HashRate", weight=0.18, data_source="Glassnode / CoinMetrics", data_description="全网算力趋势、挖矿难度调整幅度", api_type="REST API", api_endpoint="api.glassnode.com;api.coinmetrics.io"),
+                    SubItemConfig(name="MinerFlow", weight=0.15, data_source="Glassnode / CryptoQuant", data_description="矿工收入、矿工流出量、矿工储备", api_type="REST API", api_endpoint="api.glassnode.com;api.cryptoquant.com"),
+                    SubItemConfig(name="MVRV", weight=0.18, data_source="Glassnode / CoinMetrics", data_description="市场价值/实现价值比率、MVRV Z-Score", api_type="REST API", api_endpoint="api.glassnode.com;api.coinmetrics.io"),
+                    SubItemConfig(name="NUPL", weight=0.14, data_source="Glassnode / LookIntoBitcoin", data_description="净未实现盈亏、市场情绪阶段", api_type="REST API", api_endpoint="api.glassnode.com"),
+                    SubItemConfig(name="StockToFlow", weight=0.10, data_source="LookIntoBitcoin / 自建计算", data_description="S2F模型价格偏差、存量产量比", api_type="REST API", api_endpoint="自建计算 + api.glassnode.com"),
+                    SubItemConfig(name="LightningNetwork", weight=0.05, data_source="mempool.space / 1ML", data_description="闪电网络容量、通道数、节点数增长", api_type="REST API", api_endpoint="mempool.space/api;api.1ml.com"),
+                ],
+                "ETH": [
+                    SubItemConfig(name="GasCongestion", weight=0.15, data_source="Etherscan / Alchemy", data_description="Gas价格(Gwei)、待处理交易数、网络拥堵度", api_type="REST API", api_endpoint="api.etherscan.io;eth-mainnet.g.alchemy.com"),
+                    SubItemConfig(name="BurnRate", weight=0.20, data_source="Etherscan / ultrasound.money", data_description="EIP-1559每日销毁量、净发行量、通缩/通胀状态", api_type="REST API", api_endpoint="api.etherscan.io;ultrasound.money/api"),
+                    SubItemConfig(name="Staking", weight=0.20, data_source="Beaconcha.in / Rated.network", data_description="质押总量、质押率、验证者数量、质押APY", api_type="REST API", api_endpoint="beaconcha.in/api;api.rated.network"),
+                    SubItemConfig(name="DeFiTVL", weight=0.18, data_source="DefiLlama", data_description="DeFi总锁仓量、Top协议TVL变化", api_type="REST API", api_endpoint="api.llama.fi"),
+                    SubItemConfig(name="L2Activity", weight=0.15, data_source="L2Beat / DefiLlama", data_description="L2 Rollup TVL、交易量(Arbitrum/Optimism/Base等)", api_type="REST API", api_endpoint="l2beat.com/api;api.llama.fi"),
+                    SubItemConfig(name="ETH_BTC_Ratio", weight=0.12, data_source="Binance / CoinGecko", data_description="ETH/BTC汇率趋势、相对强弱", api_type="REST API", api_endpoint="api.binance.com;api.coingecko.com"),
+                ],
+            }),
         ],
         boost_factor=0.8,
     )

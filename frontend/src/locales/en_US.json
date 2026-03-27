@@ -484,6 +484,12 @@
     "deleteSubItem": "Delete",
     "subItemWeightWarning": "Sub-item weights should sum to 100%",
     "weightDistribution": "Weight Distribution",
-    "subItemCount": "sub-items"
+    "subItemCount": "sub-items",
+    "coinSpecificItems": "Coin-Specific Factor Config",
+    "coinSpecificFactors": "Specific Factors",
+    "coinGroupCount": "coin(s)",
+    "addCoinGroup": "Add Coin",
+    "deleteCoinGroup": "Remove Coin",
+    "newCoinSymbol": "Coin symbol (e.g. BTC)"
   }
 }

@@ -65,11 +65,34 @@ class TechnicalIndicator(BaseModel):
     signal: str  # buy | sell | neutral
 
 
-class TechnicalAnalysis(BaseModel):
+class ExecutionMetrics(BaseModel):
+    """Execution-layer health metrics (slippage, latency, API stability)."""
+    avg_slippage_bps: float = Field(0, description="Average slippage in basis points")
+    network_latency_ms: float = Field(0, description="API round-trip latency in ms")
+    api_success_rate: float = Field(1.0, ge=0, le=1, description="API call success rate 0-1")
+    order_book_depth_score: float = Field(
+        0, ge=0, le=100, description="Liquidity depth score 0-100"
+    )
+    execution_risk: str = "low"  # low | medium | high
+
+
+class TechnicalTrend(BaseModel):
+    """Trend assessment for a given time-horizon."""
+    horizon: str  # short_term | mid_long_term
     trend: str  # uptrend | downtrend | sideways
+    confidence: float = Field(0.5, ge=0, le=1, description="Confidence 0-1")
+    key_indicators: list[TechnicalIndicator] = []
+    summary: str = ""
+
+
+class TechnicalAnalysis(BaseModel):
+    trend: str  # uptrend | downtrend | sideways  (overall / backward-compat)
+    short_term_trend: TechnicalTrend | None = None
+    mid_long_term_trend: TechnicalTrend | None = None
     support_levels: list[float]
     resistance_levels: list[float]
     indicators: list[TechnicalIndicator]
+    execution: ExecutionMetrics | None = None
     summary: str
 
 
@@ -117,11 +140,17 @@ class SubItemConfig(BaseModel):
 
 
 class DimensionConfig(BaseModel):
-    """Config for a single analysis dimension (frontend-editable)."""
+    """Config for a single analysis dimension (frontend-editable).
+
+    ``sub_items`` holds **common / base** indicators that apply to all coins.
+    ``coin_specific_items`` holds per-coin quantitative factors keyed by a
+    normalised coin symbol (e.g. ``"BTC"``, ``"ETH"``).
+    """
     name: str
     base_weight: float = Field(..., ge=0, le=1)
     enabled: bool = True
     sub_items: list[SubItemConfig] = []
+    coin_specific_items: dict[str, list[SubItemConfig]] = {}
 
 
 class TrendReportConfig(BaseModel):

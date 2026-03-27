@@ -484,6 +484,12 @@
     "deleteSubItem": "删除",
     "subItemWeightWarning": "子项权重合计应为 100%",
     "weightDistribution": "权重分布",
-    "subItemCount": "个子项"
+    "subItemCount": "个子项",
+    "coinSpecificItems": "品种专属因子配置",
+    "coinSpecificFactors": "专属量化因子",
+    "coinGroupCount": "个品种",
+    "addCoinGroup": "添加品种",
+    "deleteCoinGroup": "删除该品种",
+    "newCoinSymbol": "输入币种 (如 BTC)"
   }
 }
