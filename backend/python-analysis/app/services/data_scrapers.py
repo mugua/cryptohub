@@ -67,7 +67,7 @@ async def fetch_data_source(
     key = source_key.lower().strip()
     fetcher = _FETCHER_REGISTRY.get(key)
     if fetcher is None:
-        logger.warning("No fetcher registered for %r – returning stub", source_key)
+        logger.error("No fetcher registered for %r – returning stub result", source_key)
         return DataSourceResult(source_name=source_key, raw_value=50.0,
                                 success=False, error="no fetcher registered")
     try:

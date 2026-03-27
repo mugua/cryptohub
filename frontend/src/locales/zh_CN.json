@@ -483,6 +483,7 @@
     "addSubItem": "添加子项",
     "deleteSubItem": "删除",
     "subItemWeightWarning": "子项权重合计应为 100%",
-    "weightDistribution": "权重分布"
+    "weightDistribution": "权重分布",
+    "subItemCount": "个子项"
   }
 }

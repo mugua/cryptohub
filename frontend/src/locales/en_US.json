@@ -483,6 +483,7 @@
     "addSubItem": "Add Sub-Item",
     "deleteSubItem": "Delete",
     "subItemWeightWarning": "Sub-item weights should sum to 100%",
-    "weightDistribution": "Weight Distribution"
+    "weightDistribution": "Weight Distribution",
+    "subItemCount": "sub-items"
   }
 }

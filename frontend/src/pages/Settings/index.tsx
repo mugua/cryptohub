@@ -26,6 +26,10 @@ const EXCHANGE_LOGOS: Record<ExchangeName, string> = {
 
 const PIE_COLORS = ['#1677ff', '#52c41a', '#faad14', '#ff7a45', '#722ed1'];
 
+const colorDotStyle = (color: string, marginRight = 0): React.CSSProperties => ({
+  display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: color, marginRight,
+});
+
 const Settings: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [exchangeConfigs, setExchangeConfigs] = useState<ExchangeApiConfig[]>([]);
@@ -536,7 +540,7 @@ const Settings: React.FC = () => {
                                   checked={dim.enabled}
                                   onChange={(checked) => handleTrendEnabledChange(idx, checked)}
                                 />
-                                <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: PIE_COLORS[idx % PIE_COLORS.length] }} />
+                                <span style={colorDotStyle(PIE_COLORS[idx % PIE_COLORS.length])} />
                                 <Text style={{ color: dim.enabled ? '#ccc' : '#555', fontSize: 13 }}>
                                   {t(`trend.${dim.name}`)}
                                 </Text>
@@ -572,8 +576,8 @@ const Settings: React.FC = () => {
                         key: dim.name,
                         label: (
                           <Text style={{ color: dim.enabled ? '#ccc' : '#555', fontSize: 13 }}>
-                            <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: PIE_COLORS[dimIdx % PIE_COLORS.length], marginRight: 8 }} />
-                            {t(`trend.${dim.name}`)} — {(dim.subItems || []).length} {t('settings.subItems').replace('配置', '').replace('Config', 'items')}
+                            <span style={colorDotStyle(PIE_COLORS[dimIdx % PIE_COLORS.length], 8)} />
+                            {t(`trend.${dim.name}`)} — {(dim.subItems || []).length} {t('settings.subItemCount')}
                           </Text>
                         ),
                         children: (
