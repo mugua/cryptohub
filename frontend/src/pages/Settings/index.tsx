@@ -177,6 +177,7 @@ const Settings: React.FC = () => {
       if (i !== dimIdx) return d;
       const coinItems = { ...(d.coinSpecificItems || {}) };
       const subs = [...(coinItems[coin] || [])];
+      if (subIdx < 0 || subIdx >= subs.length) return d;
       subs[subIdx] = { ...subs[subIdx], [field]: field === 'weight' ? (value as number) / 100 : value };
       coinItems[coin] = subs;
       return { ...d, coinSpecificItems: coinItems };
@@ -203,6 +204,7 @@ const Settings: React.FC = () => {
       if (i !== dimIdx) return d;
       const coinItems = { ...(d.coinSpecificItems || {}) };
       const subs = [...(coinItems[coin] || [])];
+      if (subIdx < 0 || subIdx >= subs.length) return d;
       subs.splice(subIdx, 1);
       coinItems[coin] = subs;
       return { ...d, coinSpecificItems: coinItems };

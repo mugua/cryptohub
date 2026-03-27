@@ -324,7 +324,7 @@ async def _fetch_ta_support_resistance(symbol: str, params: dict[str, Any]) -> D
 
 
 @register_fetcher("ta_candlestick_patterns")
-async def _fetch_ta_candlestick(symbol: str, params: dict[str, Any]) -> DataSourceResult:
+async def _fetch_ta_candlestick_patterns(symbol: str, params: dict[str, Any]) -> DataSourceResult:
     """Candlestick / chart pattern recognition.
 
     Short-term: single/double candle patterns (engulfing, doji, hammer, etc.).
