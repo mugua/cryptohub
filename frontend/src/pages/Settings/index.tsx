@@ -2,17 +2,18 @@ import React, { useEffect, useState } from 'react';
 import {
   Row, Col, Card, Form, Input, Select, Switch, Slider, Button,
   Typography, Divider, InputNumber, message, Spin, Tabs, Tag,
-  Table, Space, Popconfirm, Modal, Badge,
+  Table, Space, Popconfirm, Modal, Badge, Alert, Collapse,
 } from 'antd';
 import {
   SettingOutlined, BellOutlined, SafetyOutlined, GlobalOutlined,
   ApiOutlined, SaveOutlined, PlusOutlined, DeleteOutlined,
-  LinkOutlined, FundOutlined,
+  LinkOutlined, FundOutlined, DownOutlined,
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { useTheme } from '../../ThemeContext';
 import { fetchSettings, fetchExchangeApiConfigs, saveExchangeApiConfig, fetchTrendReportConfig, saveTrendReportConfig } from '../../services/api';
-import type { ExchangeApiConfig, ExchangeName, TrendReportConfig } from '../../types';
+import type { ExchangeApiConfig, ExchangeName, TrendReportConfig, SubItemConfig } from '../../types';
 import './Settings.css';
 
 const { Title, Text } = Typography;
@@ -22,6 +23,12 @@ const EXCHANGE_LOGOS: Record<ExchangeName, string> = {
   binance: '🟡', okx: '⚫', bybit: '🟠', coinbase: '🔵',
   kraken: '🟣', gate: '🟢', huobi: '🔴',
 };
+
+const PIE_COLORS = ['#1677ff', '#52c41a', '#faad14', '#ff7a45', '#722ed1'];
+
+const colorDotStyle = (color: string, marginRight = 0): React.CSSProperties => ({
+  display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: color, marginRight,
+});
 
 const Settings: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -128,6 +135,44 @@ const Settings: React.FC = () => {
     await saveTrendReportConfig(trendConfig);
     message.success(t('settings.trendConfigSaved'));
   };
+
+  /* ── Sub-item handlers ── */
+  const handleSubItemChange = (dimIdx: number, subIdx: number, field: keyof SubItemConfig, value: unknown) => {
+    if (!trendConfig) return;
+    const updated = { ...trendConfig, dimensions: trendConfig.dimensions.map((d, i) => {
+      if (i !== dimIdx) return d;
+      const subs = [...(d.subItems || [])];
+      subs[subIdx] = { ...subs[subIdx], [field]: field === 'weight' ? (value as number) / 100 : value };
+      return { ...d, subItems: subs };
+    })};
+    setTrendConfig(updated);
+  };
+
+  const handleAddSubItem = (dimIdx: number) => {
+    if (!trendConfig) return;
+    const updated = { ...trendConfig, dimensions: trendConfig.dimensions.map((d, i) => {
+      if (i !== dimIdx) return d;
+      const subs = [...(d.subItems || [])];
+      subs.push({ name: '', weight: 0, dataSource: '', dataDescription: '', apiType: 'REST API', apiEndpoint: '', enabled: true });
+      return { ...d, subItems: subs };
+    })};
+    setTrendConfig(updated);
+  };
+
+  const handleDeleteSubItem = (dimIdx: number, subIdx: number) => {
+    if (!trendConfig) return;
+    const updated = { ...trendConfig, dimensions: trendConfig.dimensions.map((d, i) => {
+      if (i !== dimIdx) return d;
+      const subs = [...(d.subItems || [])];
+      subs.splice(subIdx, 1);
+      return { ...d, subItems: subs };
+    })};
+    setTrendConfig(updated);
+  };
+
+  const isTrendWeightValid = trendConfig
+    ? Math.abs(trendConfig.dimensions.filter((d) => d.enabled).reduce((a, d) => a + d.baseWeight, 0) - 1) < 0.01
+    : true;
 
   if (loading) {
     return (
@@ -431,65 +476,213 @@ const Settings: React.FC = () => {
                 </Text>
                 {trendConfig && (
                   <>
-                    <Divider style={{ borderColor: '#1f2937', margin: '8px 0 20px' }}>
-                      <Text style={{ color: '#888', fontSize: 12 }}>{t('settings.dimensionWeights')}</Text>
-                    </Divider>
-                    {trendConfig.dimensions.map((dim, idx) => (
-                      <Row key={dim.name} gutter={16} style={{ marginBottom: 16, alignItems: 'center' }}>
-                        <Col xs={6} md={4}>
-                          <Space>
-                            <Switch
-                              size="small"
-                              checked={dim.enabled}
-                              onChange={(checked) => handleTrendEnabledChange(idx, checked)}
-                            />
-                            <Text style={{ color: dim.enabled ? '#ccc' : '#555', fontSize: 13 }}>
-                              {t(`trend.${dim.name}`)}
-                            </Text>
-                          </Space>
-                        </Col>
-                        <Col xs={12} md={14}>
-                          <Slider
-                            min={0}
-                            max={100}
-                            step={1}
-                            value={Math.round(dim.baseWeight * 100)}
-                            onChange={(v) => handleTrendWeightChange(idx, v)}
-                            disabled={!dim.enabled}
-                            tooltip={{ formatter: (v?: number) => `${v}%` }}
-                          />
-                        </Col>
-                        <Col xs={6} md={6}>
-                          <InputNumber
-                            min={0}
-                            max={100}
-                            step={1}
-                            value={Math.round(dim.baseWeight * 100)}
-                            onChange={(v) => handleTrendWeightChange(idx, v)}
-                            disabled={!dim.enabled}
-                            formatter={(v) => `${v}%`}
-                            parser={(v) => (v ? Number(v.replace('%', '')) : 0) as number}
-                            style={{ width: '100%' }}
-                            size="small"
-                          />
-                        </Col>
-                      </Row>
-                    ))}
-                    <Card className="inner-card" size="small" style={{ marginBottom: 16 }}>
-                      <Row gutter={16} style={{ alignItems: 'center' }}>
-                        <Col xs={24} md={8}>
+                    {/* Real-time validation warning */}
+                    {!isTrendWeightValid && (
+                      <Alert
+                        type="warning"
+                        showIcon
+                        message={t('settings.trendWeightWarning')}
+                        style={{ marginBottom: 16 }}
+                      />
+                    )}
+
+                    <Row gutter={24}>
+                      {/* Left: Pie chart */}
+                      <Col xs={24} md={10}>
+                        <Divider style={{ borderColor: '#1f2937', margin: '0 0 12px' }}>
+                          <Text style={{ color: '#888', fontSize: 12 }}>{t('settings.weightDistribution')}</Text>
+                        </Divider>
+                        <ResponsiveContainer width="100%" height={240}>
+                          <PieChart>
+                            <Pie
+                              data={trendConfig.dimensions.filter(d => d.enabled).map((dim) => ({
+                                name: t(`trend.${dim.name}`),
+                                value: Math.round(dim.baseWeight * 100),
+                                fill: PIE_COLORS[trendConfig.dimensions.indexOf(dim) % PIE_COLORS.length],
+                              }))}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={50}
+                              outerRadius={90}
+                              paddingAngle={2}
+                              dataKey="value"
+                              label={({ name, value }) => `${name} ${value}%`}
+                              labelLine={{ stroke: '#888' }}
+                            >
+                              {trendConfig.dimensions.filter(d => d.enabled).map((dim) => (
+                                <Cell key={dim.name} fill={PIE_COLORS[trendConfig.dimensions.indexOf(dim) % PIE_COLORS.length]} />
+                              ))}
+                            </Pie>
+                            <Tooltip formatter={(value: number) => `${value}%`} />
+                          </PieChart>
+                        </ResponsiveContainer>
+                        <div style={{ textAlign: 'center', marginTop: 4 }}>
                           <Text style={{ color: '#ccc', fontSize: 13 }}>
                             {t('settings.totalWeight')}:{' '}
-                            <Tag color={
-                              Math.abs(trendConfig.dimensions.filter((d) => d.enabled).reduce((a, d) => a + d.baseWeight, 0) - 1) < 0.01
-                                ? 'green' : 'red'
-                            }>
+                            <Tag color={isTrendWeightValid ? 'green' : 'red'}>
                               {Math.round(trendConfig.dimensions.filter((d) => d.enabled).reduce((a, d) => a + d.baseWeight, 0) * 100)}%
                             </Tag>
                           </Text>
-                        </Col>
-                      </Row>
-                    </Card>
+                        </div>
+                      </Col>
+
+                      {/* Right: Dimension weight inputs */}
+                      <Col xs={24} md={14}>
+                        <Divider style={{ borderColor: '#1f2937', margin: '0 0 12px' }}>
+                          <Text style={{ color: '#888', fontSize: 12 }}>{t('settings.dimensionWeights')}</Text>
+                        </Divider>
+                        {trendConfig.dimensions.map((dim, idx) => (
+                          <Row key={dim.name} gutter={12} style={{ marginBottom: 12, alignItems: 'center' }}>
+                            <Col flex="auto">
+                              <Space>
+                                <Switch
+                                  size="small"
+                                  checked={dim.enabled}
+                                  onChange={(checked) => handleTrendEnabledChange(idx, checked)}
+                                />
+                                <span style={colorDotStyle(PIE_COLORS[idx % PIE_COLORS.length])} />
+                                <Text style={{ color: dim.enabled ? '#ccc' : '#555', fontSize: 13 }}>
+                                  {t(`trend.${dim.name}`)}
+                                </Text>
+                              </Space>
+                            </Col>
+                            <Col>
+                              <InputNumber
+                                min={0}
+                                max={100}
+                                step={1}
+                                value={Math.round(dim.baseWeight * 100)}
+                                onChange={(v) => handleTrendWeightChange(idx, v)}
+                                disabled={!dim.enabled}
+                                formatter={(v) => `${v}%`}
+                                parser={(v) => (v ? Number(v.replace('%', '')) : 0) as number}
+                                style={{ width: 80 }}
+                                size="small"
+                              />
+                            </Col>
+                          </Row>
+                        ))}
+                      </Col>
+                    </Row>
+
+                    {/* Sub-items configuration */}
+                    <Divider style={{ borderColor: '#1f2937', margin: '20px 0 12px' }}>
+                      <Text style={{ color: '#888', fontSize: 12 }}>{t('settings.subItems')}</Text>
+                    </Divider>
+                    <Collapse
+                      ghost
+                      expandIcon={({ isActive }) => <DownOutlined rotate={isActive ? 0 : -90} style={{ color: '#888' }} />}
+                      items={trendConfig.dimensions.map((dim, dimIdx) => ({
+                        key: dim.name,
+                        label: (
+                          <Text style={{ color: dim.enabled ? '#ccc' : '#555', fontSize: 13 }}>
+                            <span style={colorDotStyle(PIE_COLORS[dimIdx % PIE_COLORS.length], 8)} />
+                            {t(`trend.${dim.name}`)} — {(dim.subItems || []).length} {t('settings.subItemCount')}
+                          </Text>
+                        ),
+                        children: (
+                          <div style={{ paddingLeft: 8 }}>
+                            {(dim.subItems || []).map((sub, subIdx) => {
+                              return (
+                                <Card key={subIdx} className="inner-card" size="small" style={{ marginBottom: 8 }}>
+                                  <Row gutter={8} style={{ alignItems: 'center' }}>
+                                    <Col>
+                                      <Switch
+                                        size="small"
+                                        checked={sub.enabled}
+                                        onChange={(checked) => handleSubItemChange(dimIdx, subIdx, 'enabled', checked)}
+                                      />
+                                    </Col>
+                                    <Col flex="120px">
+                                      <Input
+                                        size="small"
+                                        placeholder={t('settings.subItemName')}
+                                        value={sub.name}
+                                        onChange={(e) => handleSubItemChange(dimIdx, subIdx, 'name', e.target.value)}
+                                        style={{ color: '#ccc', background: '#161b22', borderColor: '#1f2937' }}
+                                      />
+                                    </Col>
+                                    <Col>
+                                      <InputNumber
+                                        min={0} max={100} step={1} size="small"
+                                        value={Math.round(sub.weight * 100)}
+                                        onChange={(v) => handleSubItemChange(dimIdx, subIdx, 'weight', v ?? 0)}
+                                        formatter={(v) => `${v}%`}
+                                        parser={(v) => (v ? Number(v.replace('%', '')) : 0) as number}
+                                        style={{ width: 70 }}
+                                        disabled={!sub.enabled}
+                                      />
+                                    </Col>
+                                    <Col flex="auto">
+                                      <Input
+                                        size="small"
+                                        placeholder={t('settings.dataSource')}
+                                        value={sub.dataSource}
+                                        onChange={(e) => handleSubItemChange(dimIdx, subIdx, 'dataSource', e.target.value)}
+                                        style={{ color: '#ccc', background: '#161b22', borderColor: '#1f2937' }}
+                                      />
+                                    </Col>
+                                    <Col>
+                                      <Select
+                                        size="small"
+                                        value={sub.apiType}
+                                        onChange={(v) => handleSubItemChange(dimIdx, subIdx, 'apiType', v)}
+                                        style={{ width: 130 }}
+                                        options={[
+                                          { value: 'REST API', label: 'REST API' },
+                                          { value: 'GraphQL API', label: 'GraphQL API' },
+                                          { value: 'REST/WebSocket', label: 'REST/WebSocket' },
+                                          { value: 'JSON API', label: 'JSON API' },
+                                          { value: 'RSS/JSON', label: 'RSS/JSON' },
+                                          { value: 'Scraper', label: 'Scraper (爬虫)' },
+                                        ]}
+                                      />
+                                    </Col>
+                                    <Col>
+                                      <Button type="text" size="small" danger icon={<DeleteOutlined />} onClick={() => handleDeleteSubItem(dimIdx, subIdx)} />
+                                    </Col>
+                                  </Row>
+                                  <Row gutter={8} style={{ marginTop: 4 }}>
+                                    <Col xs={12}>
+                                      <Input
+                                        size="small"
+                                        addonBefore={<span style={{ fontSize: 11 }}>{t('settings.dataDescription')}</span>}
+                                        value={sub.dataDescription}
+                                        onChange={(e) => handleSubItemChange(dimIdx, subIdx, 'dataDescription', e.target.value)}
+                                        style={{ color: '#ccc', background: '#161b22', borderColor: '#1f2937' }}
+                                      />
+                                    </Col>
+                                    <Col xs={12}>
+                                      <Input
+                                        size="small"
+                                        addonBefore={<span style={{ fontSize: 11 }}>{t('settings.apiEndpoint')}</span>}
+                                        value={sub.apiEndpoint}
+                                        onChange={(e) => handleSubItemChange(dimIdx, subIdx, 'apiEndpoint', e.target.value)}
+                                        style={{ color: '#ccc', background: '#161b22', borderColor: '#1f2937' }}
+                                      />
+                                    </Col>
+                                  </Row>
+                                </Card>
+                              );
+                            })}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
+                              <Button type="dashed" size="small" icon={<PlusOutlined />} onClick={() => handleAddSubItem(dimIdx)}>
+                                {t('settings.addSubItem')}
+                              </Button>
+                              {(dim.subItems || []).length > 0 && (() => {
+                                const subTotal = (dim.subItems || []).filter(s => s.enabled).reduce((a, s) => a + s.weight, 0);
+                                return (
+                                  <Tag color={Math.abs(subTotal - 1) < 0.01 ? 'green' : 'orange'}>
+                                    {t('settings.subItemWeight')}: {Math.round(subTotal * 100)}%
+                                  </Tag>
+                                );
+                              })()}
+                            </div>
+                          </div>
+                        ),
+                      }))}
+                    />
+
                     <Divider style={{ borderColor: '#1f2937', margin: '16px 0 20px' }}>
                       <Text style={{ color: '#888', fontSize: 12 }}>{t('settings.boostConfig')}</Text>
                     </Divider>
@@ -504,7 +697,7 @@ const Settings: React.FC = () => {
                           step={0.1}
                           value={trendConfig.boostFactor}
                           onChange={handleBoostFactorChange}
-                          style={{ width: '100%' }}
+                          style={{ width: 120 }}
                         />
                       </Col>
                       <Col xs={24} md={16}>
@@ -515,7 +708,7 @@ const Settings: React.FC = () => {
                         </Card>
                       </Col>
                     </Row>
-                    <Button type="primary" icon={<SaveOutlined />} onClick={handleSaveTrendConfig}>
+                    <Button type="primary" icon={<SaveOutlined />} onClick={handleSaveTrendConfig} disabled={!isTrendWeightValid}>
                       {t('settings.saveTrendConfig')}
                     </Button>
                   </>

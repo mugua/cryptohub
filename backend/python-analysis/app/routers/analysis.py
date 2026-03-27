@@ -4,16 +4,18 @@ import random
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Query
+from pydantic import ValidationError
 
 from app.models.schemas import (
     AnalysisReport, MacroAnalysis, PolicyAnalysis, PolicyEvent,
     SupplyDemandAnalysis, SentimentAnalysis, TechnicalAnalysis,
     TechnicalIndicator, Signal,
-    DimensionScore, TrendReport,
+    DimensionScore, TrendReport, TrendReportConfig,
 )
 from app.services.trend_report import (
     BASE_WEIGHTS, compute_trend, normalise_score, severity_from_score,
 )
+from app.services.data_scrapers import fetch_data_source, fetch_all_sources
 
 router = APIRouter()
 
@@ -204,3 +206,97 @@ async def get_trend_report(
             "建议关注关键支撑阻力位变化。"
         ),
     )
+
+
+# ── Trend Report Configuration ───────────────────────────────────────────────
+
+# In-memory store (replace with database in production)
+_trend_config_store: TrendReportConfig | None = None
+
+
+@router.get("/trend-config", response_model=TrendReportConfig)
+async def get_trend_config() -> TrendReportConfig:
+    """Return current trend report configuration (dimensions + sub-items)."""
+    if _trend_config_store is not None:
+        return _trend_config_store
+    # Return default configuration
+    from app.models.schemas import SubItemConfig, DimensionConfig
+    return TrendReportConfig(
+        dimensions=[
+            DimensionConfig(name="macro", base_weight=0.20, enabled=True, sub_items=[
+                SubItemConfig(name="FRED", weight=0.25, data_source="FRED (美联储经济数据)", data_description="利率、通胀率、CPI、失业率、GDP", api_type="REST API", api_endpoint="api.stlouisfed.org/fred"),
+                SubItemConfig(name="TradingEconomics", weight=0.25, data_source="TradingEconomics", data_description="全球宏观经济指标", api_type="REST API", api_endpoint="tradingeconomics.com/api"),
+                SubItemConfig(name="Quandl/Nasdaq", weight=0.20, data_source="Quandl/Nasdaq Data Link", data_description="金融经济数据集", api_type="REST API", api_endpoint="data.nasdaq.com/api"),
+                SubItemConfig(name="WorldBank", weight=0.15, data_source="World Bank Open Data", data_description="全球经济指标", api_type="REST API", api_endpoint="api.worldbank.org/v2"),
+                SubItemConfig(name="IMF", weight=0.15, data_source="IMF Data", data_description="国际货币基金组织数据", api_type="REST API", api_endpoint="data.imf.org/api"),
+            ]),
+            DimensionConfig(name="policy", base_weight=0.25, enabled=True, sub_items=[
+                SubItemConfig(name="SEC_EDGAR", weight=0.20, data_source="SEC EDGAR", data_description="SEC公告、注册文件", api_type="REST API", api_endpoint="www.sec.gov/cgi-bin/browse-edgar"),
+                SubItemConfig(name="CryptoRegulations", weight=0.20, data_source="CryptoRegulations.org", data_description="全球加密货币监管状态", api_type="REST API", api_endpoint="需申请"),
+                SubItemConfig(name="CoinDesk", weight=0.20, data_source="CoinDesk API", data_description="监管新闻、政策动态", api_type="REST API", api_endpoint="data-api.coindesk.com"),
+                SubItemConfig(name="Cointelegraph", weight=0.20, data_source="Cointelegraph API", data_description="政策法规新闻", api_type="RSS/JSON", api_endpoint="cointelegraph.com/rss"),
+                SubItemConfig(name="GovAnnouncements", weight=0.20, data_source="官方政府公报", data_description="美国、中国、欧盟、韩国央行/财政部公告", api_type="Scraper", api_endpoint="需爬虫 自建RSS解析"),
+            ]),
+            DimensionConfig(name="supply_demand", base_weight=0.25, enabled=True, sub_items=[
+                SubItemConfig(name="Glassnode", weight=0.20, data_source="Glassnode", data_description="链上指标、交易所余额、持仓分布", api_type="REST API", api_endpoint="api.glassnode.com"),
+                SubItemConfig(name="CryptoQuant", weight=0.20, data_source="CryptoQuant", data_description="交易所资金流动、矿工数据", api_type="REST API", api_endpoint="api.cryptoquant.com"),
+                SubItemConfig(name="CoinMetrics", weight=0.15, data_source="Coin Metrics", data_description="全链数据分析", api_type="REST API", api_endpoint="api.coinmetrics.io"),
+                SubItemConfig(name="Santiment", weight=0.15, data_source="Santiment", data_description="社交+链上数据", api_type="GraphQL API", api_endpoint="api.santiment.net"),
+                SubItemConfig(name="Messari", weight=0.15, data_source="Messari", data_description="资产指标、交易所数据", api_type="REST API", api_endpoint="data.messari.io/api"),
+                SubItemConfig(name="BlockchainDotCom", weight=0.15, data_source="Blockchain.com API", data_description="区块链原始数据", api_type="REST API", api_endpoint="api.blockchain.info"),
+            ]),
+            DimensionConfig(name="sentiment", base_weight=0.15, enabled=True, sub_items=[
+                SubItemConfig(name="FearGreed", weight=0.20, data_source="Alternative.me (Fear & Greed Index)", data_description="恐惧贪婪指数", api_type="JSON API", api_endpoint="api.alternative.me/fng"),
+                SubItemConfig(name="LunarCrush", weight=0.20, data_source="LunarCrush", data_description="社交媒体情绪、影响力排名", api_type="REST API", api_endpoint="lunarcrush.com/api"),
+                SubItemConfig(name="SantimentSocial", weight=0.15, data_source="Santiment", data_description="加权社交情绪", api_type="GraphQL API", api_endpoint="api.santiment.net"),
+                SubItemConfig(name="TheTIE", weight=0.15, data_source="The TIE", data_description="机构投资者情绪", api_type="REST API", api_endpoint="thetie.io/api"),
+                SubItemConfig(name="Twitter", weight=0.10, data_source="Twitter API v2", data_description="社交推文情感分析", api_type="REST API", api_endpoint="api.twitter.com/2"),
+                SubItemConfig(name="Reddit", weight=0.10, data_source="Reddit API", data_description="加密货币板块情绪", api_type="REST API", api_endpoint="www.reddit.com/dev/api"),
+                SubItemConfig(name="GoogleTrends", weight=0.10, data_source="Google Trends API", data_description="搜索热度趋势", api_type="Scraper", api_endpoint="trends.google.com/trends/explore"),
+            ]),
+            DimensionConfig(name="technical", base_weight=0.15, enabled=True, sub_items=[
+                SubItemConfig(name="OKX_Binance", weight=0.25, data_source="OKX/Binance API", data_description="K线、交易量、深度图", api_type="REST/WebSocket", api_endpoint="api.okx.com;api.binance.com"),
+                SubItemConfig(name="CoinGecko", weight=0.25, data_source="CoinGecko", data_description="价格、市值、历史数据", api_type="REST API", api_endpoint="api.coingecko.com"),
+                SubItemConfig(name="CoinMarketCap", weight=0.20, data_source="CoinMarketCap", data_description="市场数据、历史价格", api_type="REST API", api_endpoint="pro-api.coinmarketcap.com"),
+                SubItemConfig(name="CryptoCompare", weight=0.15, data_source="CryptoCompare", data_description="多交易所OHLCV数据", api_type="REST/WebSocket", api_endpoint="min-api.cryptocompare.com"),
+                SubItemConfig(name="TradingView", weight=0.15, data_source="TradingView (UNOFFICIAL)", data_description="图表数据", api_type="Scraper", api_endpoint="pine_fetch() 或爬虫"),
+            ]),
+        ],
+        boost_factor=0.8,
+    )
+
+
+@router.post("/trend-config", response_model=TrendReportConfig)
+async def save_trend_config(config: TrendReportConfig) -> TrendReportConfig:
+    """Save trend report configuration.
+
+    Validates that enabled dimension weights sum to 1.0 (100%).
+    """
+    global _trend_config_store
+    enabled_total = sum(d.base_weight for d in config.dimensions if d.enabled)
+    if abs(enabled_total - 1.0) > 0.01:
+        from fastapi import HTTPException
+        raise HTTPException(
+            status_code=422,
+            detail=f"Enabled dimension weights must sum to 100% (got {enabled_total * 100:.1f}%)",
+        )
+    _trend_config_store = config
+    return config
+
+
+@router.get("/data-source/{source_key}")
+async def get_data_source(
+    source_key: str,
+    symbol: str = Query("BTC/USDT", description="Trading pair symbol"),
+) -> dict:
+    """Fetch data from a single registered data source (for testing / preview)."""
+    result = await fetch_data_source(source_key, symbol)
+    return {
+        "data": {
+            "source_name": result.source_name,
+            "raw_value": result.raw_value,
+            "success": result.success,
+            "error": result.error,
+            "meta": result.meta,
+        }
+    }
