@@ -467,11 +467,22 @@
     "trendConfigDesc": "Configure the five dimension weights and boost factor for trend report. Changes will affect composite score calculation.",
     "dimensionWeights": "Dimension Weights",
     "totalWeight": "Total enabled weight",
-    "trendWeightWarning": "Enabled dimension weights must sum to 100%",
+    "trendWeightWarning": "Enabled dimension weights must sum to 100%. Cannot save.",
     "boostConfig": "Boost Factor Config",
     "boostFactor": "Severity Boost Factor",
     "boostFormulaDesc": "📊 Formula: adjusted_weight = base_weight × (1 + severity × boost_factor). Higher boost factor means greater weight adjustment for high-severity dimensions. Default: 0.8",
     "saveTrendConfig": "Save Trend Config",
-    "trendConfigSaved": "Trend report configuration saved"
+    "trendConfigSaved": "Trend report configuration saved",
+    "subItems": "Sub-Items Config",
+    "subItemName": "Sub-Item Name",
+    "subItemWeight": "Weight",
+    "dataSource": "Data Source",
+    "dataDescription": "Key Data",
+    "apiType": "API Type",
+    "apiEndpoint": "Endpoint",
+    "addSubItem": "Add Sub-Item",
+    "deleteSubItem": "Delete",
+    "subItemWeightWarning": "Sub-item weights should sum to 100%",
+    "weightDistribution": "Weight Distribution"
   }
 }

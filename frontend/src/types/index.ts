@@ -259,10 +259,21 @@ export interface ExchangeApiConfig {
 }
 
 // ─── Trend Report Config ──────────────────────────────────────────────────────
+export interface SubItemConfig {
+  name: string;
+  weight: number;         // 0 to 1 within its parent dimension
+  dataSource: string;     // e.g. "FRED", "Glassnode"
+  dataDescription: string;
+  apiType: string;        // e.g. "REST API", "GraphQL API", "WebSocket", "RSS/JSON", "Scraper"
+  apiEndpoint: string;    // e.g. "api.stlouisfed.org/fred"
+  enabled: boolean;
+}
+
 export interface DimensionConfig {
   name: string;
   baseWeight: number;
   enabled: boolean;
+  subItems?: SubItemConfig[];
 }
 
 export interface TrendReportConfig {

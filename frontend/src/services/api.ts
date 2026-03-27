@@ -480,11 +480,59 @@ export async function saveExchangeApiConfig(_config: Partial<ExchangeApiConfig>)
 
 const DEFAULT_TREND_CONFIG: TrendReportConfig = {
   dimensions: [
-    { name: 'macro', baseWeight: 0.20, enabled: true },
-    { name: 'policy', baseWeight: 0.25, enabled: true },
-    { name: 'supply_demand', baseWeight: 0.25, enabled: true },
-    { name: 'sentiment', baseWeight: 0.15, enabled: true },
-    { name: 'technical', baseWeight: 0.15, enabled: true },
+    {
+      name: 'macro', baseWeight: 0.20, enabled: true,
+      subItems: [
+        { name: 'FRED', weight: 0.25, dataSource: 'FRED (美联储经济数据)', dataDescription: '利率、通胀率、CPI、失业率、GDP', apiType: 'REST API', apiEndpoint: 'api.stlouisfed.org/fred', enabled: true },
+        { name: 'TradingEconomics', weight: 0.25, dataSource: 'TradingEconomics', dataDescription: '全球宏观经济指标', apiType: 'REST API', apiEndpoint: 'tradingeconomics.com/api', enabled: true },
+        { name: 'Quandl/Nasdaq', weight: 0.20, dataSource: 'Quandl/Nasdaq Data Link', dataDescription: '金融经济数据集', apiType: 'REST API', apiEndpoint: 'data.nasdaq.com/api', enabled: true },
+        { name: 'WorldBank', weight: 0.15, dataSource: 'World Bank Open Data', dataDescription: '全球经济指标', apiType: 'REST API', apiEndpoint: 'api.worldbank.org/v2', enabled: true },
+        { name: 'IMF', weight: 0.15, dataSource: 'IMF Data', dataDescription: '国际货币基金组织数据', apiType: 'REST API', apiEndpoint: 'data.imf.org/api', enabled: true },
+      ],
+    },
+    {
+      name: 'policy', baseWeight: 0.25, enabled: true,
+      subItems: [
+        { name: 'SEC_EDGAR', weight: 0.20, dataSource: 'SEC EDGAR', dataDescription: 'SEC公告、注册文件', apiType: 'REST API', apiEndpoint: 'www.sec.gov/cgi-bin/browse-edgar', enabled: true },
+        { name: 'CryptoRegulations', weight: 0.20, dataSource: 'CryptoRegulations.org', dataDescription: '全球加密货币监管状态', apiType: 'REST API', apiEndpoint: '需申请', enabled: true },
+        { name: 'CoinDesk', weight: 0.20, dataSource: 'CoinDesk API', dataDescription: '监管新闻、政策动态', apiType: 'REST API', apiEndpoint: 'data-api.coindesk.com', enabled: true },
+        { name: 'Cointelegraph', weight: 0.20, dataSource: 'Cointelegraph API', dataDescription: '政策法规新闻', apiType: 'RSS/JSON', apiEndpoint: 'cointelegraph.com/rss', enabled: true },
+        { name: 'GovAnnouncements', weight: 0.20, dataSource: '官方政府公报', dataDescription: '美国、中国、欧盟、韩国央行/财政部公告', apiType: 'Scraper', apiEndpoint: '需爬虫 自建RSS解析', enabled: true },
+      ],
+    },
+    {
+      name: 'supply_demand', baseWeight: 0.25, enabled: true,
+      subItems: [
+        { name: 'Glassnode', weight: 0.20, dataSource: 'Glassnode', dataDescription: '链上指标、交易所余额、持仓分布', apiType: 'REST API', apiEndpoint: 'api.glassnode.com', enabled: true },
+        { name: 'CryptoQuant', weight: 0.20, dataSource: 'CryptoQuant', dataDescription: '交易所资金流动、矿工数据', apiType: 'REST API', apiEndpoint: 'api.cryptoquant.com', enabled: true },
+        { name: 'CoinMetrics', weight: 0.15, dataSource: 'Coin Metrics', dataDescription: '全链数据分析', apiType: 'REST API', apiEndpoint: 'api.coinmetrics.io', enabled: true },
+        { name: 'Santiment', weight: 0.15, dataSource: 'Santiment', dataDescription: '社交+链上数据', apiType: 'GraphQL API', apiEndpoint: 'api.santiment.net', enabled: true },
+        { name: 'Messari', weight: 0.15, dataSource: 'Messari', dataDescription: '资产指标、交易所数据', apiType: 'REST API', apiEndpoint: 'data.messari.io/api', enabled: true },
+        { name: 'BlockchainDotCom', weight: 0.15, dataSource: 'Blockchain.com API', dataDescription: '区块链原始数据', apiType: 'REST API', apiEndpoint: 'api.blockchain.info', enabled: true },
+      ],
+    },
+    {
+      name: 'sentiment', baseWeight: 0.15, enabled: true,
+      subItems: [
+        { name: 'FearGreed', weight: 0.20, dataSource: 'Alternative.me (Fear & Greed Index)', dataDescription: '恐惧贪婪指数', apiType: 'JSON API', apiEndpoint: 'api.alternative.me/fng', enabled: true },
+        { name: 'LunarCrush', weight: 0.20, dataSource: 'LunarCrush', dataDescription: '社交媒体情绪、影响力排名', apiType: 'REST API', apiEndpoint: 'lunarcrush.com/api', enabled: true },
+        { name: 'SantimentSocial', weight: 0.15, dataSource: 'Santiment', dataDescription: '加权社交情绪', apiType: 'GraphQL API', apiEndpoint: 'api.santiment.net', enabled: true },
+        { name: 'TheTIE', weight: 0.15, dataSource: 'The TIE', dataDescription: '机构投资者情绪', apiType: 'REST API', apiEndpoint: 'thetie.io/api', enabled: true },
+        { name: 'Twitter', weight: 0.10, dataSource: 'Twitter API v2', dataDescription: '社交推文情感分析', apiType: 'REST API', apiEndpoint: 'api.twitter.com/2', enabled: true },
+        { name: 'Reddit', weight: 0.10, dataSource: 'Reddit API', dataDescription: '加密货币板块情绪', apiType: 'REST API', apiEndpoint: 'www.reddit.com/dev/api', enabled: true },
+        { name: 'GoogleTrends', weight: 0.10, dataSource: 'Google Trends API', dataDescription: '搜索热度趋势', apiType: 'Scraper', apiEndpoint: 'trends.google.com/trends/explore', enabled: true },
+      ],
+    },
+    {
+      name: 'technical', baseWeight: 0.15, enabled: true,
+      subItems: [
+        { name: 'OKX_Binance', weight: 0.25, dataSource: 'OKX/Binance API', dataDescription: 'K线、交易量、深度图', apiType: 'REST/WebSocket', apiEndpoint: 'api.okx.com;api.binance.com', enabled: true },
+        { name: 'CoinGecko', weight: 0.25, dataSource: 'CoinGecko', dataDescription: '价格、市值、历史数据', apiType: 'REST API', apiEndpoint: 'api.coingecko.com', enabled: true },
+        { name: 'CoinMarketCap', weight: 0.20, dataSource: 'CoinMarketCap', dataDescription: '市场数据、历史价格', apiType: 'REST API', apiEndpoint: 'pro-api.coinmarketcap.com', enabled: true },
+        { name: 'CryptoCompare', weight: 0.15, dataSource: 'CryptoCompare', dataDescription: '多交易所OHLCV数据', apiType: 'REST/WebSocket', apiEndpoint: 'min-api.cryptocompare.com', enabled: true },
+        { name: 'TradingView', weight: 0.15, dataSource: 'TradingView (UNOFFICIAL)', dataDescription: '图表数据', apiType: 'Scraper', apiEndpoint: 'pine_fetch() 或爬虫', enabled: true },
+      ],
+    },
   ],
   boostFactor: 0.8,
 };

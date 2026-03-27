@@ -467,11 +467,22 @@
     "trendConfigDesc": "配置趋势报告的五大维度权重和增强因子参数，调整后将影响趋势报告的综合得分计算",
     "dimensionWeights": "维度权重配置",
     "totalWeight": "已启用维度权重合计",
-    "trendWeightWarning": "已启用的维度权重合计必须为 100%",
+    "trendWeightWarning": "已启用的维度权重合计必须为 100%，当前无法保存",
     "boostConfig": "增强因子配置",
     "boostFactor": "Severity 增强因子",
     "boostFormulaDesc": "📊 公式：adjusted_weight = base_weight × (1 + severity × boost_factor)。增强因子越大，高严重程度维度的权重调整幅度越大。默认值 0.8",
     "saveTrendConfig": "保存趋势配置",
-    "trendConfigSaved": "趋势报告配置已保存"
+    "trendConfigSaved": "趋势报告配置已保存",
+    "subItems": "子项配置",
+    "subItemName": "子项名称",
+    "subItemWeight": "子项权重",
+    "dataSource": "数据来源",
+    "dataDescription": "主要数据",
+    "apiType": "API类型",
+    "apiEndpoint": "接口地址",
+    "addSubItem": "添加子项",
+    "deleteSubItem": "删除",
+    "subItemWeightWarning": "子项权重合计应为 100%",
+    "weightDistribution": "权重分布"
   }
 }

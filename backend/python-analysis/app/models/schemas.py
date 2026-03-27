@@ -105,6 +105,31 @@ class DimensionScore(BaseModel):
     summary: str
 
 
+class SubItemConfig(BaseModel):
+    """Configurable sub-item within a dimension (data source + API config)."""
+    name: str
+    weight: float = Field(0, ge=0, le=1, description="Weight within parent dimension")
+    data_source: str = ""
+    data_description: str = ""
+    api_type: str = "REST API"    # REST API | GraphQL API | WebSocket | RSS/JSON | Scraper
+    api_endpoint: str = ""
+    enabled: bool = True
+
+
+class DimensionConfig(BaseModel):
+    """Config for a single analysis dimension (frontend-editable)."""
+    name: str
+    base_weight: float = Field(..., ge=0, le=1)
+    enabled: bool = True
+    sub_items: list[SubItemConfig] = []
+
+
+class TrendReportConfig(BaseModel):
+    """Full trend report configuration (five dimensions + boost)."""
+    dimensions: list[DimensionConfig]
+    boost_factor: float = Field(0.8, ge=0, le=2)
+
+
 class TrendReport(BaseModel):
     """Aggregated multi-dimension trend report."""
     symbol: str
