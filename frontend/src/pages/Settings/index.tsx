@@ -170,6 +170,74 @@ const Settings: React.FC = () => {
     setTrendConfig(updated);
   };
 
+  /* ── Coin-specific item handlers ── */
+  const handleCoinItemChange = (dimIdx: number, coin: string, subIdx: number, field: keyof SubItemConfig, value: unknown) => {
+    if (!trendConfig) return;
+    const updated = { ...trendConfig, dimensions: trendConfig.dimensions.map((d, i) => {
+      if (i !== dimIdx) return d;
+      const coinItems = { ...(d.coinSpecificItems || {}) };
+      const subs = [...(coinItems[coin] || [])];
+      subs[subIdx] = { ...subs[subIdx], [field]: field === 'weight' ? (value as number) / 100 : value };
+      coinItems[coin] = subs;
+      return { ...d, coinSpecificItems: coinItems };
+    })};
+    setTrendConfig(updated);
+  };
+
+  const handleAddCoinItem = (dimIdx: number, coin: string) => {
+    if (!trendConfig) return;
+    const updated = { ...trendConfig, dimensions: trendConfig.dimensions.map((d, i) => {
+      if (i !== dimIdx) return d;
+      const coinItems = { ...(d.coinSpecificItems || {}) };
+      const subs = [...(coinItems[coin] || [])];
+      subs.push({ name: '', weight: 0, dataSource: '', dataDescription: '', apiType: 'REST API', apiEndpoint: '', enabled: true });
+      coinItems[coin] = subs;
+      return { ...d, coinSpecificItems: coinItems };
+    })};
+    setTrendConfig(updated);
+  };
+
+  const handleDeleteCoinItem = (dimIdx: number, coin: string, subIdx: number) => {
+    if (!trendConfig) return;
+    const updated = { ...trendConfig, dimensions: trendConfig.dimensions.map((d, i) => {
+      if (i !== dimIdx) return d;
+      const coinItems = { ...(d.coinSpecificItems || {}) };
+      const subs = [...(coinItems[coin] || [])];
+      subs.splice(subIdx, 1);
+      coinItems[coin] = subs;
+      return { ...d, coinSpecificItems: coinItems };
+    })};
+    setTrendConfig(updated);
+  };
+
+  const handleAddCoinGroup = (dimIdx: number) => {
+    if (!trendConfig) return;
+    const coin = (newCoinSymbol || '').toUpperCase().trim();
+    if (!coin) return;
+    const updated = { ...trendConfig, dimensions: trendConfig.dimensions.map((d, i) => {
+      if (i !== dimIdx) return d;
+      const coinItems = { ...(d.coinSpecificItems || {}) };
+      if (coinItems[coin]) return d;
+      coinItems[coin] = [];
+      return { ...d, coinSpecificItems: coinItems };
+    })};
+    setTrendConfig(updated);
+    setNewCoinSymbol('');
+  };
+
+  const handleDeleteCoinGroup = (dimIdx: number, coin: string) => {
+    if (!trendConfig) return;
+    const updated = { ...trendConfig, dimensions: trendConfig.dimensions.map((d, i) => {
+      if (i !== dimIdx) return d;
+      const coinItems = { ...(d.coinSpecificItems || {}) };
+      delete coinItems[coin];
+      return { ...d, coinSpecificItems: coinItems };
+    })};
+    setTrendConfig(updated);
+  };
+
+  const [newCoinSymbol, setNewCoinSymbol] = useState<string>('');
+
   const isTrendWeightValid = trendConfig
     ? Math.abs(trendConfig.dimensions.filter((d) => d.enabled).reduce((a, d) => a + d.baseWeight, 0) - 1) < 0.01
     : true;
@@ -681,6 +749,119 @@ const Settings: React.FC = () => {
                           </div>
                         ),
                       }))}
+                    />
+
+                    {/* Coin-specific items configuration */}
+                    <Divider style={{ borderColor: '#1f2937', margin: '20px 0 12px' }}>
+                      <Text style={{ color: '#888', fontSize: 12 }}>{t('settings.coinSpecificItems')}</Text>
+                    </Divider>
+                    <Collapse
+                      ghost
+                      expandIcon={({ isActive }) => <DownOutlined rotate={isActive ? 0 : -90} style={{ color: '#888' }} />}
+                      items={trendConfig.dimensions.filter(dim => dim.coinSpecificItems && Object.keys(dim.coinSpecificItems).length > 0).map((dim) => {
+                        const dimIdx = trendConfig.dimensions.indexOf(dim);
+                        const coins = Object.keys(dim.coinSpecificItems || {});
+                        return {
+                          key: `coin_${dim.name}`,
+                          label: (
+                            <Text style={{ color: dim.enabled ? '#ccc' : '#555', fontSize: 13 }}>
+                              <span style={colorDotStyle(PIE_COLORS[dimIdx % PIE_COLORS.length], 8)} />
+                              {t(`trend.${dim.name}`)} — {coins.length} {t('settings.coinGroupCount')}
+                            </Text>
+                          ),
+                          children: (
+                            <div style={{ paddingLeft: 8 }}>
+                              {coins.map((coin) => {
+                                const items = (dim.coinSpecificItems || {})[coin] || [];
+                                return (
+                                  <Card key={coin} className="inner-card" size="small" style={{ marginBottom: 12 }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                                      <Tag color="blue" style={{ fontSize: 13, fontWeight: 600 }}>{coin} {t('settings.coinSpecificFactors')}</Tag>
+                                      <Button type="text" size="small" danger icon={<DeleteOutlined />} onClick={() => handleDeleteCoinGroup(dimIdx, coin)}>
+                                        {t('settings.deleteCoinGroup')}
+                                      </Button>
+                                    </div>
+                                    {items.map((sub, subIdx) => (
+                                      <Card key={subIdx} size="small" style={{ marginBottom: 6, background: '#0d1117', border: '1px solid #1f2937' }}>
+                                        <Row gutter={8} style={{ alignItems: 'center' }}>
+                                          <Col>
+                                            <Switch size="small" checked={sub.enabled}
+                                              onChange={(checked) => handleCoinItemChange(dimIdx, coin, subIdx, 'enabled', checked)} />
+                                          </Col>
+                                          <Col flex="120px">
+                                            <Input size="small" placeholder={t('settings.subItemName')} value={sub.name}
+                                              onChange={(e) => handleCoinItemChange(dimIdx, coin, subIdx, 'name', e.target.value)}
+                                              style={{ color: '#ccc', background: '#161b22', borderColor: '#1f2937' }} />
+                                          </Col>
+                                          <Col>
+                                            <InputNumber min={0} max={100} step={1} size="small"
+                                              value={Math.round(sub.weight * 100)}
+                                              onChange={(v) => handleCoinItemChange(dimIdx, coin, subIdx, 'weight', v ?? 0)}
+                                              formatter={(v) => `${v}%`}
+                                              parser={(v) => (v ? Number(v.replace('%', '')) : 0) as number}
+                                              style={{ width: 70 }} disabled={!sub.enabled} />
+                                          </Col>
+                                          <Col flex="auto">
+                                            <Input size="small" placeholder={t('settings.dataSource')} value={sub.dataSource}
+                                              onChange={(e) => handleCoinItemChange(dimIdx, coin, subIdx, 'dataSource', e.target.value)}
+                                              style={{ color: '#ccc', background: '#161b22', borderColor: '#1f2937' }} />
+                                          </Col>
+                                          <Col>
+                                            <Button type="text" size="small" danger icon={<DeleteOutlined />}
+                                              onClick={() => handleDeleteCoinItem(dimIdx, coin, subIdx)} />
+                                          </Col>
+                                        </Row>
+                                        <Row gutter={8} style={{ marginTop: 4 }}>
+                                          <Col xs={12}>
+                                            <Input size="small"
+                                              addonBefore={<span style={{ fontSize: 11 }}>{t('settings.dataDescription')}</span>}
+                                              value={sub.dataDescription}
+                                              onChange={(e) => handleCoinItemChange(dimIdx, coin, subIdx, 'dataDescription', e.target.value)}
+                                              style={{ color: '#ccc', background: '#161b22', borderColor: '#1f2937' }} />
+                                          </Col>
+                                          <Col xs={12}>
+                                            <Input size="small"
+                                              addonBefore={<span style={{ fontSize: 11 }}>{t('settings.apiEndpoint')}</span>}
+                                              value={sub.apiEndpoint}
+                                              onChange={(e) => handleCoinItemChange(dimIdx, coin, subIdx, 'apiEndpoint', e.target.value)}
+                                              style={{ color: '#ccc', background: '#161b22', borderColor: '#1f2937' }} />
+                                          </Col>
+                                        </Row>
+                                      </Card>
+                                    ))}
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
+                                      <Button type="dashed" size="small" icon={<PlusOutlined />} onClick={() => handleAddCoinItem(dimIdx, coin)}>
+                                        {t('settings.addSubItem')}
+                                      </Button>
+                                      {items.length > 0 && (() => {
+                                        const coinTotal = items.filter(s => s.enabled).reduce((a, s) => a + s.weight, 0);
+                                        return (
+                                          <Tag color={Math.abs(coinTotal - 1) < 0.01 ? 'green' : 'orange'}>
+                                            {t('settings.subItemWeight')}: {Math.round(coinTotal * 100)}%
+                                          </Tag>
+                                        );
+                                      })()}
+                                    </div>
+                                  </Card>
+                                );
+                              })}
+                              <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                                <Input
+                                  size="small"
+                                  placeholder={t('settings.newCoinSymbol')}
+                                  value={newCoinSymbol}
+                                  onChange={(e) => setNewCoinSymbol(e.target.value)}
+                                  style={{ width: 120, color: '#ccc', background: '#161b22', borderColor: '#1f2937' }}
+                                  onPressEnter={() => handleAddCoinGroup(dimIdx)}
+                                />
+                                <Button type="dashed" size="small" icon={<PlusOutlined />} onClick={() => handleAddCoinGroup(dimIdx)}>
+                                  {t('settings.addCoinGroup')}
+                                </Button>
+                              </div>
+                            </div>
+                          ),
+                        };
+                      })}
                     />
 
                     <Divider style={{ borderColor: '#1f2937', margin: '16px 0 20px' }}>

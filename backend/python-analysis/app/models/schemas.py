@@ -140,11 +140,17 @@ class SubItemConfig(BaseModel):
 
 
 class DimensionConfig(BaseModel):
-    """Config for a single analysis dimension (frontend-editable)."""
+    """Config for a single analysis dimension (frontend-editable).
+
+    ``sub_items`` holds **common / base** indicators that apply to all coins.
+    ``coin_specific_items`` holds per-coin quantitative factors keyed by a
+    normalised coin symbol (e.g. ``"BTC"``, ``"ETH"``).
+    """
     name: str
     base_weight: float = Field(..., ge=0, le=1)
     enabled: bool = True
     sub_items: list[SubItemConfig] = []
+    coin_specific_items: dict[str, list[SubItemConfig]] = {}
 
 
 class TrendReportConfig(BaseModel):

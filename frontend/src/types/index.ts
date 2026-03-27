@@ -274,6 +274,8 @@ export interface DimensionConfig {
   baseWeight: number;
   enabled: boolean;
   subItems?: SubItemConfig[];
+  /** Per-coin quantitative factors, keyed by normalised coin symbol (e.g. "BTC", "ETH"). */
+  coinSpecificItems?: Record<string, SubItemConfig[]>;
 }
 
 export interface TrendReportConfig {

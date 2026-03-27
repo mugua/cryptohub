@@ -295,7 +295,25 @@ async def get_trend_config() -> TrendReportConfig:
                 SubItemConfig(name="CandlestickPatterns", weight=0.10, data_source="Binance/OKX OHLCV", data_description="K线形态识别(吞没、十字星、锤头等)", api_type="REST/WebSocket", api_endpoint="api.binance.com;api.okx.com"),
                 SubItemConfig(name="MarketMicrostructure", weight=0.10, data_source="Binance/OKX OrderBook + Coinglass", data_description="订单簿深度、买卖价差、爆仓数据", api_type="REST/WebSocket", api_endpoint="api.binance.com;api.okx.com;api.coinglass.com"),
                 SubItemConfig(name="ExecutionLayer", weight=0.10, data_source="内部监控 + Exchange Ping", data_description="滑点(bps)、网络延迟(ms)、API成功率、流动性深度", api_type="REST/WebSocket", api_endpoint="内部监控系统"),
-            ]),
+            ], coin_specific_items={
+                "BTC": [
+                    SubItemConfig(name="HalvingCycle", weight=0.20, data_source="Blockchain.com / Blockchair", data_description="减半周期阶段、距下次减半天数、历史规律", api_type="REST API", api_endpoint="api.blockchain.info;api.blockchair.com"),
+                    SubItemConfig(name="HashRate", weight=0.18, data_source="Glassnode / CoinMetrics", data_description="全网算力趋势、挖矿难度调整幅度", api_type="REST API", api_endpoint="api.glassnode.com;api.coinmetrics.io"),
+                    SubItemConfig(name="MinerFlow", weight=0.15, data_source="Glassnode / CryptoQuant", data_description="矿工收入、矿工流出量、矿工储备", api_type="REST API", api_endpoint="api.glassnode.com;api.cryptoquant.com"),
+                    SubItemConfig(name="MVRV", weight=0.18, data_source="Glassnode / CoinMetrics", data_description="市场价值/实现价值比率、MVRV Z-Score", api_type="REST API", api_endpoint="api.glassnode.com;api.coinmetrics.io"),
+                    SubItemConfig(name="NUPL", weight=0.14, data_source="Glassnode / LookIntoBitcoin", data_description="净未实现盈亏、市场情绪阶段", api_type="REST API", api_endpoint="api.glassnode.com"),
+                    SubItemConfig(name="StockToFlow", weight=0.10, data_source="LookIntoBitcoin / 自建计算", data_description="S2F模型价格偏差、存量产量比", api_type="REST API", api_endpoint="自建计算 + api.glassnode.com"),
+                    SubItemConfig(name="LightningNetwork", weight=0.05, data_source="mempool.space / 1ML", data_description="闪电网络容量、通道数、节点数增长", api_type="REST API", api_endpoint="mempool.space/api;api.1ml.com"),
+                ],
+                "ETH": [
+                    SubItemConfig(name="GasCongestion", weight=0.15, data_source="Etherscan / Alchemy", data_description="Gas价格(Gwei)、待处理交易数、网络拥堵度", api_type="REST API", api_endpoint="api.etherscan.io;eth-mainnet.g.alchemy.com"),
+                    SubItemConfig(name="BurnRate", weight=0.20, data_source="Etherscan / ultrasound.money", data_description="EIP-1559每日销毁量、净发行量、通缩/通胀状态", api_type="REST API", api_endpoint="api.etherscan.io;ultrasound.money/api"),
+                    SubItemConfig(name="Staking", weight=0.20, data_source="Beaconcha.in / Rated.network", data_description="质押总量、质押率、验证者数量、质押APY", api_type="REST API", api_endpoint="beaconcha.in/api;api.rated.network"),
+                    SubItemConfig(name="DeFiTVL", weight=0.18, data_source="DefiLlama", data_description="DeFi总锁仓量、Top协议TVL变化", api_type="REST API", api_endpoint="api.llama.fi"),
+                    SubItemConfig(name="L2Activity", weight=0.15, data_source="L2Beat / DefiLlama", data_description="L2 Rollup TVL、交易量(Arbitrum/Optimism/Base等)", api_type="REST API", api_endpoint="l2beat.com/api;api.llama.fi"),
+                    SubItemConfig(name="ETH_BTC_Ratio", weight=0.12, data_source="Binance / CoinGecko", data_description="ETH/BTC汇率趋势、相对强弱", api_type="REST API", api_endpoint="api.binance.com;api.coingecko.com"),
+                ],
+            }),
         ],
         boost_factor=0.8,
     )
