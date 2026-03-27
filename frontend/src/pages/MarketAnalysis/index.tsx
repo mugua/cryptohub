@@ -19,7 +19,7 @@ import { fetchAnalysis, fetchCandles, fetchTrendReport } from '../../services/ap
 import type { AnalysisReport, Candle, TrendReport, TrendSignal } from '../../types';
 import './MarketAnalysis.css';
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
 const { Option } = Select;
 
 const SYMBOLS = ['BTC/USDT', 'ETH/USDT', 'BNB/USDT', 'SOL/USDT', 'XRP/USDT'];
@@ -491,7 +491,7 @@ const MarketAnalysis: React.FC = () => {
                     <Radar dataKey="score" stroke="#1677ff" fill="#1677ff" fillOpacity={0.3} />
                     <Tooltip
                       contentStyle={{ background: '#1f2937', border: '1px solid #374151', color: '#fff' }}
-                      formatter={(v: number) => [`${v}/100`, t('market.score')]}
+                      formatter={(v) => [`${v}/100`, t('market.score')]}
                     />
                   </RadarChart>
                 </ResponsiveContainer>
