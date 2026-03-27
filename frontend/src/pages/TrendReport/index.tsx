@@ -206,7 +206,7 @@ const TrendReport: React.FC = () => {
                 />
                 <Tooltip
                   contentStyle={{ background: '#1f2937', border: '1px solid #374151', color: '#fff' }}
-                  formatter={(v: number) => [`${v}/100`, t('market.score')]}
+                  formatter={(v) => [`${v}/100`, t('market.score')]}
                 />
               </RadarChart>
             </ResponsiveContainer>
