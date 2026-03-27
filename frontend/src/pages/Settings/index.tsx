@@ -513,7 +513,7 @@ const Settings: React.FC = () => {
                                 <Cell key={dim.name} fill={PIE_COLORS[trendConfig.dimensions.indexOf(dim) % PIE_COLORS.length]} />
                               ))}
                             </Pie>
-                            <Tooltip formatter={(value: number) => `${value}%`} />
+                            <Tooltip formatter={(value) => `${value}%`} />
                           </PieChart>
                         </ResponsiveContainer>
                         <div style={{ textAlign: 'center', marginTop: 4 }}>
