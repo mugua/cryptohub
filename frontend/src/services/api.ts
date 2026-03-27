@@ -348,9 +348,8 @@ export async function loginByPassword(email: string, password: string): Promise<
   return { success: false, message: 'auth.invalidCredentials' };
 }
 
-export async function registerByEmail(email: string, password: string, code: string): Promise<{ success: boolean; token?: string; user?: UserProfile; message?: string }> {
+export async function registerByEmail(email: string, password: string, _code: string): Promise<{ success: boolean; token?: string; user?: UserProfile; message?: string }> {
   await delay(500);
-  void code;
   const users = getMockUsers();
   if (users.find((u) => u.email === email)) {
     return { success: false, message: 'auth.emailExists' };
@@ -370,9 +369,8 @@ export async function registerByEmail(email: string, password: string, code: str
   return { success: true, token: 'mock-jwt-' + Date.now(), user: newUser };
 }
 
-export async function resetPassword(email: string, code: string, newPassword: string): Promise<{ success: boolean; message?: string }> {
+export async function resetPassword(email: string, _code: string, newPassword: string): Promise<{ success: boolean; message?: string }> {
   await delay(400);
-  void code;
   const users = getMockUsers();
   const found = users.find((u) => u.email === email);
   if (!found) {

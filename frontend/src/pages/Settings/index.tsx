@@ -468,7 +468,7 @@ const Settings: React.FC = () => {
                             onChange={(v) => handleTrendWeightChange(idx, v)}
                             disabled={!dim.enabled}
                             formatter={(v) => `${v}%`}
-                            parser={(v) => (v ? Number(v.replace('%', '')) : 0) as 0}
+                            parser={(v) => (v ? Number(v.replace('%', '')) : 0) as number}
                             style={{ width: '100%' }}
                             size="small"
                           />
