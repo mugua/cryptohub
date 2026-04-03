@@ -68,7 +68,7 @@ build:
 	done
 	$(LOG) "Building frontend"
 	cd $(FRONTEND_DIR) && npm run build
-	@echo "✅  Build complete — artefacts in ./bin/ and ./frontend/dist/"
+	@echo "✅  Build complete — artifacts in ./bin/ and ./frontend/dist/"
 
 # ============================================================================
 # test — run full test suite
@@ -182,4 +182,4 @@ clean:
 	find $(GO_DIR) -name '*.pb.go' -delete
 	find $(PYTHON_DIR) -name '__pycache__' -type d -exec rm -rf {} + 2>/dev/null || true
 	find . -name '*.pyc' -delete
-	@echo "✅  Clean complete"
+	@echo "✅  Clean complete — all build artifacts removed"

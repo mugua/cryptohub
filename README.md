@@ -173,7 +173,7 @@ make docker-build    Build all Docker images
 make migrate         Run DB migrations (golang-migrate)
 make seed            Seed dev data
 make proto           Generate gRPC/protobuf stubs
-make clean           Remove build artefacts
+make clean           Remove build artifacts
 make frontend-dev    Vite dev server (port 3000)
 make backend-go-dev  Air hot-reload for Go services
 make backend-python-dev  Uvicorn reload for Python services

@@ -231,7 +231,11 @@ services:
       <<: *go-env
       PORT: "8085"
       GRPC_PORT: "9085"
-      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-dev-encryption-key-32-bytes!!}
+      # AES-256 requires exactly 32 bytes — override with a secure random key in production
+      # e.g.  openssl rand -hex 16   (produces a 32-char hex string = 16 bytes when decoded,
+      #        or use a 32-char ASCII string directly)
+      # NEVER use the default in production environments
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-dev-encryption-key-00000000000000}
     depends_on:
       postgres: {condition: service_healthy}
       redis:    {condition: service_healthy}

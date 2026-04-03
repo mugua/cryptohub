@@ -57,7 +57,7 @@ jobs:
       - name: Build (Vite)
         run: npm run build
 
-      - name: Upload build artefact
+      - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: frontend-dist

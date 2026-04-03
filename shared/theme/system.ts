@@ -5,7 +5,7 @@ import { darkTheme } from './dark';
 export type ThemeMode = 'light' | 'dark' | 'system';
 
 /**
- * Detects the OS-level colour scheme preference.
+ * Detects the OS-level color scheme preference.
  * Returns 'dark' if the user prefers dark mode, otherwise 'light'.
  */
 export function detectSystemTheme(): 'light' | 'dark' {
@@ -23,7 +23,7 @@ export function resolveTheme(mode: ThemeMode): ThemeConfig {
 }
 
 /**
- * Subscribe to OS-level colour scheme changes.
+ * Subscribe to OS-level color scheme changes.
  * The provided callback is invoked whenever the preference changes.
  * Returns an unsubscribe function.
  */
