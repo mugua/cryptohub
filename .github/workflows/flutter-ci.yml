@@ -19,6 +19,8 @@ jobs:
   analyze-test:
     name: Analyze & Test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     defaults:
       run:
         working-directory: mobile
@@ -58,6 +60,8 @@ jobs:
     name: Build Android APK
     runs-on: ubuntu-latest
     needs: analyze-test
+    permissions:
+      contents: read
     defaults:
       run:
         working-directory: mobile
@@ -96,6 +100,8 @@ jobs:
     name: Build iOS (no-codesign)
     runs-on: macos-latest
     needs: analyze-test
+    permissions:
+      contents: read
     defaults:
       run:
         working-directory: mobile
