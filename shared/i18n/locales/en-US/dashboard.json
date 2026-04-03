@@ -1,0 +1,61 @@
+{
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back, {{name}}",
+    "lastUpdated": "Last updated: {{time}}"
+  },
+  "assets": {
+    "title": "Portfolio Overview",
+    "totalValue": "Total Value",
+    "availableBalance": "Available Balance",
+    "lockedBalance": "Locked Balance",
+    "allocation": "Allocation",
+    "topHoldings": "Top Holdings"
+  },
+  "pnl": {
+    "title": "P&L Summary",
+    "todayPnl": "Today's P&L",
+    "weekPnl": "Weekly P&L",
+    "monthPnl": "Monthly P&L",
+    "totalPnl": "Total P&L",
+    "unrealizedPnl": "Unrealized P&L",
+    "realizedPnl": "Realized P&L",
+    "winRate": "Win Rate",
+    "sharpeRatio": "Sharpe Ratio",
+    "maxDrawdown": "Max Drawdown"
+  },
+  "market": {
+    "title": "Market Overview",
+    "price": "Price",
+    "change24h": "24H Change",
+    "volume24h": "24H Volume",
+    "marketCap": "Market Cap",
+    "fearGreed": "Fear & Greed Index",
+    "fearGreedDesc": "Current market sentiment",
+    "extremeFear": "Extreme Fear",
+    "fear": "Fear",
+    "neutral": "Neutral",
+    "greed": "Greed",
+    "extremeGreed": "Extreme Greed"
+  },
+  "trades": {
+    "title": "Recent Trades",
+    "symbol": "Symbol",
+    "side": "Side",
+    "price": "Price",
+    "quantity": "Quantity",
+    "total": "Total",
+    "time": "Time",
+    "buy": "BUY",
+    "sell": "SELL",
+    "noTrades": "No recent trades"
+  },
+  "strategies": {
+    "title": "Strategy Status",
+    "active": "Running",
+    "paused": "Paused",
+    "profit": "P&L",
+    "noStrategies": "No active strategies",
+    "createFirst": "Create your first strategy"
+  }
+}

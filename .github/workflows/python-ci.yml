@@ -1,0 +1,106 @@
+name: Python CI
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'backend/python-services/**'
+      - '.github/workflows/python-ci.yml'
+  pull_request:
+    paths:
+      - 'backend/python-services/**'
+      - '.github/workflows/python-ci.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: ${{ matrix.service }} – Lint & Test
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - trend-engine
+          - data-collector
+          - backtest-engine
+          - sentiment-analyzer
+
+    defaults:
+      run:
+        working-directory: backend/python-services/${{ matrix.service }}
+
+    services:
+      postgres:
+        image: timescale/timescaledb:latest-pg15
+        env:
+          POSTGRES_DB: cryptohub_test
+          POSTGRES_USER: cryptohub
+          POSTGRES_PASSWORD: secret
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      POSTGRES_URL: postgres://cryptohub:secret@localhost:5432/cryptohub_test
+      REDIS_URL: redis://localhost:6379/0
+      ENVIRONMENT: test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: backend/python-services/${{ matrix.service }}/requirements.txt
+
+      - name: Install TA-Lib
+        run: |
+          sudo apt-get install -y build-essential wget
+          wget -q http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz
+          tar -xzf ta-lib-0.4.0-src.tar.gz
+          cd ta-lib && ./configure --prefix=/usr && make -j$(nproc) && sudo make install
+          cd .. && rm -rf ta-lib ta-lib-0.4.0-src.tar.gz
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Ruff lint
+        run: ruff check .
+
+      - name: Ruff format check
+        run: ruff format --check .
+
+      - name: Pytest
+        run: |
+          pytest --tb=short -q \
+            --cov=. \
+            --cov-report=xml:coverage.xml \
+            --cov-report=term-missing
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: python-coverage-${{ matrix.service }}
+          path: backend/python-services/${{ matrix.service }}/coverage.xml
+          retention-days: 7

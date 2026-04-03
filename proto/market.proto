@@ -1,0 +1,133 @@
+syntax = "proto3";
+
+package cryptohub.v1;
+
+option go_package = "github.com/cryptohub/cryptohub/backend/go-services/gen/proto/market/v1;marketv1";
+option python_package = "cryptohub.v1";
+
+import "google/protobuf/timestamp.proto";
+import "proto/common.proto";
+
+// ── Ticker ────────────────────────────────────────────────────────────────────
+
+message Ticker {
+  string   symbol         = 1;
+  Exchange exchange       = 2;
+  string   last_price     = 3;
+  string   bid_price      = 4;
+  string   ask_price      = 5;
+  string   open_24h       = 6;
+  string   high_24h       = 7;
+  string   low_24h        = 8;
+  string   volume_24h     = 9;   // base asset volume
+  string   quote_volume_24h = 10; // quote asset volume
+  double   price_change_pct = 11;
+  google.protobuf.Timestamp timestamp = 12;
+}
+
+// ── Kline (OHLCV) ─────────────────────────────────────────────────────────────
+
+message Kline {
+  google.protobuf.Timestamp open_time  = 1;
+  google.protobuf.Timestamp close_time = 2;
+  string symbol    = 3;
+  KlineInterval interval = 4;
+  string open      = 5;
+  string high      = 6;
+  string low       = 7;
+  string close     = 8;
+  string volume    = 9;
+  string quote_volume = 10;
+  int64  trade_count  = 11;
+  bool   is_closed    = 12;
+}
+
+// ── Order Book ────────────────────────────────────────────────────────────────
+
+message OrderBookEntry {
+  string price    = 1;
+  string quantity = 2;
+}
+
+message OrderBook {
+  string   symbol          = 1;
+  Exchange exchange        = 2;
+  repeated OrderBookEntry bids = 3;
+  repeated OrderBookEntry asks = 4;
+  google.protobuf.Timestamp timestamp = 5;
+}
+
+// ── Requests / Responses ─────────────────────────────────────────────────────
+
+message GetTickerRequest {
+  string   symbol   = 1;
+  Exchange exchange = 2;
+}
+
+message GetTickerResponse {
+  Ticker ticker = 1;
+  Error  error  = 2;
+}
+
+message GetMultipleTickersRequest {
+  repeated string symbols   = 1;
+  Exchange        exchange  = 2;
+}
+
+message GetMultipleTickersResponse {
+  repeated Ticker tickers = 1;
+  Error           error   = 2;
+}
+
+message GetKlinesRequest {
+  string        symbol   = 1;
+  Exchange      exchange = 2;
+  KlineInterval interval = 3;
+  int32         limit    = 4;  // max candles to return (default 500)
+  google.protobuf.Timestamp from_time = 5;
+  google.protobuf.Timestamp to_time   = 6;
+}
+
+message GetKlinesResponse {
+  repeated Kline klines = 1;
+  Error          error  = 2;
+}
+
+message GetOrderBookRequest {
+  string   symbol   = 1;
+  Exchange exchange = 2;
+  int32    depth    = 3;  // 5, 10, 20, 50, 100
+}
+
+message GetOrderBookResponse {
+  OrderBook order_book = 1;
+  Error     error      = 2;
+}
+
+message SubscribeMarketRequest {
+  repeated string symbols   = 1;
+  Exchange        exchange  = 2;
+  bool            tickers   = 3;
+  bool            klines    = 4;
+  KlineInterval   interval  = 5;
+  bool            order_book = 6;
+  int32           order_book_depth = 7;
+}
+
+message MarketEvent {
+  oneof event {
+    Ticker    ticker     = 1;
+    Kline     kline      = 2;
+    OrderBook order_book = 3;
+  }
+}
+
+// ── Service definition ────────────────────────────────────────────────────────
+
+service MarketService {
+  rpc GetTicker          (GetTickerRequest)           returns (GetTickerResponse);
+  rpc GetMultipleTickers (GetMultipleTickersRequest)  returns (GetMultipleTickersResponse);
+  rpc GetKlines          (GetKlinesRequest)           returns (GetKlinesResponse);
+  rpc GetOrderBook       (GetOrderBookRequest)        returns (GetOrderBookResponse);
+  rpc SubscribeMarket    (SubscribeMarketRequest)     returns (stream MarketEvent);
+}

@@ -1,0 +1,77 @@
+{
+  "analysis": {
+    "title": "Market Analysis",
+    "trendScore": "Trend Score",
+    "signal": "Signal",
+    "signals": {
+      "strongBuy": "Strong Buy",
+      "buy": "Buy",
+      "neutral": "Neutral",
+      "sell": "Sell",
+      "strongSell": "Strong Sell"
+    },
+    "confidence": "Model Confidence",
+    "lastUpdated": "Last Updated",
+    "refresh": "Refresh Analysis",
+    "selectSymbol": "Select Symbol"
+  },
+  "factors": {
+    "title": "Factor Analysis",
+    "weight": "Weight",
+    "score": "Score",
+    "contribution": "Contribution",
+    "adjustWeights": "Adjust Weights",
+    "resetWeights": "Reset Weights",
+    "macro": "Macro Economics",
+    "policy": "Policy & Regulation",
+    "supplyDemand": "Supply & Demand",
+    "sentiment": "Market Sentiment",
+    "technical": "Technical Analysis",
+    "capitalFlow": "Capital Flow"
+  },
+  "macro": {
+    "title": "Macro Indicators",
+    "dxy": "US Dollar Index (DXY)",
+    "fedRate": "Fed Funds Rate",
+    "spxCorrelation": "S&P 500 Correlation",
+    "goldCorrelation": "Gold Correlation",
+    "inflationCPI": "Inflation (CPI)",
+    "yieldCurve": "Yield Curve"
+  },
+  "policy": {
+    "title": "Policy Analysis",
+    "regulatoryNews": "Regulatory News",
+    "govActions": "Government Actions",
+    "etfStatus": "ETF Status",
+    "institutionalAdoption": "Institutional Adoption",
+    "sentiment": "Policy Sentiment"
+  },
+  "supplyDemand": {
+    "title": "Supply & Demand",
+    "exchangeNetFlow": "Exchange Net Flow",
+    "longTermHolders": "Long-term Holders",
+    "shortTermHolders": "Short-term Holders",
+    "sopr": "SOPR",
+    "nvt": "NVT Ratio",
+    "activAddresses": "Active Addresses"
+  },
+  "sentiment": {
+    "title": "Sentiment Analysis",
+    "fearGreedIndex": "Fear & Greed Index",
+    "socialVolume": "Social Volume",
+    "googleTrends": "Google Trends",
+    "fundingRate": "Funding Rate",
+    "longShortRatio": "Long/Short Ratio",
+    "openInterest": "Open Interest"
+  },
+  "technical": {
+    "title": "Technical Indicators",
+    "rsi": "Relative Strength Index (RSI)",
+    "macd": "MACD",
+    "bollingerBands": "Bollinger Bands",
+    "ema": "EMA Ribbon",
+    "volume": "Volume Analysis",
+    "support": "Support Level",
+    "resistance": "Resistance Level"
+  }
+}

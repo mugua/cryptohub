@@ -1,0 +1,8 @@
+{
+  "profile": { "title": "個人中心", "myProfile": "我的資料" },
+  "userInfo": { "title": "基本資料", "displayName": "顯示名稱", "username": "使用者名稱", "email": "電子郵件", "avatarUrl": "頭像連結", "timezone": "時區", "language": "語言", "preferredCurrency": "偏好貨幣", "memberSince": "加入時間", "subscriptionTier": "訂閱等級", "free": "免費版", "pro": "專業版", "enterprise": "企業版", "upgradePlan": "升級方案" },
+  "security": { "title": "安全設定", "changePassword": "修改密碼", "currentPassword": "目前密碼", "newPassword": "新密碼", "confirmNewPassword": "確認新密碼", "twoFactor": "雙重驗證", "enable2FA": "啟用雙重驗證", "disable2FA": "關閉雙重驗證", "twoFactorEnabled": "雙重驗證已啟用", "twoFactorDisabled": "雙重驗證已關閉", "backupCodes": "備用驗證碼", "activeSessions": "活躍工作階段", "revokeSession": "撤銷工作階段", "revokeAllSessions": "撤銷所有工作階段" },
+  "apiKeys": { "title": "API金鑰管理", "addApiKey": "新增API金鑰", "exchange": "交易所", "label": "標籤", "apiKey": "API Key", "apiSecret": "API Secret", "passphrase": "密碼短語（選填）", "permissions": "權限", "canTrade": "允許交易", "canWithdraw": "允許提款", "lastUsed": "最後使用", "deleteApiKey": "刪除金鑰", "noApiKeys": "尚未新增API金鑰", "warning": "僅儲存加密版本，請妥善保管您的原始金鑰" },
+  "exchanges": { "title": "已連接交易所", "connect": "連接交易所", "disconnect": "中斷連接", "connected": "已連接", "disconnected": "未連接", "testConnection": "測試連接" },
+  "subscription": { "title": "訂閱管理", "currentPlan": "目前方案", "billingCycle": "計費週期", "nextBillingDate": "下次計費日期", "cancelSubscription": "取消訂閱", "renewSubscription": "續費" }
+}

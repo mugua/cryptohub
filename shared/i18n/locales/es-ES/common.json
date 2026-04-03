@@ -1,0 +1,101 @@
+{
+  "app": {
+    "name": "CryptoHub",
+    "tagline": "Plataforma Empresarial de Análisis de Tendencias y Trading de Criptomonedas",
+    "version": "Versión {{version}}"
+  },
+  "nav": {
+    "dashboard": "Panel",
+    "analysis": "Análisis de Tendencias",
+    "trading": "Trading",
+    "profile": "Perfil",
+    "settings": "Configuración",
+    "logout": "Cerrar Sesión",
+    "documentation": "Documentación",
+    "support": "Soporte"
+  },
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "add": "Agregar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "reset": "Restablecer",
+    "refresh": "Actualizar",
+    "loading": "Cargando...",
+    "noData": "Sin datos disponibles",
+    "viewAll": "Ver todo",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "submit": "Enviar",
+    "close": "Cerrar",
+    "copy": "Copiar",
+    "copied": "¡Copiado!",
+    "download": "Descargar",
+    "export": "Exportar",
+    "import": "Importar"
+  },
+  "theme": {
+    "light": "Modo Claro",
+    "dark": "Modo Oscuro",
+    "system": "Predeterminado del Sistema"
+  },
+  "lang": {
+    "zh-CN": "简体中文",
+    "en-US": "English",
+    "zh-TW": "繁體中文",
+    "ja-JP": "日本語",
+    "ko-KR": "한국어",
+    "es-ES": "Español"
+  },
+  "time": {
+    "now": "Ahora mismo",
+    "minutesAgo": "Hace {{count}} minuto(s)",
+    "hoursAgo": "Hace {{count}} hora(s)",
+    "daysAgo": "Hace {{count}} día(s)",
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "thisWeek": "Esta semana",
+    "thisMonth": "Este mes",
+    "dateFormat": "DD/MM/YYYY",
+    "dateTimeFormat": "DD/MM/YYYY HH:mm:ss"
+  },
+  "status": {
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "pending": "Pendiente",
+    "success": "Exitoso",
+    "failed": "Fallido",
+    "cancelled": "Cancelado",
+    "processing": "Procesando",
+    "completed": "Completado"
+  },
+  "error": {
+    "generic": "Ocurrió un error. Por favor, inténtelo de nuevo.",
+    "network": "Falló la conexión de red.",
+    "unauthorized": "No autorizado. Por favor, inicie sesión.",
+    "forbidden": "No tiene permiso para acceder a este recurso.",
+    "notFound": "Recurso no encontrado.",
+    "serverError": "Error del servidor. Por favor, inténtelo más tarde.",
+    "timeout": "La solicitud expiró. Compruebe su conexión.",
+    "validation": "Error de validación de datos de entrada."
+  },
+  "auth": {
+    "login": "Iniciar Sesión",
+    "register": "Registrarse",
+    "forgotPassword": "¿Olvidó su contraseña?",
+    "resetPassword": "Restablecer Contraseña",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar Contraseña",
+    "twoFactor": "Autenticación de Dos Factores",
+    "twoFactorCode": "Código de Verificación",
+    "rememberMe": "Recuérdame",
+    "loginSuccess": "Sesión iniciada correctamente",
+    "logoutSuccess": "Sesión cerrada correctamente"
+  }
+}

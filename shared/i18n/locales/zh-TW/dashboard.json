@@ -1,0 +1,8 @@
+{
+  "dashboard": { "title": "總覽", "welcome": "歡迎回來，{{name}}", "lastUpdated": "最後更新：{{time}}" },
+  "assets": { "title": "資產總覽", "totalValue": "總資產", "availableBalance": "可用餘額", "lockedBalance": "鎖定金額", "allocation": "資產配置", "topHoldings": "主要持倉" },
+  "pnl": { "title": "損益統計", "todayPnl": "今日損益", "weekPnl": "本週損益", "monthPnl": "本月損益", "totalPnl": "總損益", "unrealizedPnl": "未實現損益", "realizedPnl": "已實現損益", "winRate": "勝率", "sharpeRatio": "夏普比率", "maxDrawdown": "最大回撤" },
+  "market": { "title": "市場行情", "price": "價格", "change24h": "24H漲跌", "volume24h": "24H成交量", "marketCap": "市值", "fearGreed": "恐懼與貪婪指數", "fearGreedDesc": "當前市場情緒", "extremeFear": "極度恐懼", "fear": "恐懼", "neutral": "中性", "greed": "貪婪", "extremeGreed": "極度貪婪" },
+  "trades": { "title": "最近交易", "symbol": "交易對", "side": "方向", "price": "價格", "quantity": "數量", "total": "總額", "time": "時間", "buy": "買入", "sell": "賣出", "noTrades": "暫無交易記錄" },
+  "strategies": { "title": "策略狀態", "active": "執行中", "paused": "已暫停", "profit": "收益", "noStrategies": "暫無活躍策略", "createFirst": "建立您的第一個策略" }
+}

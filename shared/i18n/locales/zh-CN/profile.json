@@ -1,0 +1,70 @@
+{
+  "profile": {
+    "title": "个人中心",
+    "myProfile": "我的资料"
+  },
+  "userInfo": {
+    "title": "基本信息",
+    "displayName": "显示名称",
+    "username": "用户名",
+    "email": "邮箱地址",
+    "avatarUrl": "头像链接",
+    "timezone": "时区",
+    "language": "语言",
+    "preferredCurrency": "首选货币",
+    "memberSince": "注册时间",
+    "subscriptionTier": "订阅等级",
+    "free": "免费版",
+    "pro": "专业版",
+    "enterprise": "企业版",
+    "upgradePlan": "升级套餐"
+  },
+  "security": {
+    "title": "安全设置",
+    "changePassword": "修改密码",
+    "currentPassword": "当前密码",
+    "newPassword": "新密码",
+    "confirmNewPassword": "确认新密码",
+    "twoFactor": "两步验证",
+    "enable2FA": "启用两步验证",
+    "disable2FA": "关闭两步验证",
+    "twoFactorEnabled": "两步验证已启用",
+    "twoFactorDisabled": "两步验证已关闭",
+    "backupCodes": "备用验证码",
+    "activeSessions": "活跃会话",
+    "revokeSession": "撤销会话",
+    "revokeAllSessions": "撤销所有会话"
+  },
+  "apiKeys": {
+    "title": "API密钥管理",
+    "addApiKey": "添加API密钥",
+    "exchange": "交易所",
+    "label": "标签",
+    "apiKey": "API Key",
+    "apiSecret": "API Secret",
+    "passphrase": "密码短语（可选）",
+    "permissions": "权限",
+    "canTrade": "允许交易",
+    "canWithdraw": "允许提现",
+    "lastUsed": "最后使用",
+    "deleteApiKey": "删除密钥",
+    "noApiKeys": "尚未添加API密钥",
+    "warning": "密钥仅存储加密版本，请妥善保管您的原始密钥"
+  },
+  "exchanges": {
+    "title": "已连接交易所",
+    "connect": "连接交易所",
+    "disconnect": "断开连接",
+    "connected": "已连接",
+    "disconnected": "未连接",
+    "testConnection": "测试连接"
+  },
+  "subscription": {
+    "title": "订阅管理",
+    "currentPlan": "当前套餐",
+    "billingCycle": "计费周期",
+    "nextBillingDate": "下次计费日期",
+    "cancelSubscription": "取消订阅",
+    "renewSubscription": "续费"
+  }
+}

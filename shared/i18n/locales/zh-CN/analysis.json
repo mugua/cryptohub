@@ -1,0 +1,77 @@
+{
+  "analysis": {
+    "title": "趋势分析",
+    "trendScore": "趋势评分",
+    "signal": "信号",
+    "signals": {
+      "strongBuy": "强烈买入",
+      "buy": "买入",
+      "neutral": "中性",
+      "sell": "卖出",
+      "strongSell": "强烈卖出"
+    },
+    "confidence": "模型置信度",
+    "lastUpdated": "上次更新",
+    "refresh": "刷新分析",
+    "selectSymbol": "选择交易对"
+  },
+  "factors": {
+    "title": "因子分析",
+    "weight": "权重",
+    "score": "评分",
+    "contribution": "贡献度",
+    "adjustWeights": "调整权重",
+    "resetWeights": "重置权重",
+    "macro": "宏观经济",
+    "policy": "政策监管",
+    "supplyDemand": "供需关系",
+    "sentiment": "市场情绪",
+    "technical": "技术分析",
+    "capitalFlow": "资金流向"
+  },
+  "macro": {
+    "title": "宏观指标",
+    "dxy": "美元指数 (DXY)",
+    "fedRate": "联储基准利率",
+    "spxCorrelation": "标普500相关性",
+    "goldCorrelation": "黄金相关性",
+    "inflationCPI": "通胀率 (CPI)",
+    "yieldCurve": "收益率曲线"
+  },
+  "policy": {
+    "title": "政策分析",
+    "regulatoryNews": "监管动态",
+    "govActions": "政府行动",
+    "etfStatus": "ETF状态",
+    "institutionalAdoption": "机构采纳",
+    "sentiment": "政策情绪"
+  },
+  "supplyDemand": {
+    "title": "供需分析",
+    "exchangeNetFlow": "交易所净流量",
+    "longTermHolders": "长期持有者",
+    "shortTermHolders": "短期持有者",
+    "sopr": "SOPR指标",
+    "nvt": "NVT比率",
+    "activAddresses": "活跃地址数"
+  },
+  "sentiment": {
+    "title": "情绪分析",
+    "fearGreedIndex": "恐惧与贪婪指数",
+    "socialVolume": "社交热度",
+    "googleTrends": "谷歌趋势",
+    "fundingRate": "资金费率",
+    "longShortRatio": "多空比率",
+    "openInterest": "持仓量"
+  },
+  "technical": {
+    "title": "技术指标",
+    "rsi": "相对强弱指数 (RSI)",
+    "macd": "MACD",
+    "bollingerBands": "布林带",
+    "ema": "指数移动均线",
+    "volume": "成交量分析",
+    "support": "支撑位",
+    "resistance": "阻力位"
+  }
+}

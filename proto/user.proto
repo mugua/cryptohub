@@ -1,0 +1,153 @@
+syntax = "proto3";
+
+package cryptohub.v1;
+
+option go_package = "github.com/cryptohub/cryptohub/backend/go-services/gen/proto/user/v1;userv1";
+option python_package = "cryptohub.v1";
+
+import "google/protobuf/timestamp.proto";
+import "proto/common.proto";
+
+// ── User ──────────────────────────────────────────────────────────────────────
+
+enum SubscriptionTier {
+  SUBSCRIPTION_TIER_UNSPECIFIED = 0;
+  SUBSCRIPTION_TIER_FREE        = 1;
+  SUBSCRIPTION_TIER_PRO         = 2;
+  SUBSCRIPTION_TIER_ENTERPRISE  = 3;
+}
+
+message User {
+  string           id               = 1;
+  string           email            = 2;
+  string           username         = 3;
+  string           display_name     = 4;
+  string           avatar_url       = 5;
+  SubscriptionTier subscription     = 6;
+  bool             two_fa_enabled   = 7;
+  bool             email_verified   = 8;
+  repeated string  preferred_symbols = 9;
+  string           preferred_currency = 10;  // "USD", "EUR", etc.
+  string           timezone         = 11;
+  string           language         = 12;    // "en-US", "zh-CN", etc.
+  google.protobuf.Timestamp created_at     = 13;
+  google.protobuf.Timestamp last_login_at  = 14;
+}
+
+// ── API Keys ──────────────────────────────────────────────────────────────────
+
+message ApiKey {
+  string   id          = 1;
+  string   user_id     = 2;
+  Exchange exchange    = 3;
+  string   label       = 4;
+  string   key_preview = 5;   // first/last 4 chars only – never full key
+  bool     is_active   = 6;
+  bool     can_trade   = 7;
+  bool     can_withdraw = 8;
+  repeated string permissions = 9;
+  google.protobuf.Timestamp created_at  = 10;
+  google.protobuf.Timestamp last_used_at = 11;
+}
+
+// ── Session ───────────────────────────────────────────────────────────────────
+
+message Session {
+  string id          = 1;
+  string user_id     = 2;
+  string ip_address  = 3;
+  string user_agent  = 4;
+  bool   is_current  = 5;
+  google.protobuf.Timestamp created_at  = 6;
+  google.protobuf.Timestamp last_seen_at = 7;
+}
+
+// ── Requests / Responses ─────────────────────────────────────────────────────
+
+message GetUserRequest {
+  string user_id = 1;
+}
+
+message GetUserResponse {
+  User  user  = 1;
+  Error error = 2;
+}
+
+message UpdateUserRequest {
+  string user_id         = 1;
+  string display_name    = 2;
+  string avatar_url      = 3;
+  string preferred_currency = 4;
+  string timezone        = 5;
+  string language        = 6;
+  repeated string preferred_symbols = 7;
+}
+
+message UpdateUserResponse {
+  User  user  = 1;
+  Error error = 2;
+}
+
+message GetApiKeysRequest {
+  string user_id = 1;
+}
+
+message GetApiKeysResponse {
+  repeated ApiKey api_keys = 1;
+  Error           error    = 2;
+}
+
+message CreateApiKeyRequest {
+  string   user_id     = 1;
+  Exchange exchange    = 2;
+  string   label       = 3;
+  string   api_key     = 4;   // encrypted in transit via TLS; stored AES-256
+  string   api_secret  = 5;
+  string   passphrase  = 6;   // optional (OKX, Coinbase)
+}
+
+message CreateApiKeyResponse {
+  ApiKey api_key = 1;
+  Error  error   = 2;
+}
+
+message DeleteApiKeyRequest {
+  string api_key_id = 1;
+  string user_id    = 2;
+}
+
+message DeleteApiKeyResponse {
+  bool  success = 1;
+  Error error   = 2;
+}
+
+message ListSessionsRequest {
+  string user_id = 1;
+}
+
+message ListSessionsResponse {
+  repeated Session sessions = 1;
+  Error            error    = 2;
+}
+
+message RevokeSessionRequest {
+  string session_id = 1;
+  string user_id    = 2;
+}
+
+message RevokeSessionResponse {
+  bool  success = 1;
+  Error error   = 2;
+}
+
+// ── Service definition ────────────────────────────────────────────────────────
+
+service UserService {
+  rpc GetUser        (GetUserRequest)        returns (GetUserResponse);
+  rpc UpdateUser     (UpdateUserRequest)     returns (UpdateUserResponse);
+  rpc GetApiKeys     (GetApiKeysRequest)     returns (GetApiKeysResponse);
+  rpc CreateApiKey   (CreateApiKeyRequest)   returns (CreateApiKeyResponse);
+  rpc DeleteApiKey   (DeleteApiKeyRequest)   returns (DeleteApiKeyResponse);
+  rpc ListSessions   (ListSessionsRequest)   returns (ListSessionsResponse);
+  rpc RevokeSession  (RevokeSessionRequest)  returns (RevokeSessionResponse);
+}

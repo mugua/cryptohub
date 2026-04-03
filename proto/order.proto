@@ -1,0 +1,107 @@
+syntax = "proto3";
+
+package cryptohub.v1;
+
+option go_package = "github.com/cryptohub/cryptohub/backend/go-services/gen/proto/order/v1;orderv1";
+option python_package = "cryptohub.v1";
+
+import "google/protobuf/timestamp.proto";
+import "proto/common.proto";
+
+// ── Order ─────────────────────────────────────────────────────────────────────
+
+message Order {
+  string      id              = 1;
+  string      user_id         = 2;
+  string      strategy_id     = 3;  // optional – empty for manual orders
+  string      client_order_id = 4;  // idempotency key
+  string      exchange_order_id = 5;
+  Exchange    exchange        = 6;
+  string      symbol          = 7;
+  OrderSide   side            = 8;
+  OrderType   type            = 9;
+  OrderStatus status          = 10;
+  TimeInForce time_in_force   = 11;
+  string      quantity        = 12;  // decimal string
+  string      price           = 13;  // decimal string; empty for MARKET
+  string      stop_price      = 14;
+  string      filled_quantity = 15;
+  string      avg_fill_price  = 16;
+  string      commission      = 17;
+  string      commission_asset = 18;
+  bool        is_paper_trade  = 19;
+  google.protobuf.Timestamp created_at  = 20;
+  google.protobuf.Timestamp updated_at  = 21;
+  google.protobuf.Timestamp filled_at   = 22;
+  google.protobuf.Timestamp cancelled_at = 23;
+}
+
+// ── Requests / Responses ─────────────────────────────────────────────────────
+
+message PlaceOrderRequest {
+  string      user_id         = 1;
+  string      strategy_id     = 2;
+  string      client_order_id = 3;
+  Exchange    exchange        = 4;
+  string      symbol          = 5;
+  OrderSide   side            = 6;
+  OrderType   type            = 7;
+  TimeInForce time_in_force   = 8;
+  string      quantity        = 9;
+  string      price           = 10;
+  string      stop_price      = 11;
+  bool        is_paper_trade  = 12;
+}
+
+message PlaceOrderResponse {
+  Order order = 1;
+  Error error = 2;
+}
+
+message CancelOrderRequest {
+  string   order_id   = 1;
+  string   user_id    = 2;
+  Exchange exchange   = 3;
+  string   symbol     = 4;
+}
+
+message CancelOrderResponse {
+  bool  success = 1;
+  Error error   = 2;
+}
+
+message GetOrderRequest {
+  string order_id = 1;
+  string user_id  = 2;
+}
+
+message GetOrderResponse {
+  Order order = 1;
+  Error error = 2;
+}
+
+message ListOrdersRequest {
+  string            user_id     = 1;
+  string            strategy_id = 2;
+  string            symbol      = 3;
+  Exchange          exchange    = 4;
+  OrderStatus       status      = 5;
+  google.protobuf.Timestamp from_time = 6;
+  google.protobuf.Timestamp to_time   = 7;
+  PaginationRequest pagination  = 8;
+}
+
+message ListOrdersResponse {
+  repeated Order     orders     = 1;
+  PaginationResponse pagination = 2;
+  Error              error      = 3;
+}
+
+// ── Service definition ────────────────────────────────────────────────────────
+
+service OrderService {
+  rpc PlaceOrder  (PlaceOrderRequest)  returns (PlaceOrderResponse);
+  rpc CancelOrder (CancelOrderRequest) returns (CancelOrderResponse);
+  rpc GetOrder    (GetOrderRequest)    returns (GetOrderResponse);
+  rpc ListOrders  (ListOrdersRequest)  returns (ListOrdersResponse);
+}

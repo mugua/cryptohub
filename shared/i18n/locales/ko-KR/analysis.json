@@ -1,0 +1,9 @@
+{
+  "analysis": { "title": "트렌드 분석", "trendScore": "트렌드 점수", "signal": "신호", "signals": { "strongBuy": "강력 매수", "buy": "매수", "neutral": "중립", "sell": "매도", "strongSell": "강력 매도" }, "confidence": "모델 신뢰도", "lastUpdated": "마지막 업데이트", "refresh": "분석 새로고침", "selectSymbol": "거래쌍 선택" },
+  "factors": { "title": "팩터 분석", "weight": "가중치", "score": "점수", "contribution": "기여도", "adjustWeights": "가중치 조정", "resetWeights": "가중치 초기화", "macro": "거시경제", "policy": "정책·규제", "supplyDemand": "수요와 공급", "sentiment": "시장 심리", "technical": "기술적 분석", "capitalFlow": "자금 흐름" },
+  "macro": { "title": "거시 지표", "dxy": "달러 지수 (DXY)", "fedRate": "연준 기준금리", "spxCorrelation": "S&P500 상관관계", "goldCorrelation": "금 상관관계", "inflationCPI": "인플레이션 (CPI)", "yieldCurve": "수익률 곡선" },
+  "policy": { "title": "정책 분석", "regulatoryNews": "규제 뉴스", "govActions": "정부 조치", "etfStatus": "ETF 현황", "institutionalAdoption": "기관 채택", "sentiment": "정책 심리" },
+  "supplyDemand": { "title": "수급 분석", "exchangeNetFlow": "거래소 순 유입량", "longTermHolders": "장기 보유자", "shortTermHolders": "단기 보유자", "sopr": "SOPR", "nvt": "NVT 비율", "activAddresses": "활성 주소 수" },
+  "sentiment": { "title": "심리 분석", "fearGreedIndex": "공포·탐욕 지수", "socialVolume": "소셜 볼륨", "googleTrends": "구글 트렌드", "fundingRate": "펀딩 비율", "longShortRatio": "롱/숏 비율", "openInterest": "미결제약정" },
+  "technical": { "title": "기술 지표", "rsi": "RSI", "macd": "MACD", "bollingerBands": "볼린저 밴드", "ema": "EMA 리본", "volume": "거래량 분석", "support": "지지선", "resistance": "저항선" }
+}

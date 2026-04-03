@@ -1,0 +1,8 @@
+{
+  "settings": { "title": "設定", "saved": "設定を保存しました", "saveError": "設定の保存に失敗しました。再試行してください。" },
+  "modelConfig": { "title": "AIモデル設定", "modelVersion": "モデルバージョン", "updateFrequency": "更新頻度", "every15min": "15分ごと", "every30min": "30分ごと", "every1h": "1時間ごと", "every4h": "4時間ごと", "every1d": "毎日", "enableLearning": "オンライン学習を有効化", "learningRate": "学習率", "resetModel": "モデルをリセット", "resetConfirm": "モデルパラメータをリセットしますか？この操作は元に戻せません。" },
+  "factors": { "title": "ファクター設定", "enableFactor": "ファクターを有効化", "factorWeight": "ファクターウェイト", "totalWeight": "合計ウェイト", "weightWarning": "すべてのファクターウェイトの合計が1.0になるようにしてください", "macro": "マクロ経済ファクター", "policy": "政策・規制ファクター", "supplyDemand": "需給ファクター", "sentiment": "市場センチメントファクター", "technical": "テクニカルファクター", "capitalFlow": "資金フローファクター" },
+  "dataSources": { "title": "データソース設定", "coingecko": "CoinGecko", "glassnode": "Glassnode", "alternativeme": "Alternative.me", "binance": "Binance", "apiKey": "APIキー", "status": "状態", "connected": "接続済み", "disconnected": "未接続", "testConnection": "接続をテスト" },
+  "notifications": { "title": "通知設定", "email": "メール通知", "telegram": "Telegram通知", "discord": "Discord通知", "webhookUrl": "Webhook URL", "trendAlerts": "トレンド変化アラート", "orderAlerts": "注文状態アラート", "riskAlerts": "リスクアラート", "priceAlerts": "価格アラート", "addPriceAlert": "価格アラートを追加", "threshold": "しきい値" },
+  "riskManagement": { "title": "リスクパラメータ", "maxDrawdownPct": "最大ドローダウン上限 (%)", "dailyLossLimitPct": "日次損失上限 (%)", "maxPositionSizePct": "最大ポジションサイズ (%)", "maxLeverage": "最大レバレッジ", "autoStopLoss": "自動損切り", "emergencyStop": "全ストラテジーを緊急停止" }
+}

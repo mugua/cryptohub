@@ -1,0 +1,61 @@
+{
+  "dashboard": {
+    "title": "概览",
+    "welcome": "欢迎回来，{{name}}",
+    "lastUpdated": "最后更新：{{time}}"
+  },
+  "assets": {
+    "title": "资产概览",
+    "totalValue": "总资产",
+    "availableBalance": "可用余额",
+    "lockedBalance": "锁定金额",
+    "allocation": "资产分配",
+    "topHoldings": "主要持仓"
+  },
+  "pnl": {
+    "title": "盈亏统计",
+    "todayPnl": "今日盈亏",
+    "weekPnl": "本周盈亏",
+    "monthPnl": "本月盈亏",
+    "totalPnl": "总盈亏",
+    "unrealizedPnl": "未实现盈亏",
+    "realizedPnl": "已实现盈亏",
+    "winRate": "胜率",
+    "sharpeRatio": "夏普比率",
+    "maxDrawdown": "最大回撤"
+  },
+  "market": {
+    "title": "市场行情",
+    "price": "价格",
+    "change24h": "24H涨跌",
+    "volume24h": "24H成交量",
+    "marketCap": "市值",
+    "fearGreed": "恐惧与贪婪指数",
+    "fearGreedDesc": "当前市场情绪",
+    "extremeFear": "极度恐惧",
+    "fear": "恐惧",
+    "neutral": "中性",
+    "greed": "贪婪",
+    "extremeGreed": "极度贪婪"
+  },
+  "trades": {
+    "title": "最近交易",
+    "symbol": "交易对",
+    "side": "方向",
+    "price": "价格",
+    "quantity": "数量",
+    "total": "总额",
+    "time": "时间",
+    "buy": "买入",
+    "sell": "卖出",
+    "noTrades": "暂无交易记录"
+  },
+  "strategies": {
+    "title": "策略状态",
+    "active": "运行中",
+    "paused": "已暂停",
+    "profit": "收益",
+    "noStrategies": "暂无活跃策略",
+    "createFirst": "创建您的第一个策略"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "profile": {
+    "title": "Profile",
+    "myProfile": "My Profile"
+  },
+  "userInfo": {
+    "title": "Personal Information",
+    "displayName": "Display Name",
+    "username": "Username",
+    "email": "Email Address",
+    "avatarUrl": "Avatar URL",
+    "timezone": "Timezone",
+    "language": "Language",
+    "preferredCurrency": "Preferred Currency",
+    "memberSince": "Member Since",
+    "subscriptionTier": "Subscription Tier",
+    "free": "Free",
+    "pro": "Pro",
+    "enterprise": "Enterprise",
+    "upgradePlan": "Upgrade Plan"
+  },
+  "security": {
+    "title": "Security",
+    "changePassword": "Change Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "twoFactor": "Two-Factor Authentication",
+    "enable2FA": "Enable 2FA",
+    "disable2FA": "Disable 2FA",
+    "twoFactorEnabled": "2FA is enabled",
+    "twoFactorDisabled": "2FA is disabled",
+    "backupCodes": "Backup Codes",
+    "activeSessions": "Active Sessions",
+    "revokeSession": "Revoke Session",
+    "revokeAllSessions": "Revoke All Sessions"
+  },
+  "apiKeys": {
+    "title": "API Key Management",
+    "addApiKey": "Add API Key",
+    "exchange": "Exchange",
+    "label": "Label",
+    "apiKey": "API Key",
+    "apiSecret": "API Secret",
+    "passphrase": "Passphrase (optional)",
+    "permissions": "Permissions",
+    "canTrade": "Can Trade",
+    "canWithdraw": "Can Withdraw",
+    "lastUsed": "Last Used",
+    "deleteApiKey": "Delete Key",
+    "noApiKeys": "No API keys added yet",
+    "warning": "Only encrypted keys are stored. Keep your original keys safe."
+  },
+  "exchanges": {
+    "title": "Connected Exchanges",
+    "connect": "Connect Exchange",
+    "disconnect": "Disconnect",
+    "connected": "Connected",
+    "disconnected": "Disconnected",
+    "testConnection": "Test Connection"
+  },
+  "subscription": {
+    "title": "Subscription",
+    "currentPlan": "Current Plan",
+    "billingCycle": "Billing Cycle",
+    "nextBillingDate": "Next Billing Date",
+    "cancelSubscription": "Cancel Subscription",
+    "renewSubscription": "Renew Subscription"
+  }
+}

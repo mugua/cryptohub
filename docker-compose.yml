@@ -1,0 +1,390 @@
+version: "3.9"
+
+# ── Networks ─────────────────────────────────────────────────────────────────
+networks:
+  cryptohub-net:
+    driver: bridge
+
+# ── Named Volumes ─────────────────────────────────────────────────────────────
+volumes:
+  postgres-data:
+  redis-data:
+  nats-data:
+
+# ── Common anchors ────────────────────────────────────────────────────────────
+x-go-common: &go-common
+  restart: unless-stopped
+  networks: [cryptohub-net]
+  environment: &go-env
+    POSTGRES_URL: postgres://cryptohub:secret@postgres:5432/cryptohub?sslmode=disable
+    REDIS_URL: redis://redis:6379/0
+    NATS_URL: nats://nats:4222
+    JWT_SECRET: ${JWT_SECRET:-dev-jwt-secret-change-in-production}
+    LOG_LEVEL: ${LOG_LEVEL:-info}
+    ENVIRONMENT: ${ENVIRONMENT:-development}
+
+x-python-common: &python-common
+  restart: unless-stopped
+  networks: [cryptohub-net]
+  environment: &python-env
+    POSTGRES_URL: postgres://cryptohub:secret@postgres:5432/cryptohub
+    REDIS_URL: redis://redis:6379/0
+    NATS_URL: nats://nats:4222
+    LOG_LEVEL: ${LOG_LEVEL:-info}
+
+# ── Services ──────────────────────────────────────────────────────────────────
+services:
+
+  # ── Infrastructure ──────────────────────────────────────────────────────────
+
+  postgres:
+    image: timescale/timescaledb:latest-pg15
+    container_name: cryptohub-postgres
+    restart: unless-stopped
+    networks: [cryptohub-net]
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: cryptohub
+      POSTGRES_USER: cryptohub
+      POSTGRES_PASSWORD: secret
+      TIMESCALEDB_TELEMETRY: "off"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./backend/go-services/migrations/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cryptohub -d cryptohub"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    container_name: cryptohub-redis
+    restart: unless-stopped
+    networks: [cryptohub-net]
+    ports:
+      - "6379:6379"
+    command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru --appendonly yes
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  nats:
+    image: nats:2-alpine
+    container_name: cryptohub-nats
+    restart: unless-stopped
+    networks: [cryptohub-net]
+    ports:
+      - "4222:4222"
+      - "8222:8222"  # monitoring
+    command: ["-js", "-m", "8222", "--store_dir=/data"]
+    volumes:
+      - nats-data:/data
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8222/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Go Microservices ─────────────────────────────────────────────────────────
+
+  api-gateway:
+    <<: *go-common
+    build:
+      context: .
+      dockerfile: docker/go.Dockerfile
+      args:
+        SERVICE_NAME: api-gateway
+    container_name: cryptohub-api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      <<: *go-env
+      PORT: "8080"
+      TRADING_ENGINE_ADDR: trading-engine:8081
+      WS_GATEWAY_ADDR: ws-gateway:8082
+      ORDER_SERVICE_ADDR: order-service:8083
+      RISK_SERVICE_ADDR: risk-service:8084
+      AUTH_SERVICE_ADDR: auth-service:8085
+      EXCHANGE_PROXY_ADDR: exchange-proxy:8086
+      TREND_ENGINE_ADDR: trend-engine:8100
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis:    {condition: service_healthy}
+      nats:     {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  trading-engine:
+    <<: *go-common
+    build:
+      context: .
+      dockerfile: docker/go.Dockerfile
+      args:
+        SERVICE_NAME: trading-engine
+    container_name: cryptohub-trading-engine
+    ports:
+      - "8081:8081"
+    environment:
+      <<: *go-env
+      PORT: "8081"
+      GRPC_PORT: "9081"
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis:    {condition: service_healthy}
+      nats:     {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8081/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  ws-gateway:
+    <<: *go-common
+    build:
+      context: .
+      dockerfile: docker/go.Dockerfile
+      args:
+        SERVICE_NAME: ws-gateway
+    container_name: cryptohub-ws-gateway
+    ports:
+      - "8082:8082"
+    environment:
+      <<: *go-env
+      PORT: "8082"
+    depends_on:
+      redis: {condition: service_healthy}
+      nats:  {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8082/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  order-service:
+    <<: *go-common
+    build:
+      context: .
+      dockerfile: docker/go.Dockerfile
+      args:
+        SERVICE_NAME: order-service
+    container_name: cryptohub-order-service
+    ports:
+      - "8083:8083"
+    environment:
+      <<: *go-env
+      PORT: "8083"
+      GRPC_PORT: "9083"
+    depends_on:
+      postgres: {condition: service_healthy}
+      nats:     {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8083/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  risk-service:
+    <<: *go-common
+    build:
+      context: .
+      dockerfile: docker/go.Dockerfile
+      args:
+        SERVICE_NAME: risk-service
+    container_name: cryptohub-risk-service
+    ports:
+      - "8084:8084"
+    environment:
+      <<: *go-env
+      PORT: "8084"
+      GRPC_PORT: "9084"
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis:    {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8084/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  auth-service:
+    <<: *go-common
+    build:
+      context: .
+      dockerfile: docker/go.Dockerfile
+      args:
+        SERVICE_NAME: auth-service
+    container_name: cryptohub-auth-service
+    ports:
+      - "8085:8085"
+    environment:
+      <<: *go-env
+      PORT: "8085"
+      GRPC_PORT: "9085"
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-dev-encryption-key-32-bytes!!}
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis:    {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8085/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  exchange-proxy:
+    <<: *go-common
+    build:
+      context: .
+      dockerfile: docker/go.Dockerfile
+      args:
+        SERVICE_NAME: exchange-proxy
+    container_name: cryptohub-exchange-proxy
+    ports:
+      - "8086:8086"
+    environment:
+      <<: *go-env
+      PORT: "8086"
+      BINANCE_API_KEY: ${BINANCE_API_KEY:-}
+      BINANCE_SECRET: ${BINANCE_SECRET:-}
+      OKX_API_KEY: ${OKX_API_KEY:-}
+      OKX_SECRET: ${OKX_SECRET:-}
+      BYBIT_API_KEY: ${BYBIT_API_KEY:-}
+      BYBIT_SECRET: ${BYBIT_SECRET:-}
+    depends_on:
+      redis: {condition: service_healthy}
+      nats:  {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8086/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  # ── Python Microservices ─────────────────────────────────────────────────────
+
+  trend-engine:
+    <<: *python-common
+    build:
+      context: .
+      dockerfile: docker/python.Dockerfile
+      args:
+        SERVICE_PATH: trend-engine
+    container_name: cryptohub-trend-engine
+    ports:
+      - "8100:8000"
+    environment:
+      <<: *python-env
+      PORT: "8000"
+      COINGECKO_API_KEY: ${COINGECKO_API_KEY:-}
+      GLASSNODE_API_KEY: ${GLASSNODE_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis:    {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8000/health"]
+      interval: 20s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  data-collector:
+    <<: *python-common
+    build:
+      context: .
+      dockerfile: docker/python.Dockerfile
+      args:
+        SERVICE_PATH: data-collector
+    container_name: cryptohub-data-collector
+    ports:
+      - "8101:8000"
+    environment:
+      <<: *python-env
+      PORT: "8000"
+      COINGECKO_API_KEY: ${COINGECKO_API_KEY:-}
+      BINANCE_WS_URL: wss://stream.binance.com:9443
+    depends_on:
+      postgres: {condition: service_healthy}
+      nats:     {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8000/health"]
+      interval: 20s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  backtest-engine:
+    <<: *python-common
+    build:
+      context: .
+      dockerfile: docker/python.Dockerfile
+      args:
+        SERVICE_PATH: backtest-engine
+    container_name: cryptohub-backtest-engine
+    ports:
+      - "8102:8000"
+    environment:
+      <<: *python-env
+      PORT: "8000"
+    depends_on:
+      postgres: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8000/health"]
+      interval: 20s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  sentiment-analyzer:
+    <<: *python-common
+    build:
+      context: .
+      dockerfile: docker/python.Dockerfile
+      args:
+        SERVICE_PATH: sentiment-analyzer
+    container_name: cryptohub-sentiment-analyzer
+    ports:
+      - "8103:8000"
+    environment:
+      <<: *python-env
+      PORT: "8000"
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      HUGGINGFACE_TOKEN: ${HUGGINGFACE_TOKEN:-}
+    depends_on:
+      redis: {condition: service_healthy}
+      nats:  {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8000/health"]
+      interval: 20s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+
+  # ── Frontend ─────────────────────────────────────────────────────────────────
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend.Dockerfile
+    container_name: cryptohub-frontend
+    restart: unless-stopped
+    networks: [cryptohub-net]
+    ports:
+      - "3000:80"
+    depends_on:
+      - api-gateway
+      - ws-gateway
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
