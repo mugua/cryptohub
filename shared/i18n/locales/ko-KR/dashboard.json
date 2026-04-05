@@ -1,0 +1,8 @@
+{
+  "dashboard": { "title": "대시보드", "welcome": "어서오세요, {{name}}님", "lastUpdated": "마지막 업데이트: {{time}}" },
+  "assets": { "title": "포트폴리오 개요", "totalValue": "총 자산", "availableBalance": "사용 가능 잔액", "lockedBalance": "잠긴 잔액", "allocation": "자산 배분", "topHoldings": "주요 보유 자산" },
+  "pnl": { "title": "손익 요약", "todayPnl": "오늘 손익", "weekPnl": "주간 손익", "monthPnl": "월간 손익", "totalPnl": "총 손익", "unrealizedPnl": "미실현 손익", "realizedPnl": "실현 손익", "winRate": "승률", "sharpeRatio": "샤프 비율", "maxDrawdown": "최대 낙폭" },
+  "market": { "title": "시장 개요", "price": "가격", "change24h": "24H 변동", "volume24h": "24H 거래량", "marketCap": "시가총액", "fearGreed": "공포·탐욕 지수", "fearGreedDesc": "현재 시장 심리", "extremeFear": "극도의 공포", "fear": "공포", "neutral": "중립", "greed": "탐욕", "extremeGreed": "극도의 탐욕" },
+  "trades": { "title": "최근 거래", "symbol": "거래쌍", "side": "방향", "price": "가격", "quantity": "수량", "total": "합계", "time": "시간", "buy": "매수", "sell": "매도", "noTrades": "최근 거래 내역 없음" },
+  "strategies": { "title": "전략 상태", "active": "실행 중", "paused": "일시 정지", "profit": "손익", "noStrategies": "활성 전략 없음", "createFirst": "첫 번째 전략을 만들어보세요" }
+}

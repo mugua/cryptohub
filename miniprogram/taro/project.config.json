@@ -1,0 +1,9 @@
+{
+  "projectname": "cryptohub",
+  "description": "CryptoHub Mini Program",
+  "appid": "your-appid-here",
+  "setting": { "urlCheck": false, "es6": true, "enhance": true, "postcss": true, "preloadBackgroundData": false, "minified": true },
+  "compileType": "miniprogram",
+  "libVersion": "3.2.4",
+  "condition": {}
+}

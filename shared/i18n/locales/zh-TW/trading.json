@@ -1,0 +1,8 @@
+{
+  "trading": { "title": "交易", "paperMode": "模擬交易模式", "liveMode": "實盤模式" },
+  "orders": { "title": "訂單管理", "placeOrder": "下單", "orderType": "訂單類型", "side": "方向", "symbol": "交易對", "price": "價格", "quantity": "數量", "total": "總額", "stopPrice": "止損價", "timeInForce": "有效期", "market": "市價單", "limit": "限價單", "stopLimit": "止損限價單", "stopMarket": "止損市價單", "buy": "買入", "sell": "賣出", "gtc": "永久有效", "ioc": "立即成交否則取消", "fok": "全部成交否則取消", "openOrders": "當前掛單", "orderHistory": "歷史訂單", "cancelOrder": "撤單", "cancelAll": "全部撤單" },
+  "strategies": { "title": "策略管理", "createStrategy": "建立策略", "strategyName": "策略名稱", "strategyType": "策略類型", "grid": "網格策略", "dca": "定投策略", "momentum": "動量策略", "meanReversion": "均值回歸", "trendFollow": "趨勢跟蹤", "allocatedCapital": "配置資金", "exchange": "交易所", "startStrategy": "啟動策略", "stopStrategy": "停止策略", "pauseStrategy": "暫停策略" },
+  "backtest": { "title": "回測", "runBacktest": "執行回測", "backtestPeriod": "回測週期", "startDate": "開始日期", "endDate": "結束日期", "initialCapital": "初始資金", "results": "回測結果", "totalReturn": "總收益率", "annualReturn": "年化收益", "sharpeRatio": "夏普比率", "maxDrawdown": "最大回撤", "winRate": "勝率", "totalTrades": "總交易次數" },
+  "positions": { "title": "持倉管理", "openPositions": "當前持倉", "positionSize": "持倉大小", "entryPrice": "開倉價格", "currentPrice": "當前價格", "unrealizedPnl": "未實現損益", "stopLoss": "止損", "takeProfit": "止盈", "closePosition": "平倉", "noPositions": "暫無持倉" },
+  "risk": { "title": "風險管理", "maxDrawdown": "最大回撤限制", "dailyLossLimit": "日虧損限額", "positionSizeLimit": "單倉上限", "leverageLimit": "槓桿限制", "riskScore": "風險評分" }
+}

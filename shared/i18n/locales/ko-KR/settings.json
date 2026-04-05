@@ -1,0 +1,8 @@
+{
+  "settings": { "title": "설정", "saved": "설정이 저장되었습니다", "saveError": "설정 저장에 실패했습니다. 다시 시도해주세요." },
+  "modelConfig": { "title": "AI 모델 구성", "modelVersion": "모델 버전", "updateFrequency": "업데이트 빈도", "every15min": "15분마다", "every30min": "30분마다", "every1h": "1시간마다", "every4h": "4시간마다", "every1d": "매일", "enableLearning": "온라인 학습 활성화", "learningRate": "학습률", "resetModel": "모델 초기화", "resetConfirm": "모델 파라미터를 초기화하시겠습니까? 이 작업은 취소할 수 없습니다." },
+  "factors": { "title": "팩터 구성", "enableFactor": "팩터 활성화", "factorWeight": "팩터 가중치", "totalWeight": "총 가중치", "weightWarning": "모든 팩터 가중치의 합이 1.0이 되어야 합니다", "macro": "거시경제 팩터", "policy": "정책·규제 팩터", "supplyDemand": "수급 팩터", "sentiment": "시장 심리 팩터", "technical": "기술 분석 팩터", "capitalFlow": "자금 흐름 팩터" },
+  "dataSources": { "title": "데이터 소스", "coingecko": "CoinGecko", "glassnode": "Glassnode", "alternativeme": "Alternative.me", "binance": "Binance", "apiKey": "API 키", "status": "상태", "connected": "연결됨", "disconnected": "연결 안 됨", "testConnection": "연결 테스트" },
+  "notifications": { "title": "알림 설정", "email": "이메일 알림", "telegram": "텔레그램 알림", "discord": "디스코드 알림", "webhookUrl": "웹훅 URL", "trendAlerts": "트렌드 변화 알림", "orderAlerts": "주문 상태 알림", "riskAlerts": "리스크 알림", "priceAlerts": "가격 알림", "addPriceAlert": "가격 알림 추가", "threshold": "임계값" },
+  "riskManagement": { "title": "리스크 파라미터", "maxDrawdownPct": "최대 낙폭 한도 (%)", "dailyLossLimitPct": "일일 손실 한도 (%)", "maxPositionSizePct": "최대 포지션 크기 (%)", "maxLeverage": "최대 레버리지", "autoStopLoss": "자동 손절", "emergencyStop": "모든 전략 긴급 정지" }
+}

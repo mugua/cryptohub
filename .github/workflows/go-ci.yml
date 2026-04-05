@@ -1,0 +1,125 @@
+name: Go CI
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'backend/go-services/**'
+      - 'proto/**'
+      - '.github/workflows/go-ci.yml'
+  pull_request:
+    paths:
+      - 'backend/go-services/**'
+      - 'proto/**'
+      - '.github/workflows/go-ci.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Test & Lint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: backend/go-services
+
+    services:
+      postgres:
+        image: timescale/timescaledb:latest-pg15
+        env:
+          POSTGRES_DB: cryptohub_test
+          POSTGRES_USER: cryptohub
+          POSTGRES_PASSWORD: secret
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      POSTGRES_URL: postgres://cryptohub:secret@localhost:5432/cryptohub_test?sslmode=disable
+      REDIS_URL: redis://localhost:6379/0
+      JWT_SECRET: test-secret-do-not-use-in-production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache-dependency-path: backend/go-services/go.sum
+
+      - name: Download modules
+        run: go mod download && go mod verify
+
+      - name: Run tests
+        run: go test -race -coverprofile=coverage.out -covermode=atomic ./...
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: go-coverage
+          path: backend/go-services/coverage.out
+          retention-days: 7
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+          working-directory: backend/go-services
+          args: --timeout=5m
+
+  build:
+    name: Build binaries
+    runs-on: ubuntu-latest
+    needs: test
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: backend/go-services
+    strategy:
+      matrix:
+        service:
+          - api-gateway
+          - trading-engine
+          - ws-gateway
+          - order-service
+          - risk-service
+          - auth-service
+          - exchange-proxy
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache-dependency-path: backend/go-services/go.sum
+
+      - name: Build ${{ matrix.service }}
+        run: |
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
+          go build -ldflags="-w -s" -o /dev/null \
+          ./cmd/${{ matrix.service }}/main.go

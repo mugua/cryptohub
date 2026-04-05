@@ -1,0 +1,68 @@
+{
+  "settings": {
+    "title": "设置",
+    "saved": "设置已保存",
+    "saveError": "保存失败，请重试"
+  },
+  "modelConfig": {
+    "title": "AI模型配置",
+    "modelVersion": "模型版本",
+    "updateFrequency": "更新频率",
+    "every15min": "每15分钟",
+    "every30min": "每30分钟",
+    "every1h": "每1小时",
+    "every4h": "每4小时",
+    "every1d": "每天",
+    "enableLearning": "启用在线学习",
+    "learningRate": "学习率",
+    "resetModel": "重置模型",
+    "resetConfirm": "确定要重置模型参数吗？此操作不可撤销。"
+  },
+  "factors": {
+    "title": "因子配置",
+    "enableFactor": "启用因子",
+    "factorWeight": "因子权重",
+    "totalWeight": "总权重",
+    "weightWarning": "所有因子权重之和应为1.0",
+    "macro": "宏观经济因子",
+    "policy": "政策监管因子",
+    "supplyDemand": "供需关系因子",
+    "sentiment": "市场情绪因子",
+    "technical": "技术分析因子",
+    "capitalFlow": "资金流向因子"
+  },
+  "dataSources": {
+    "title": "数据源设置",
+    "coingecko": "CoinGecko",
+    "glassnode": "Glassnode",
+    "alternativeme": "Alternative.me",
+    "binance": "Binance",
+    "apiKey": "API密钥",
+    "status": "状态",
+    "connected": "已连接",
+    "disconnected": "未连接",
+    "testConnection": "测试连接"
+  },
+  "notifications": {
+    "title": "通知设置",
+    "email": "邮件通知",
+    "telegram": "Telegram通知",
+    "discord": "Discord通知",
+    "webhookUrl": "Webhook URL",
+    "trendAlerts": "趋势变化提醒",
+    "orderAlerts": "订单状态提醒",
+    "riskAlerts": "风险预警",
+    "priceAlerts": "价格提醒",
+    "addPriceAlert": "添加价格提醒",
+    "threshold": "触发阈值"
+  },
+  "riskManagement": {
+    "title": "风险参数",
+    "maxDrawdownPct": "最大回撤限制 (%)",
+    "dailyLossLimitPct": "日亏损限额 (%)",
+    "maxPositionSizePct": "单仓上限 (%)",
+    "maxLeverage": "最大杠杆倍数",
+    "autoStopLoss": "自动止损",
+    "emergencyStop": "紧急停止所有策略"
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "trading": {
+    "title": "交易",
+    "paperMode": "模拟交易模式",
+    "liveMode": "实盘模式"
+  },
+  "orders": {
+    "title": "订单管理",
+    "placeOrder": "下单",
+    "orderType": "订单类型",
+    "side": "方向",
+    "symbol": "交易对",
+    "price": "价格",
+    "quantity": "数量",
+    "total": "总额",
+    "stopPrice": "止损价",
+    "timeInForce": "有效期",
+    "market": "市价单",
+    "limit": "限价单",
+    "stopLimit": "止损限价单",
+    "stopMarket": "止损市价单",
+    "buy": "买入",
+    "sell": "卖出",
+    "gtc": "永久有效",
+    "ioc": "立即成交否则取消",
+    "fok": "全部成交否则取消",
+    "openOrders": "当前挂单",
+    "orderHistory": "历史订单",
+    "cancelOrder": "撤单",
+    "cancelAll": "全部撤单"
+  },
+  "strategies": {
+    "title": "策略管理",
+    "createStrategy": "创建策略",
+    "strategyName": "策略名称",
+    "strategyType": "策略类型",
+    "grid": "网格策略",
+    "dca": "定投策略",
+    "momentum": "动量策略",
+    "meanReversion": "均值回归",
+    "trendFollow": "趋势跟踪",
+    "allocatedCapital": "配置资金",
+    "exchange": "交易所",
+    "startStrategy": "启动策略",
+    "stopStrategy": "停止策略",
+    "pauseStrategy": "暂停策略"
+  },
+  "backtest": {
+    "title": "回测",
+    "runBacktest": "运行回测",
+    "backtestPeriod": "回测周期",
+    "startDate": "开始日期",
+    "endDate": "结束日期",
+    "initialCapital": "初始资金",
+    "results": "回测结果",
+    "totalReturn": "总收益率",
+    "annualReturn": "年化收益",
+    "sharpeRatio": "夏普比率",
+    "maxDrawdown": "最大回撤",
+    "winRate": "胜率",
+    "totalTrades": "总交易次数"
+  },
+  "positions": {
+    "title": "持仓管理",
+    "openPositions": "当前持仓",
+    "positionSize": "持仓大小",
+    "entryPrice": "开仓价格",
+    "currentPrice": "当前价格",
+    "unrealizedPnl": "未实现盈亏",
+    "stopLoss": "止损",
+    "takeProfit": "止盈",
+    "closePosition": "平仓",
+    "noPositions": "暂无持仓"
+  },
+  "risk": {
+    "title": "风险管理",
+    "maxDrawdown": "最大回撤限制",
+    "dailyLossLimit": "日亏损限额",
+    "positionSizeLimit": "单仓上限",
+    "leverageLimit": "杠杆限制",
+    "riskScore": "风险评分"
+  }
+}

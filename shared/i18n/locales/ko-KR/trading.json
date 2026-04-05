@@ -1,0 +1,8 @@
+{
+  "trading": { "title": "거래", "paperMode": "모의 거래 모드", "liveMode": "실거래 모드" },
+  "orders": { "title": "주문 관리", "placeOrder": "주문하기", "orderType": "주문 유형", "side": "방향", "symbol": "거래쌍", "price": "가격", "quantity": "수량", "total": "합계", "stopPrice": "스톱 가격", "timeInForce": "유효 기간", "market": "시장가", "limit": "지정가", "stopLimit": "스톱 지정가", "stopMarket": "스톱 시장가", "buy": "매수", "sell": "매도", "gtc": "취소 전까지 유효", "ioc": "즉시 또는 취소", "fok": "전부 또는 취소", "openOrders": "미체결 주문", "orderHistory": "주문 내역", "cancelOrder": "주문 취소", "cancelAll": "전체 취소" },
+  "strategies": { "title": "전략 관리", "createStrategy": "전략 만들기", "strategyName": "전략 이름", "strategyType": "전략 유형", "grid": "그리드 거래", "dca": "적립식 투자", "momentum": "모멘텀", "meanReversion": "평균 회귀", "trendFollow": "트렌드 추종", "allocatedCapital": "배정 자본", "exchange": "거래소", "startStrategy": "전략 시작", "stopStrategy": "전략 중지", "pauseStrategy": "전략 일시 정지" },
+  "backtest": { "title": "백테스트", "runBacktest": "백테스트 실행", "backtestPeriod": "백테스트 기간", "startDate": "시작 날짜", "endDate": "종료 날짜", "initialCapital": "초기 자본", "results": "백테스트 결과", "totalReturn": "총 수익률", "annualReturn": "연간 수익률", "sharpeRatio": "샤프 비율", "maxDrawdown": "최대 낙폭", "winRate": "승률", "totalTrades": "총 거래 횟수" },
+  "positions": { "title": "포지션 관리", "openPositions": "오픈 포지션", "positionSize": "포지션 크기", "entryPrice": "진입 가격", "currentPrice": "현재 가격", "unrealizedPnl": "미실현 손익", "stopLoss": "손절", "takeProfit": "익절", "closePosition": "포지션 청산", "noPositions": "오픈 포지션 없음" },
+  "risk": { "title": "리스크 관리", "maxDrawdown": "최대 낙폭 한도", "dailyLossLimit": "일일 손실 한도", "positionSizeLimit": "포지션 크기 한도", "leverageLimit": "레버리지 한도", "riskScore": "리스크 점수" }
+}

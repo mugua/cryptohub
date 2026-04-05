@@ -1,0 +1,149 @@
+syntax = "proto3";
+
+package cryptohub.v1;
+
+option go_package = "github.com/cryptohub/cryptohub/backend/go-services/gen/proto/trading/v1;tradingv1";
+option python_package = "cryptohub.v1";
+
+import "google/protobuf/timestamp.proto";
+import "proto/common.proto";
+
+// ── Strategy ──────────────────────────────────────────────────────────────────
+
+enum StrategyType {
+  STRATEGY_TYPE_UNSPECIFIED    = 0;
+  STRATEGY_TYPE_GRID           = 1;
+  STRATEGY_TYPE_DCA            = 2;
+  STRATEGY_TYPE_MOMENTUM       = 3;
+  STRATEGY_TYPE_MEAN_REVERSION = 4;
+  STRATEGY_TYPE_TREND_FOLLOW   = 5;
+  STRATEGY_TYPE_ARBITRAGE      = 6;
+}
+
+enum StrategyStatus {
+  STRATEGY_STATUS_UNSPECIFIED = 0;
+  STRATEGY_STATUS_DRAFT       = 1;
+  STRATEGY_STATUS_ACTIVE      = 2;
+  STRATEGY_STATUS_PAUSED      = 3;
+  STRATEGY_STATUS_STOPPED     = 4;
+  STRATEGY_STATUS_ERROR       = 5;
+}
+
+message Strategy {
+  string         id          = 1;
+  string         user_id     = 2;
+  string         name        = 3;
+  StrategyType   type        = 4;
+  StrategyStatus status      = 5;
+  string         symbol      = 6;
+  Exchange       exchange    = 7;
+  string         config_json = 8;  // JSON-encoded strategy parameters
+  Money          allocated_capital = 9;
+  double         pnl_percent = 10;
+  double         pnl_absolute = 11;
+  google.protobuf.Timestamp created_at = 12;
+  google.protobuf.Timestamp updated_at = 13;
+}
+
+// ── Position ──────────────────────────────────────────────────────────────────
+
+message Position {
+  string   id           = 1;
+  string   user_id      = 2;
+  string   strategy_id  = 3;
+  string   symbol       = 4;
+  Exchange exchange     = 5;
+  OrderSide side        = 6;
+  string   size         = 7;   // decimal string
+  string   entry_price  = 8;
+  string   current_price = 9;
+  string   unrealized_pnl = 10;
+  string   realized_pnl   = 11;
+  string   stop_loss      = 12;
+  string   take_profit    = 13;
+  double   leverage       = 14;
+  google.protobuf.Timestamp opened_at = 15;
+}
+
+// ── Requests / Responses ─────────────────────────────────────────────────────
+
+message CreateStrategyRequest {
+  string       user_id     = 1;
+  string       name        = 2;
+  StrategyType type        = 3;
+  string       symbol      = 4;
+  Exchange     exchange    = 5;
+  string       config_json = 6;
+  Money        allocated_capital = 7;
+}
+
+message CreateStrategyResponse {
+  Strategy strategy = 1;
+  Error    error    = 2;
+}
+
+message GetStrategyRequest {
+  string strategy_id = 1;
+  string user_id     = 2;
+}
+
+message GetStrategyResponse {
+  Strategy strategy = 1;
+  Error    error    = 2;
+}
+
+message ListStrategiesRequest {
+  string            user_id    = 1;
+  StrategyStatus    status     = 2;
+  PaginationRequest pagination = 3;
+}
+
+message ListStrategiesResponse {
+  repeated Strategy   strategies  = 1;
+  PaginationResponse  pagination  = 2;
+  Error               error       = 3;
+}
+
+message StartStrategyRequest {
+  string strategy_id = 1;
+  string user_id     = 2;
+  bool   paper_trade = 3;  // paper trading mode
+}
+
+message StartStrategyResponse {
+  bool  success = 1;
+  Error error   = 2;
+}
+
+message StopStrategyRequest {
+  string strategy_id        = 1;
+  string user_id            = 2;
+  bool   close_positions    = 3;
+}
+
+message StopStrategyResponse {
+  bool  success = 1;
+  Error error   = 2;
+}
+
+message GetPositionsRequest {
+  string user_id     = 1;
+  string strategy_id = 2;
+  string symbol      = 3;
+}
+
+message GetPositionsResponse {
+  repeated Position positions = 1;
+  Error             error     = 2;
+}
+
+// ── Service definition ────────────────────────────────────────────────────────
+
+service TradingService {
+  rpc CreateStrategy  (CreateStrategyRequest)  returns (CreateStrategyResponse);
+  rpc GetStrategy     (GetStrategyRequest)     returns (GetStrategyResponse);
+  rpc ListStrategies  (ListStrategiesRequest)  returns (ListStrategiesResponse);
+  rpc StartStrategy   (StartStrategyRequest)   returns (StartStrategyResponse);
+  rpc StopStrategy    (StopStrategyRequest)    returns (StopStrategyResponse);
+  rpc GetPositions    (GetPositionsRequest)    returns (GetPositionsResponse);
+}

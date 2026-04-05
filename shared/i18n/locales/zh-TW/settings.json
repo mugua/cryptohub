@@ -1,0 +1,8 @@
+{
+  "settings": { "title": "設定", "saved": "設定已儲存", "saveError": "儲存失敗，請重試" },
+  "modelConfig": { "title": "AI模型設定", "modelVersion": "模型版本", "updateFrequency": "更新頻率", "every15min": "每15分鐘", "every30min": "每30分鐘", "every1h": "每1小時", "every4h": "每4小時", "every1d": "每天", "enableLearning": "啟用線上學習", "learningRate": "學習率", "resetModel": "重設模型", "resetConfirm": "確定要重設模型參數嗎？此操作無法復原。" },
+  "factors": { "title": "因子設定", "enableFactor": "啟用因子", "factorWeight": "因子權重", "totalWeight": "總權重", "weightWarning": "所有因子權重之和應為1.0", "macro": "總體經濟因子", "policy": "政策監管因子", "supplyDemand": "供需關係因子", "sentiment": "市場情緒因子", "technical": "技術分析因子", "capitalFlow": "資金流向因子" },
+  "dataSources": { "title": "資料來源設定", "coingecko": "CoinGecko", "glassnode": "Glassnode", "alternativeme": "Alternative.me", "binance": "Binance", "apiKey": "API金鑰", "status": "狀態", "connected": "已連接", "disconnected": "未連接", "testConnection": "測試連接" },
+  "notifications": { "title": "通知設定", "email": "電子郵件通知", "telegram": "Telegram通知", "discord": "Discord通知", "webhookUrl": "Webhook網址", "trendAlerts": "趨勢變化提醒", "orderAlerts": "訂單狀態提醒", "riskAlerts": "風險預警", "priceAlerts": "價格提醒", "addPriceAlert": "新增價格提醒", "threshold": "觸發閾值" },
+  "riskManagement": { "title": "風險參數", "maxDrawdownPct": "最大回撤限制 (%)", "dailyLossLimitPct": "日虧損限額 (%)", "maxPositionSizePct": "單倉上限 (%)", "maxLeverage": "最大槓桿倍數", "autoStopLoss": "自動止損", "emergencyStop": "緊急停止所有策略" }
+}

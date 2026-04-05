@@ -1,0 +1,8 @@
+{
+  "profile": { "title": "プロフィール", "myProfile": "マイプロフィール" },
+  "userInfo": { "title": "個人情報", "displayName": "表示名", "username": "ユーザー名", "email": "メールアドレス", "avatarUrl": "アバターURL", "timezone": "タイムゾーン", "language": "言語", "preferredCurrency": "優先通貨", "memberSince": "登録日", "subscriptionTier": "サブスクリプション", "free": "無料", "pro": "プロ", "enterprise": "エンタープライズ", "upgradePlan": "プランをアップグレード" },
+  "security": { "title": "セキュリティ", "changePassword": "パスワードを変更", "currentPassword": "現在のパスワード", "newPassword": "新しいパスワード", "confirmNewPassword": "新しいパスワードを確認", "twoFactor": "二要素認証", "enable2FA": "2FAを有効化", "disable2FA": "2FAを無効化", "twoFactorEnabled": "2FAが有効です", "twoFactorDisabled": "2FAが無効です", "backupCodes": "バックアップコード", "activeSessions": "アクティブセッション", "revokeSession": "セッションを無効化", "revokeAllSessions": "全セッションを無効化" },
+  "apiKeys": { "title": "APIキー管理", "addApiKey": "APIキーを追加", "exchange": "取引所", "label": "ラベル", "apiKey": "APIキー", "apiSecret": "APIシークレット", "passphrase": "パスフレーズ（任意）", "permissions": "権限", "canTrade": "取引可能", "canWithdraw": "出金可能", "lastUsed": "最終使用", "deleteApiKey": "キーを削除", "noApiKeys": "APIキーがまだ追加されていません", "warning": "暗号化されたキーのみ保存されます。元のキーは安全に保管してください。" },
+  "exchanges": { "title": "接続済み取引所", "connect": "取引所を接続", "disconnect": "接続を解除", "connected": "接続済み", "disconnected": "未接続", "testConnection": "接続をテスト" },
+  "subscription": { "title": "サブスクリプション", "currentPlan": "現在のプラン", "billingCycle": "請求サイクル", "nextBillingDate": "次回請求日", "cancelSubscription": "サブスクリプションをキャンセル", "renewSubscription": "更新する" }
+}

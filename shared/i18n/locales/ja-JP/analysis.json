@@ -1,0 +1,9 @@
+{
+  "analysis": { "title": "トレンド分析", "trendScore": "トレンドスコア", "signal": "シグナル", "signals": { "strongBuy": "強い買い", "buy": "買い", "neutral": "中立", "sell": "売り", "strongSell": "強い売り" }, "confidence": "モデル信頼度", "lastUpdated": "最終更新", "refresh": "分析を更新", "selectSymbol": "通貨ペアを選択" },
+  "factors": { "title": "ファクター分析", "weight": "ウェイト", "score": "スコア", "contribution": "寄与度", "adjustWeights": "ウェイトを調整", "resetWeights": "ウェイトをリセット", "macro": "マクロ経済", "policy": "政策・規制", "supplyDemand": "需給", "sentiment": "市場センチメント", "technical": "テクニカル分析", "capitalFlow": "資金フロー" },
+  "macro": { "title": "マクロ指標", "dxy": "ドル指数 (DXY)", "fedRate": "FF金利", "spxCorrelation": "S&P500相関", "goldCorrelation": "金との相関", "inflationCPI": "インフレ率 (CPI)", "yieldCurve": "イールドカーブ" },
+  "policy": { "title": "政策分析", "regulatoryNews": "規制ニュース", "govActions": "政府の行動", "etfStatus": "ETFの状況", "institutionalAdoption": "機関投資家の採用", "sentiment": "政策センチメント" },
+  "supplyDemand": { "title": "需給分析", "exchangeNetFlow": "取引所純フロー", "longTermHolders": "長期保有者", "shortTermHolders": "短期保有者", "sopr": "SOPR", "nvt": "NVT比率", "activAddresses": "アクティブアドレス数" },
+  "sentiment": { "title": "センチメント分析", "fearGreedIndex": "恐怖・強欲指数", "socialVolume": "ソーシャルボリューム", "googleTrends": "Googleトレンド", "fundingRate": "資金調達率", "longShortRatio": "ロング/ショート比率", "openInterest": "建玉残高" },
+  "technical": { "title": "テクニカル指標", "rsi": "RSI", "macd": "MACD", "bollingerBands": "ボリンジャーバンド", "ema": "EMAリボン", "volume": "出来高分析", "support": "サポートライン", "resistance": "レジスタンスライン" }
+}

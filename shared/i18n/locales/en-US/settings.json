@@ -1,0 +1,68 @@
+{
+  "settings": {
+    "title": "Settings",
+    "saved": "Settings saved successfully",
+    "saveError": "Failed to save settings. Please try again."
+  },
+  "modelConfig": {
+    "title": "AI Model Configuration",
+    "modelVersion": "Model Version",
+    "updateFrequency": "Update Frequency",
+    "every15min": "Every 15 minutes",
+    "every30min": "Every 30 minutes",
+    "every1h": "Every hour",
+    "every4h": "Every 4 hours",
+    "every1d": "Daily",
+    "enableLearning": "Enable Online Learning",
+    "learningRate": "Learning Rate",
+    "resetModel": "Reset Model",
+    "resetConfirm": "Are you sure you want to reset the model parameters? This action cannot be undone."
+  },
+  "factors": {
+    "title": "Factor Configuration",
+    "enableFactor": "Enable Factor",
+    "factorWeight": "Factor Weight",
+    "totalWeight": "Total Weight",
+    "weightWarning": "All factor weights should sum to 1.0",
+    "macro": "Macro Economics Factor",
+    "policy": "Policy & Regulation Factor",
+    "supplyDemand": "Supply & Demand Factor",
+    "sentiment": "Market Sentiment Factor",
+    "technical": "Technical Analysis Factor",
+    "capitalFlow": "Capital Flow Factor"
+  },
+  "dataSources": {
+    "title": "Data Sources",
+    "coingecko": "CoinGecko",
+    "glassnode": "Glassnode",
+    "alternativeme": "Alternative.me",
+    "binance": "Binance",
+    "apiKey": "API Key",
+    "status": "Status",
+    "connected": "Connected",
+    "disconnected": "Disconnected",
+    "testConnection": "Test Connection"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "email": "Email Notifications",
+    "telegram": "Telegram Notifications",
+    "discord": "Discord Notifications",
+    "webhookUrl": "Webhook URL",
+    "trendAlerts": "Trend Change Alerts",
+    "orderAlerts": "Order Status Alerts",
+    "riskAlerts": "Risk Alerts",
+    "priceAlerts": "Price Alerts",
+    "addPriceAlert": "Add Price Alert",
+    "threshold": "Threshold"
+  },
+  "riskManagement": {
+    "title": "Risk Parameters",
+    "maxDrawdownPct": "Max Drawdown Limit (%)",
+    "dailyLossLimitPct": "Daily Loss Limit (%)",
+    "maxPositionSizePct": "Max Position Size (%)",
+    "maxLeverage": "Max Leverage",
+    "autoStopLoss": "Auto Stop-Loss",
+    "emergencyStop": "Emergency Stop All Strategies"
+  }
+}

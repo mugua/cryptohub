@@ -1,0 +1,8 @@
+{
+  "dashboard": { "title": "Panel", "welcome": "Bienvenido/a, {{name}}", "lastUpdated": "Última actualización: {{time}}" },
+  "assets": { "title": "Resumen de Cartera", "totalValue": "Valor Total", "availableBalance": "Saldo Disponible", "lockedBalance": "Saldo Bloqueado", "allocation": "Distribución", "topHoldings": "Principales Activos" },
+  "pnl": { "title": "Resumen de P&G", "todayPnl": "P&G de Hoy", "weekPnl": "P&G Semanal", "monthPnl": "P&G Mensual", "totalPnl": "P&G Total", "unrealizedPnl": "P&G No Realizado", "realizedPnl": "P&G Realizado", "winRate": "Tasa de Éxito", "sharpeRatio": "Ratio de Sharpe", "maxDrawdown": "Caída Máxima" },
+  "market": { "title": "Visión del Mercado", "price": "Precio", "change24h": "Cambio 24H", "volume24h": "Volumen 24H", "marketCap": "Cap. de Mercado", "fearGreed": "Índice Miedo y Codicia", "fearGreedDesc": "Sentimiento actual del mercado", "extremeFear": "Miedo Extremo", "fear": "Miedo", "neutral": "Neutral", "greed": "Codicia", "extremeGreed": "Codicia Extrema" },
+  "trades": { "title": "Operaciones Recientes", "symbol": "Par", "side": "Lado", "price": "Precio", "quantity": "Cantidad", "total": "Total", "time": "Hora", "buy": "COMPRA", "sell": "VENTA", "noTrades": "Sin operaciones recientes" },
+  "strategies": { "title": "Estado de Estrategias", "active": "Activa", "paused": "Pausada", "profit": "P&G", "noStrategies": "Sin estrategias activas", "createFirst": "Cree su primera estrategia" }
+}

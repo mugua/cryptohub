@@ -1,0 +1,9 @@
+{
+  "name": "cryptohub-harmony",
+  "version": "1.0.0",
+  "description": "CryptoHub HarmonyOS App",
+  "main": "Index",
+  "author": "CryptoHub Team",
+  "license": "MIT",
+  "dependencies": {}
+}

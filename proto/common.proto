@@ -1,0 +1,131 @@
+syntax = "proto3";
+
+package cryptohub.v1;
+
+option go_package = "github.com/cryptohub/cryptohub/backend/go-services/gen/proto/common/v1;commonv1";
+option python_package = "cryptohub.v1";
+
+import "google/protobuf/timestamp.proto";
+
+// ── Pagination ────────────────────────────────────────────────────────────────
+
+message PaginationRequest {
+  int32 page      = 1;
+  int32 page_size = 2;
+}
+
+message PaginationResponse {
+  int32 page        = 1;
+  int32 page_size   = 2;
+  int32 total_pages = 3;
+  int64 total_items = 4;
+  bool  has_next    = 5;
+}
+
+// ── Error ─────────────────────────────────────────────────────────────────────
+
+enum ErrorCode {
+  ERROR_CODE_UNSPECIFIED          = 0;
+  ERROR_CODE_INTERNAL             = 1;
+  ERROR_CODE_NOT_FOUND            = 2;
+  ERROR_CODE_ALREADY_EXISTS       = 3;
+  ERROR_CODE_PERMISSION_DENIED    = 4;
+  ERROR_CODE_UNAUTHENTICATED      = 5;
+  ERROR_CODE_INVALID_ARGUMENT     = 6;
+  ERROR_CODE_RESOURCE_EXHAUSTED   = 7;
+  ERROR_CODE_UNAVAILABLE          = 8;
+  ERROR_CODE_INSUFFICIENT_FUNDS   = 9;
+  ERROR_CODE_EXCHANGE_ERROR       = 10;
+  ERROR_CODE_RATE_LIMIT_EXCEEDED  = 11;
+}
+
+message Error {
+  ErrorCode code    = 1;
+  string    message = 2;
+  string    details = 3;
+}
+
+// ── Timestamp wrapper ─────────────────────────────────────────────────────────
+
+message Timestamp {
+  google.protobuf.Timestamp value = 1;
+}
+
+// ── Currency & Money ──────────────────────────────────────────────────────────
+
+message Currency {
+  string symbol   = 1;  // e.g. "BTC", "ETH", "USDT"
+  string name     = 2;  // e.g. "Bitcoin"
+  int32  decimals = 3;
+}
+
+message Money {
+  string currency = 1;  // ISO 4217 or crypto symbol
+  string amount   = 2;  // decimal string for precision
+}
+
+// ── Trading enums ─────────────────────────────────────────────────────────────
+
+enum OrderSide {
+  ORDER_SIDE_UNSPECIFIED = 0;
+  ORDER_SIDE_BUY         = 1;
+  ORDER_SIDE_SELL        = 2;
+}
+
+enum OrderType {
+  ORDER_TYPE_UNSPECIFIED  = 0;
+  ORDER_TYPE_MARKET       = 1;
+  ORDER_TYPE_LIMIT        = 2;
+  ORDER_TYPE_STOP_LIMIT   = 3;
+  ORDER_TYPE_STOP_MARKET  = 4;
+  ORDER_TYPE_TAKE_PROFIT  = 5;
+  ORDER_TYPE_TRAILING_STOP = 6;
+}
+
+enum OrderStatus {
+  ORDER_STATUS_UNSPECIFIED  = 0;
+  ORDER_STATUS_PENDING      = 1;
+  ORDER_STATUS_OPEN         = 2;
+  ORDER_STATUS_PARTIAL_FILL = 3;
+  ORDER_STATUS_FILLED       = 4;
+  ORDER_STATUS_CANCELLED    = 5;
+  ORDER_STATUS_REJECTED     = 6;
+  ORDER_STATUS_EXPIRED      = 7;
+}
+
+enum TimeInForce {
+  TIME_IN_FORCE_UNSPECIFIED = 0;
+  TIME_IN_FORCE_GTC         = 1;  // Good Till Cancelled
+  TIME_IN_FORCE_IOC         = 2;  // Immediate Or Cancel
+  TIME_IN_FORCE_FOK         = 3;  // Fill Or Kill
+  TIME_IN_FORCE_GTD         = 4;  // Good Till Date
+}
+
+enum Exchange {
+  EXCHANGE_UNSPECIFIED = 0;
+  EXCHANGE_BINANCE     = 1;
+  EXCHANGE_OKX         = 2;
+  EXCHANGE_BYBIT       = 3;
+  EXCHANGE_COINBASE    = 4;
+  EXCHANGE_KRAKEN      = 5;
+}
+
+// ── Kline / OHLCV ─────────────────────────────────────────────────────────────
+
+enum KlineInterval {
+  KLINE_INTERVAL_UNSPECIFIED = 0;
+  KLINE_INTERVAL_1M          = 1;
+  KLINE_INTERVAL_3M          = 2;
+  KLINE_INTERVAL_5M          = 3;
+  KLINE_INTERVAL_15M         = 4;
+  KLINE_INTERVAL_30M         = 5;
+  KLINE_INTERVAL_1H          = 6;
+  KLINE_INTERVAL_2H          = 7;
+  KLINE_INTERVAL_4H          = 8;
+  KLINE_INTERVAL_6H          = 9;
+  KLINE_INTERVAL_12H         = 10;
+  KLINE_INTERVAL_1D          = 11;
+  KLINE_INTERVAL_3D          = 12;
+  KLINE_INTERVAL_1W          = 13;
+  KLINE_INTERVAL_1MONTH      = 14;
+}

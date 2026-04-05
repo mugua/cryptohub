@@ -1,0 +1,9 @@
+{
+  "src": [
+    "pages/DashboardPage",
+    "pages/AnalysisPage",
+    "pages/TradingPage",
+    "pages/ProfilePage",
+    "pages/SettingsPage"
+  ]
+}

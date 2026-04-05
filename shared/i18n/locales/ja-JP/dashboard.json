@@ -1,0 +1,8 @@
+{
+  "dashboard": { "title": "ダッシュボード", "welcome": "おかえりなさい、{{name}}さん", "lastUpdated": "最終更新：{{time}}" },
+  "assets": { "title": "ポートフォリオ概要", "totalValue": "総資産", "availableBalance": "利用可能残高", "lockedBalance": "ロック中の残高", "allocation": "資産配分", "topHoldings": "主要保有資産" },
+  "pnl": { "title": "損益サマリー", "todayPnl": "本日の損益", "weekPnl": "週間損益", "monthPnl": "月間損益", "totalPnl": "累計損益", "unrealizedPnl": "含み損益", "realizedPnl": "確定損益", "winRate": "勝率", "sharpeRatio": "シャープレシオ", "maxDrawdown": "最大ドローダウン" },
+  "market": { "title": "市場概況", "price": "価格", "change24h": "24H変動", "volume24h": "24H取引量", "marketCap": "時価総額", "fearGreed": "恐怖・強欲指数", "fearGreedDesc": "現在の市場心理", "extremeFear": "極端な恐怖", "fear": "恐怖", "neutral": "中立", "greed": "強欲", "extremeGreed": "極端な強欲" },
+  "trades": { "title": "最近の取引", "symbol": "通貨ペア", "side": "売買", "price": "価格", "quantity": "数量", "total": "合計", "time": "時間", "buy": "買い", "sell": "売り", "noTrades": "取引履歴がありません" },
+  "strategies": { "title": "ストラテジー状態", "active": "稼働中", "paused": "一時停止", "profit": "損益", "noStrategies": "アクティブなストラテジーがありません", "createFirst": "最初のストラテジーを作成しましょう" }
+}

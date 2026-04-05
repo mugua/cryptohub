@@ -1,0 +1,9 @@
+{
+  "analysis": { "title": "趨勢分析", "trendScore": "趨勢評分", "signal": "訊號", "signals": { "strongBuy": "強烈買入", "buy": "買入", "neutral": "中性", "sell": "賣出", "strongSell": "強烈賣出" }, "confidence": "模型信心度", "lastUpdated": "上次更新", "refresh": "重新整理分析", "selectSymbol": "選擇交易對" },
+  "factors": { "title": "因子分析", "weight": "權重", "score": "評分", "contribution": "貢獻度", "adjustWeights": "調整權重", "resetWeights": "重設權重", "macro": "總體經濟", "policy": "政策監管", "supplyDemand": "供需關係", "sentiment": "市場情緒", "technical": "技術分析", "capitalFlow": "資金流向" },
+  "macro": { "title": "總體指標", "dxy": "美元指數 (DXY)", "fedRate": "聯準會基準利率", "spxCorrelation": "標普500相關性", "goldCorrelation": "黃金相關性", "inflationCPI": "通膨率 (CPI)", "yieldCurve": "殖利率曲線" },
+  "policy": { "title": "政策分析", "regulatoryNews": "監管動態", "govActions": "政府行動", "etfStatus": "ETF狀態", "institutionalAdoption": "機構採用", "sentiment": "政策情緒" },
+  "supplyDemand": { "title": "供需分析", "exchangeNetFlow": "交易所淨流量", "longTermHolders": "長期持有者", "shortTermHolders": "短期持有者", "sopr": "SOPR指標", "nvt": "NVT比率", "activAddresses": "活躍地址數" },
+  "sentiment": { "title": "情緒分析", "fearGreedIndex": "恐懼與貪婪指數", "socialVolume": "社群熱度", "googleTrends": "谷歌趨勢", "fundingRate": "資金費率", "longShortRatio": "多空比率", "openInterest": "持倉量" },
+  "technical": { "title": "技術指標", "rsi": "相對強弱指數 (RSI)", "macd": "MACD", "bollingerBands": "布林帶", "ema": "指數移動平均線", "volume": "成交量分析", "support": "支撐位", "resistance": "阻力位" }
+}

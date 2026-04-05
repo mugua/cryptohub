@@ -1,0 +1,101 @@
+{
+  "app": {
+    "name": "CryptoHub",
+    "tagline": "Enterprise Crypto Trend Analysis & Trading Platform",
+    "version": "Version {{version}}"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "analysis": "Market Analysis",
+    "trading": "Trading",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Log Out",
+    "documentation": "Documentation",
+    "support": "Support"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "filter": "Filter",
+    "reset": "Reset",
+    "refresh": "Refresh",
+    "loading": "Loading...",
+    "noData": "No data available",
+    "viewAll": "View All",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "close": "Close",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "download": "Download",
+    "export": "Export",
+    "import": "Import"
+  },
+  "theme": {
+    "light": "Light Mode",
+    "dark": "Dark Mode",
+    "system": "System Default"
+  },
+  "lang": {
+    "zh-CN": "简体中文",
+    "en-US": "English",
+    "zh-TW": "繁體中文",
+    "ja-JP": "日本語",
+    "ko-KR": "한국어",
+    "es-ES": "Español"
+  },
+  "time": {
+    "now": "Just now",
+    "minutesAgo": "{{count}} minute(s) ago",
+    "hoursAgo": "{{count}} hour(s) ago",
+    "daysAgo": "{{count}} day(s) ago",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "thisWeek": "This Week",
+    "thisMonth": "This Month",
+    "dateFormat": "MM/DD/YYYY",
+    "dateTimeFormat": "MM/DD/YYYY HH:mm:ss"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "pending": "Pending",
+    "success": "Success",
+    "failed": "Failed",
+    "cancelled": "Cancelled",
+    "processing": "Processing",
+    "completed": "Completed"
+  },
+  "error": {
+    "generic": "An error occurred. Please try again.",
+    "network": "Network connection failed.",
+    "unauthorized": "Unauthorized. Please log in.",
+    "forbidden": "You don't have permission to access this resource.",
+    "notFound": "Resource not found.",
+    "serverError": "Server error. Please try again later.",
+    "timeout": "Request timed out. Please check your connection.",
+    "validation": "Input validation failed."
+  },
+  "auth": {
+    "login": "Log In",
+    "register": "Sign Up",
+    "forgotPassword": "Forgot Password",
+    "resetPassword": "Reset Password",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "twoFactor": "Two-Factor Authentication",
+    "twoFactorCode": "Verification Code",
+    "rememberMe": "Remember Me",
+    "loginSuccess": "Logged in successfully",
+    "logoutSuccess": "Logged out successfully"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "trading": { "title": "取引", "paperMode": "ペーパートレードモード", "liveMode": "ライブ取引モード" },
+  "orders": { "title": "注文管理", "placeOrder": "注文する", "orderType": "注文タイプ", "side": "売買", "symbol": "通貨ペア", "price": "価格", "quantity": "数量", "total": "合計", "stopPrice": "逆指値価格", "timeInForce": "有効期間", "market": "成行", "limit": "指値", "stopLimit": "逆指値指値", "stopMarket": "逆指値成行", "buy": "買い", "sell": "売り", "gtc": "GTC", "ioc": "IOC", "fok": "FOK", "openOrders": "未約定注文", "orderHistory": "注文履歴", "cancelOrder": "注文をキャンセル", "cancelAll": "全注文をキャンセル" },
+  "strategies": { "title": "ストラテジー管理", "createStrategy": "ストラテジーを作成", "strategyName": "ストラテジー名", "strategyType": "ストラテジータイプ", "grid": "グリッド取引", "dca": "ドルコスト平均法", "momentum": "モメンタム", "meanReversion": "平均回帰", "trendFollow": "トレンドフォロー", "allocatedCapital": "配分資金", "exchange": "取引所", "startStrategy": "ストラテジーを開始", "stopStrategy": "ストラテジーを停止", "pauseStrategy": "ストラテジーを一時停止" },
+  "backtest": { "title": "バックテスト", "runBacktest": "バックテストを実行", "backtestPeriod": "バックテスト期間", "startDate": "開始日", "endDate": "終了日", "initialCapital": "初期資本", "results": "バックテスト結果", "totalReturn": "総リターン", "annualReturn": "年率リターン", "sharpeRatio": "シャープレシオ", "maxDrawdown": "最大ドローダウン", "winRate": "勝率", "totalTrades": "総取引数" },
+  "positions": { "title": "ポジション管理", "openPositions": "オープンポジション", "positionSize": "ポジションサイズ", "entryPrice": "エントリー価格", "currentPrice": "現在価格", "unrealizedPnl": "含み損益", "stopLoss": "損切り", "takeProfit": "利確", "closePosition": "ポジションをクローズ", "noPositions": "オープンポジションなし" },
+  "risk": { "title": "リスク管理", "maxDrawdown": "最大ドローダウン上限", "dailyLossLimit": "日次損失上限", "positionSizeLimit": "ポジションサイズ上限", "leverageLimit": "レバレッジ上限", "riskScore": "リスクスコア" }
+}

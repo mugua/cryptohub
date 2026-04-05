@@ -1,0 +1,118 @@
+syntax = "proto3";
+
+package cryptohub.v1;
+
+option go_package = "github.com/cryptohub/cryptohub/backend/go-services/gen/proto/analysis/v1;analysisv1";
+option python_package = "cryptohub.v1";
+
+import "google/protobuf/timestamp.proto";
+import "proto/common.proto";
+
+// ── Factor Score ──────────────────────────────────────────────────────────────
+
+enum FactorGroup {
+  FACTOR_GROUP_UNSPECIFIED  = 0;
+  FACTOR_GROUP_MACRO        = 1;  // DXY, Fed rate, SPX correlation
+  FACTOR_GROUP_POLICY       = 2;  // Regulatory news, government actions
+  FACTOR_GROUP_SUPPLY_DEMAND = 3; // On-chain metrics, exchange flows
+  FACTOR_GROUP_SENTIMENT    = 4;  // Fear & Greed, social volume
+  FACTOR_GROUP_TECHNICAL    = 5;  // RSI, MACD, Bollinger, EMA
+  FACTOR_GROUP_CAPITAL_FLOW = 6;  // Whale alerts, exchange net-flow
+}
+
+message FactorScore {
+  FactorGroup group       = 1;
+  double      score       = 2;  // 0.0 – 1.0
+  double      weight      = 3;  // configured weight 0.0 – 1.0
+  double      contribution = 4; // score * weight
+  string      signal      = 5;  // "BULLISH" | "BEARISH" | "NEUTRAL"
+  string      explanation = 6;
+  repeated SubFactor sub_factors = 7;
+}
+
+message SubFactor {
+  string name        = 1;
+  double value       = 2;
+  double score       = 3;
+  string unit        = 4;
+  string description = 5;
+}
+
+// ── Trend Report ──────────────────────────────────────────────────────────────
+
+message TrendReport {
+  string   id          = 1;
+  string   symbol      = 2;  // e.g. "BTCUSDT"
+  double   trend_score = 3;  // composite 0–100
+  string   signal      = 4;  // "STRONG_BUY" | "BUY" | "NEUTRAL" | "SELL" | "STRONG_SELL"
+  repeated FactorScore factors = 5;
+  string   summary     = 6;  // NL summary
+  double   confidence  = 7;  // model confidence 0.0–1.0
+  google.protobuf.Timestamp generated_at = 8;
+  google.protobuf.Timestamp valid_until   = 9;
+}
+
+// ── Factor Weights ────────────────────────────────────────────────────────────
+
+message FactorWeight {
+  FactorGroup group  = 1;
+  double      weight = 2;  // 0.0 – 1.0
+}
+
+// ── Requests / Responses ─────────────────────────────────────────────────────
+
+message GetTrendReportRequest {
+  string symbol   = 1;
+  bool   refresh  = 2;  // force model re-run (bypass cache)
+}
+
+message GetTrendReportResponse {
+  TrendReport report = 1;
+  Error       error  = 2;
+}
+
+message GetFactorScoresRequest {
+  string      symbol       = 1;
+  FactorGroup factor_group = 2;  // optional filter; unspecified = all groups
+}
+
+message GetFactorScoresResponse {
+  string          symbol  = 1;
+  repeated FactorScore factors = 2;
+  Error           error   = 3;
+}
+
+message UpdateWeightsRequest {
+  string              user_id = 1;
+  repeated FactorWeight weights = 2;
+}
+
+message UpdateWeightsResponse {
+  bool  success = 1;
+  Error error   = 2;
+}
+
+message GetWeightsRequest {
+  string user_id = 1;
+}
+
+message GetWeightsResponse {
+  repeated FactorWeight weights = 1;
+  Error                 error   = 2;
+}
+
+message ListSupportedSymbolsRequest {}
+
+message ListSupportedSymbolsResponse {
+  repeated string symbols = 1;
+}
+
+// ── Service definition ────────────────────────────────────────────────────────
+
+service TrendAnalysisService {
+  rpc GetTrendReport      (GetTrendReportRequest)      returns (GetTrendReportResponse);
+  rpc GetFactorScores     (GetFactorScoresRequest)     returns (GetFactorScoresResponse);
+  rpc UpdateWeights       (UpdateWeightsRequest)       returns (UpdateWeightsResponse);
+  rpc GetWeights          (GetWeightsRequest)          returns (GetWeightsResponse);
+  rpc ListSupportedSymbols(ListSupportedSymbolsRequest) returns (ListSupportedSymbolsResponse);
+}

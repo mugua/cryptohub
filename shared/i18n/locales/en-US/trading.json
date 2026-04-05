@@ -1,0 +1,83 @@
+{
+  "trading": {
+    "title": "Trading",
+    "paperMode": "Paper Trading Mode",
+    "liveMode": "Live Trading Mode"
+  },
+  "orders": {
+    "title": "Order Management",
+    "placeOrder": "Place Order",
+    "orderType": "Order Type",
+    "side": "Side",
+    "symbol": "Symbol",
+    "price": "Price",
+    "quantity": "Quantity",
+    "total": "Total",
+    "stopPrice": "Stop Price",
+    "timeInForce": "Time in Force",
+    "market": "Market",
+    "limit": "Limit",
+    "stopLimit": "Stop-Limit",
+    "stopMarket": "Stop-Market",
+    "buy": "Buy",
+    "sell": "Sell",
+    "gtc": "Good Till Cancelled",
+    "ioc": "Immediate or Cancel",
+    "fok": "Fill or Kill",
+    "openOrders": "Open Orders",
+    "orderHistory": "Order History",
+    "cancelOrder": "Cancel Order",
+    "cancelAll": "Cancel All"
+  },
+  "strategies": {
+    "title": "Strategy Management",
+    "createStrategy": "Create Strategy",
+    "strategyName": "Strategy Name",
+    "strategyType": "Strategy Type",
+    "grid": "Grid Trading",
+    "dca": "Dollar-Cost Averaging",
+    "momentum": "Momentum",
+    "meanReversion": "Mean Reversion",
+    "trendFollow": "Trend Following",
+    "allocatedCapital": "Allocated Capital",
+    "exchange": "Exchange",
+    "startStrategy": "Start Strategy",
+    "stopStrategy": "Stop Strategy",
+    "pauseStrategy": "Pause Strategy"
+  },
+  "backtest": {
+    "title": "Backtesting",
+    "runBacktest": "Run Backtest",
+    "backtestPeriod": "Backtest Period",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "initialCapital": "Initial Capital",
+    "results": "Backtest Results",
+    "totalReturn": "Total Return",
+    "annualReturn": "Annual Return",
+    "sharpeRatio": "Sharpe Ratio",
+    "maxDrawdown": "Max Drawdown",
+    "winRate": "Win Rate",
+    "totalTrades": "Total Trades"
+  },
+  "positions": {
+    "title": "Position Management",
+    "openPositions": "Open Positions",
+    "positionSize": "Position Size",
+    "entryPrice": "Entry Price",
+    "currentPrice": "Current Price",
+    "unrealizedPnl": "Unrealized P&L",
+    "stopLoss": "Stop Loss",
+    "takeProfit": "Take Profit",
+    "closePosition": "Close Position",
+    "noPositions": "No open positions"
+  },
+  "risk": {
+    "title": "Risk Management",
+    "maxDrawdown": "Max Drawdown Limit",
+    "dailyLossLimit": "Daily Loss Limit",
+    "positionSizeLimit": "Position Size Limit",
+    "leverageLimit": "Leverage Limit",
+    "riskScore": "Risk Score"
+  }
+}
