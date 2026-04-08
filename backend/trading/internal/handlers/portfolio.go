@@ -137,6 +137,7 @@ func (h *PortfolioHandler) GetPerformance(c *gin.Context) {
 		WeeklyReturn: 1.8,
 	}
 
+	// TODO: query actual portfolio data filtered by userID
 	_ = userID
 	c.JSON(http.StatusOK, perf)
 }
