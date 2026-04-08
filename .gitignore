@@ -1,0 +1,21 @@
+# CryptoHub · .gitignore
+node_modules/
+dist/
+build/
+.env
+*.pyc
+__pycache__/
+.venv/
+*.egg-info/
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+*.log
+coverage/
+.dart_tool/
+.packages
+pubspec.lock
+*.iml

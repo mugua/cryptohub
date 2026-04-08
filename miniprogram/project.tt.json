@@ -1,0 +1,12 @@
+{
+  "miniprogramRoot": "dist/",
+  "projectname": "cryptohub-miniprogram",
+  "description": "CryptoHub Mini Program",
+  "appid": "tt0000000000000000",
+  "setting": {
+    "urlCheck": true,
+    "es6": false,
+    "minified": false
+  },
+  "compileType": "miniprogram"
+}
