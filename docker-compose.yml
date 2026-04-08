@@ -65,7 +65,7 @@ services:
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      CLUSTER_ID: cryptohub-kafka-cluster
+      CLUSTER_ID: cjTMDewySXyt5dHiMcodVw
     ports:
       - "9092:9092"
     volumes:
