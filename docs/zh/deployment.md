@@ -53,7 +53,7 @@ docker compose logs -f
 
 | 服务 | 地址 | 说明 |
 |---|---|---|
-| Web 界面 | `http://localhost:8080` | 通过 Nginx 反向代理 |
+| Web 界面 | `http://localhost:3000` | 前端服务 |
 | 分析 API 文档 | `http://localhost:8000/docs` | FastAPI 自动文档 (Swagger) |
 | 交易 API | `http://localhost:8001` | Go/Gin 服务 |
 | InfluxDB 管理 | `http://localhost:8086` | 时序数据库管理界面 |
@@ -156,10 +156,10 @@ docker compose exec postgres psql -U cryptohub -c "SELECT 1"
 
 ### Q2: 前端无法连接 API
 
-确认 Nginx 配置正确，且后端服务已启动。检查 Nginx 日志。
+确认后端服务已启动。检查服务日志。
 
 ```bash
-docker compose logs nginx
+docker compose logs frontend
 curl http://localhost:8000/health
 ```
 

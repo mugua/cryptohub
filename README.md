@@ -45,7 +45,7 @@ CryptoHub is an enterprise-grade full-stack cryptocurrency trend analysis and qu
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                        Nginx (Reverse Proxy)                     │
+│                   External Reverse Proxy (User-provided)         │
 ├──────────┬──────────────────────────┬───────────────────────────┤
 │ Frontend │   Analysis Service       │   Trading Service         │
 │ React+TS │   Python / FastAPI       │   Go / Gin                │
@@ -82,7 +82,7 @@ CryptoHub is an enterprise-grade full-stack cryptocurrency trend analysis and qu
 | **Mini Program** | Taro 3 · React · TypeScript | WeChat / Douyin / H5 |
 | **Database** | PostgreSQL 16 · Redis 7 · InfluxDB 2.7 | Relational + Cache + Time-series |
 | **MQ** | Apache Kafka 3.7 (KRaft) | Event-driven architecture |
-| **Deploy** | Docker · Docker Compose · Nginx | Containerized one-click deployment |
+| **Deploy** | Docker · Docker Compose | Containerized one-click deployment |
 
 ---
 
@@ -193,7 +193,7 @@ cp .env.example .env
 docker compose up -d
 
 # Access
-# Web UI:       http://localhost:8080
+# Web UI:       http://localhost:3000
 # Analysis API: http://localhost:8000/docs
 # Trading API:  http://localhost:8001/api/v1/trading/
 ```
@@ -296,8 +296,6 @@ cryptohub/
 ├── database/
 │   └── migrations/             # SQL database migration scripts
 │
-├── docker/
-│   └── nginx/                  # Nginx reverse proxy configuration
 │
 ├── docs/
 │   ├── zh/                     # Chinese documentation
@@ -414,7 +412,6 @@ docker compose logs -f trading
 
 | Service | Port | Description |
 |---|---|---|
-| Nginx | 8080, 8443 | Reverse proxy |
 | Frontend | 3000 | Web frontend |
 | Analysis API | 8000 | Analysis service |
 | Trading API | 8001 | Trading service |
