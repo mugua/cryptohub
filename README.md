@@ -193,9 +193,27 @@ cp .env.example .env
 docker compose up -d
 
 # Access
-# Web UI:       http://localhost
+# Web UI:       http://localhost:8080
 # Analysis API: http://localhost:8000/docs
 # Trading API:  http://localhost:8001/api/v1/trading/
+```
+
+### Reinstall
+
+```bash
+# Stop and remove all containers, networks and volumes, then rebuild and start
+docker compose down -v
+docker compose up -d --build
+```
+
+### Uninstall
+
+```bash
+# Stop and remove all containers, networks and volumes
+docker compose down -v
+
+# To also remove all built images
+docker compose down -v --rmi all
 ```
 
 ### Development Mode
@@ -396,7 +414,7 @@ docker compose logs -f trading
 
 | Service | Port | Description |
 |---|---|---|
-| Nginx | 80, 443 | Reverse proxy |
+| Nginx | 8080, 8443 | Reverse proxy |
 | Frontend | 3000 | Web frontend |
 | Analysis API | 8000 | Analysis service |
 | Trading API | 8001 | Trading service |

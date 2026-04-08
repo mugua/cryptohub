@@ -195,9 +195,27 @@ cp .env.example .env
 docker compose up -d
 
 # 访问
-# Web UI:       http://localhost
+# Web UI:       http://localhost:8080
 # Analysis API: http://localhost:8000/docs
 # Trading API:  http://localhost:8001/api/v1/trading/
+```
+
+### 重装项目
+
+```bash
+# 停止并删除所有容器、网络和数据卷，然后重新构建并启动
+docker compose down -v
+docker compose up -d --build
+```
+
+### 卸载项目
+
+```bash
+# 停止并删除所有容器、网络和数据卷
+docker compose down -v
+
+# 如需同时删除所有已构建的镜像
+docker compose down -v --rmi all
 ```
 
 ### 开发模式
@@ -398,7 +416,7 @@ docker compose logs -f trading
 
 | 服务 | 端口 | 说明 |
 |---|---|---|
-| Nginx | 80, 443 | 反向代理 |
+| Nginx | 8080, 8443 | 反向代理 |
 | Frontend | 3000 | Web 前端 |
 | Analysis API | 8000 | 分析服务 |
 | Trading API | 8001 | 交易服务 |

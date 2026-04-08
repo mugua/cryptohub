@@ -53,7 +53,7 @@ docker compose logs -f
 
 | Service | URL | Description |
 |---|---|---|
-| Web UI | `http://localhost` | Via Nginx reverse proxy |
+| Web UI | `http://localhost:8080` | Via Nginx reverse proxy |
 | Analysis API Docs | `http://localhost:8000/docs` | FastAPI auto docs (Swagger) |
 | Trading API | `http://localhost:8001` | Go/Gin service |
 | InfluxDB Admin | `http://localhost:8086` | Time-series DB admin |
