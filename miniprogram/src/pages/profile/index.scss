@@ -1,0 +1,141 @@
+.profile-page {
+  min-height: 100vh;
+  background-color: #0B0E11;
+  padding: 24rpx;
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48rpx 0 32rpx;
+  }
+
+  &__avatar {
+    width: 128rpx;
+    height: 128rpx;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #F0B90B, #F8D33A);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20rpx;
+  }
+
+  &__avatar-text {
+    font-size: 56rpx;
+    font-weight: 700;
+    color: #0B0E11;
+  }
+
+  &__username {
+    font-size: 36rpx;
+    font-weight: 700;
+    color: #EAECEF;
+    margin-bottom: 8rpx;
+  }
+
+  &__email {
+    font-size: 26rpx;
+    color: #848E9C;
+  }
+
+  &__stats-row {
+    display: flex;
+    flex-direction: row;
+    background-color: #1E2329;
+    border-radius: 16rpx;
+    padding: 28rpx 0;
+    margin-bottom: 32rpx;
+  }
+
+  &__stat-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &__stat-value {
+    font-size: 32rpx;
+    font-weight: 700;
+    color: #EAECEF;
+    margin-bottom: 8rpx;
+  }
+
+  &__stat-label {
+    font-size: 22rpx;
+    color: #848E9C;
+  }
+
+  &__stat-divider {
+    width: 1rpx;
+    background-color: #2B3139;
+  }
+
+  &__settings {
+    background-color: #1E2329;
+    border-radius: 16rpx;
+    overflow: hidden;
+    margin-bottom: 32rpx;
+  }
+
+  &__setting-cell {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 28rpx 32rpx;
+    border-bottom: 1rpx solid #2B3139;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  &__setting-left {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  &__setting-icon {
+    font-size: 36rpx;
+    margin-right: 20rpx;
+  }
+
+  &__setting-label {
+    font-size: 30rpx;
+    color: #EAECEF;
+  }
+
+  &__setting-right {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  &__setting-value {
+    font-size: 26rpx;
+    color: #848E9C;
+    margin-right: 12rpx;
+  }
+
+  &__setting-arrow {
+    font-size: 36rpx;
+    color: #474D57;
+  }
+
+  &__logout {
+    background-color: #1E2329;
+    border-radius: 16rpx;
+    padding: 28rpx 0;
+    text-align: center;
+    border: 2rpx solid #F6465D;
+  }
+
+  &__logout-text {
+    font-size: 32rpx;
+    font-weight: 600;
+    color: #F6465D;
+  }
+}

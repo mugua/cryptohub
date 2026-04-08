@@ -1,6 +1,8 @@
 module github.com/cryptohub/trading
 
-go 1.22
+go 1.23
+
+toolchain go1.24.13
 
 require (
 	github.com/gin-gonic/gin v1.10.0

@@ -1,0 +1,43 @@
+.price-card {
+  background-color: #1E2329;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+
+  &__header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 12rpx;
+  }
+
+  &__name {
+    font-size: 30rpx;
+    font-weight: 600;
+    color: #EAECEF;
+    margin-right: 12rpx;
+  }
+
+  &__symbol {
+    font-size: 24rpx;
+    color: #848E9C;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__price {
+    font-size: 36rpx;
+    font-weight: 700;
+    color: #EAECEF;
+  }
+
+  &__change {
+    font-size: 28rpx;
+    font-weight: 600;
+  }
+}

@@ -1,0 +1,97 @@
+.detail-page {
+  min-height: 100vh;
+  background-color: #0B0E11;
+  padding: 24rpx;
+
+  &__header {
+    background-color: #1E2329;
+    border-radius: 16rpx;
+    padding: 32rpx;
+    margin-bottom: 24rpx;
+  }
+
+  &__coin-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 16rpx;
+  }
+
+  &__coin-name {
+    font-size: 36rpx;
+    font-weight: 700;
+    color: #EAECEF;
+    margin-right: 16rpx;
+  }
+
+  &__coin-symbol {
+    font-size: 26rpx;
+    color: #848E9C;
+  }
+
+  &__price-section {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+  }
+
+  &__price {
+    font-size: 48rpx;
+    font-weight: 700;
+    color: #EAECEF;
+    margin-right: 16rpx;
+  }
+
+  &__change {
+    font-size: 28rpx;
+    font-weight: 600;
+  }
+
+  &__score-section {
+    margin-bottom: 24rpx;
+  }
+
+  &__section-title {
+    font-size: 32rpx;
+    font-weight: 600;
+    color: #EAECEF;
+    margin-bottom: 20rpx;
+    display: block;
+  }
+
+  &__factors-section {
+    margin-bottom: 24rpx;
+  }
+
+  &__factors-list {
+    margin-top: 8rpx;
+  }
+
+  &__summary {
+    margin-bottom: 24rpx;
+  }
+
+  &__summary-text {
+    font-size: 28rpx;
+    color: #B7BFC7;
+    line-height: 1.8;
+  }
+
+  &__action {
+    padding: 0 24rpx;
+    margin-bottom: 24rpx;
+  }
+
+  &__generate-btn {
+    background-color: #F0B90B;
+    border-radius: 12rpx;
+    padding: 24rpx 0;
+    text-align: center;
+  }
+
+  &__generate-text {
+    font-size: 32rpx;
+    font-weight: 600;
+    color: #0B0E11;
+  }
+}
