@@ -53,7 +53,7 @@ docker compose logs -f
 
 | 服务 | 地址 | 说明 |
 |---|---|---|
-| Web 界面 | `http://localhost` | 通过 Nginx 反向代理 |
+| Web 界面 | `http://localhost:8080` | 通过 Nginx 反向代理 |
 | 分析 API 文档 | `http://localhost:8000/docs` | FastAPI 自动文档 (Swagger) |
 | 交易 API | `http://localhost:8001` | Go/Gin 服务 |
 | InfluxDB 管理 | `http://localhost:8086` | 时序数据库管理界面 |

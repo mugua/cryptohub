@@ -195,7 +195,7 @@ cp .env.example .env
 docker compose up -d
 
 # 访问
-# Web UI:       http://localhost
+# Web UI:       http://localhost:8080
 # Analysis API: http://localhost:8000/docs
 # Trading API:  http://localhost:8001/api/v1/trading/
 ```
@@ -416,7 +416,7 @@ docker compose logs -f trading
 
 | 服务 | 端口 | 说明 |
 |---|---|---|
-| Nginx | 80, 443 | 反向代理 |
+| Nginx | 8080, 8443 | 反向代理 |
 | Frontend | 3000 | Web 前端 |
 | Analysis API | 8000 | 分析服务 |
 | Trading API | 8001 | 交易服务 |
