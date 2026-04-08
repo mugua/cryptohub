@@ -140,7 +140,7 @@ class TrendEngine:
 
         # Final score calculation
         if weight_boost_sum > 0:
-            final_score = (weighted_sum / weight_boost_sum)
+            final_score = (weighted_sum / weight_boost_sum).quantize(Decimal("0.01"))
         else:
             final_score = Decimal("0")
 

@@ -143,7 +143,10 @@ class TechnicalAnalysisService:
         closes = [candle[4] for candle in ohlcv if len(candle) >= 5]
         volumes = []
 
-        # CoinGecko OHLCV doesn't have volume, so we approximate from price changes
+        # PLACEHOLDER: CoinGecko free-tier OHLC endpoint does not include volume.
+        # In production, replace with actual volume data from exchange APIs or a
+        # paid market-data provider. The price-delta proxy below is only a rough
+        # approximation and should NOT be relied upon for real trading decisions.
         for i in range(len(closes)):
             volumes.append(abs(closes[i] - closes[i - 1]) if i > 0 else 0)
 
