@@ -200,6 +200,24 @@ docker compose up -d
 # Trading API:  http://localhost:8001/api/v1/trading/
 ```
 
+### 重装项目
+
+```bash
+# 停止并删除所有容器、网络和数据卷，然后重新构建并启动
+docker compose down -v
+docker compose up -d --build
+```
+
+### 卸载项目
+
+```bash
+# 停止并删除所有容器、网络和数据卷
+docker compose down -v
+
+# 如需同时删除所有已构建的镜像
+docker compose down -v --rmi all
+```
+
 ### 开发模式
 
 ```bash

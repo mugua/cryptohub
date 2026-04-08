@@ -198,6 +198,24 @@ docker compose up -d
 # Trading API:  http://localhost:8001/api/v1/trading/
 ```
 
+### Reinstall
+
+```bash
+# Stop and remove all containers, networks and volumes, then rebuild and start
+docker compose down -v
+docker compose up -d --build
+```
+
+### Uninstall
+
+```bash
+# Stop and remove all containers, networks and volumes
+docker compose down -v
+
+# To also remove all built images
+docker compose down -v --rmi all
+```
+
 ### Development Mode
 
 ```bash
