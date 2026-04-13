@@ -21,6 +21,7 @@ import csv
 import io
 import logging
 import os
+import threading
 import time
 from typing import Any, Dict, List, Optional
 
@@ -31,12 +32,14 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 _store: List[Dict] = []
 _id_counter = 0
+_id_lock = threading.Lock()
 
 
 def _next_id() -> int:
     global _id_counter
-    _id_counter += 1
-    return _id_counter
+    with _id_lock:
+        _id_counter += 1
+        return _id_counter
 
 
 class AnalysisKnowledgeBase:

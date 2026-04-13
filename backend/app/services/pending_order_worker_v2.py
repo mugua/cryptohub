@@ -63,19 +63,31 @@ def _fetch_pending_orders(conn) -> List[Dict]:
         return [dict(zip(cols, row)) for row in cur.fetchall()]
 
 
+_UPDATE_SQL: dict = {
+    "triggered": (
+        "UPDATE qd_pending_orders "
+        "SET status = %s, triggered_at = NOW(), error_msg = %s, updated_at = NOW() "
+        "WHERE id = %s"
+    ),
+    "filled": (
+        "UPDATE qd_pending_orders "
+        "SET status = %s, filled_at = NOW(), error_msg = %s, updated_at = NOW() "
+        "WHERE id = %s"
+    ),
+    "_default": (
+        "UPDATE qd_pending_orders "
+        "SET status = %s, error_msg = %s, updated_at = NOW() "
+        "WHERE id = %s"
+    ),
+}
+
+
 def _update_order(conn, order_id: int, status: str, error_msg: str = "") -> None:
-    ts_col = "triggered_at" if status == "triggered" else (
-        "filled_at" if status == "filled" else "updated_at"
-    )
+    """Update a pending order row using pre-written parameterised statements
+    (no f-string interpolation into SQL)."""
+    sql = _UPDATE_SQL.get(status, _UPDATE_SQL["_default"])
     with conn.cursor() as cur:
-        cur.execute(
-            f"""
-            UPDATE qd_pending_orders
-            SET status = %s, {ts_col} = NOW(), error_msg = %s, updated_at = NOW()
-            WHERE id = %s
-            """,
-            (status, error_msg, order_id),
-        )
+        cur.execute(sql, (status, error_msg, order_id))
     conn.commit()
 
 

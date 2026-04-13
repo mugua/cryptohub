@@ -36,6 +36,8 @@ _WEIGHTS = {
     "gvz": 0.067,
     "put_call_ratio": 0.066,
 }
+# Weights intentionally do not sum to exactly 1.0 (they sum to 0.999);
+# _compute_overall normalises by total_weight to handle this correctly.
 
 
 # ---------------------------------------------------------------------------

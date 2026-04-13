@@ -70,7 +70,7 @@ def _search_symbols(query: str) -> List[Dict]:
             if q in symbol.lower() or q in name.lower():
                 results.append(
                     {"type": "symbol", "market": market, "symbol": symbol,
-                     "name": name, "_score": _relevance_score(query, symbol + " " + name)}
+                     "name": name, "_score": _relevance_score(query, f"{symbol} {name}")}
                 )
     results.sort(key=lambda x: x.get("_score", 0), reverse=True)
     return results

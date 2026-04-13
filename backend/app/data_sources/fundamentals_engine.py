@@ -210,16 +210,7 @@ class FundamentalsEngine:
         result: Optional[Dict] = None
         if market == "us_stock":
             result = _yfinance_statements(symbol)
-        # CN/HK: Twelve Data only
-        if not result and _TWELVEDATA_KEY:
-            # Twelve Data income-statement endpoint
-            try:
-                import requests
-
-                for endpoint in ("income_statement", "balance_sheet", "cash_flow"):
-                    pass  # Placeholder – full TD parsing omitted for brevity
-            except Exception:
-                pass
+        # CN/HK: Twelve Data statements not yet implemented; return empty dict.
 
         output = result or {}
         set_cached(cache_key, output, ttl=_CACHE_TTL)
