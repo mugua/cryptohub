@@ -1,0 +1,18 @@
+{
+  "errors": {
+    "auth_failed": "认证失败",
+    "invalid_params": "参数错误",
+    "rate_limited": "请求过于频繁，请稍后再试",
+    "not_found": "资源不存在",
+    "server_error": "服务器内部错误"
+  },
+  "ai": {
+    "language_instruction": "请用中文回答。",
+    "analysis_prompt_prefix": "你是一个专业的量化交易分析师。"
+  },
+  "notifications": {
+    "order_triggered": "挂单已触发: {symbol} {side} @ {price}",
+    "order_filled": "挂单已成交: {symbol} {side}",
+    "order_failed": "挂单执行失败: {symbol} - {error}"
+  }
+}

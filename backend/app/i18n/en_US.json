@@ -1,0 +1,18 @@
+{
+  "errors": {
+    "auth_failed": "Authentication failed",
+    "invalid_params": "Invalid parameters",
+    "rate_limited": "Too many requests, please try again later",
+    "not_found": "Resource not found",
+    "server_error": "Internal server error"
+  },
+  "ai": {
+    "language_instruction": "Please respond in English.",
+    "analysis_prompt_prefix": "You are a professional quantitative trading analyst."
+  },
+  "notifications": {
+    "order_triggered": "Order triggered: {symbol} {side} @ {price}",
+    "order_filled": "Order filled: {symbol} {side}",
+    "order_failed": "Order execution failed: {symbol} - {error}"
+  }
+}
